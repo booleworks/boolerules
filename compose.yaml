@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: MIT
+# Copyright 2023 BooleWorks GmbH
+
+# Starts the BooleRules Showcase Frontend together with the BooleRules backend and the required Redis DB
+# Usage: `docker compose up`
+
+name: boolerules
+services:
+  boolerules-frontend:
+    image: ghcr.io/booleworks/boolerules-showcase:0.1
+    ports:
+      - 3000:3000
+  boolerules-backend:
+    image: ghcr.io/booleworks/boolerules:0.1
+    environment:
+      - INSTANCE=compose
+      - PORT=7070
+      - REDIS_URL=http://redis:6379
+      - NUM_THREADS=1
+    ports:
+      - 7070:7070
+    depends_on:
+      redis:
+        condition: service_started
+  redis:
+    image: redis:alpine
+    ports:
+      - 6389:6379
