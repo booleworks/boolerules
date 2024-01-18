@@ -8,10 +8,12 @@ name: boolerules
 services:
   boolerules-frontend:
     image: ghcr.io/booleworks/boolerules-showcase:0.1
+    pull_policy: always
     ports:
       - 3000:3000
   boolerules-backend:
     image: ghcr.io/booleworks/boolerules:0.1
+    pull_policy: always
     environment:
       - INSTANCE=compose
       - PORT=7070
