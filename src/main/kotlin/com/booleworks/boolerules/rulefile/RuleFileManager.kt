@@ -16,6 +16,7 @@ import com.booleworks.prl.model.SlicingEnumPropertyDefinition
 import com.booleworks.prl.model.SlicingIntPropertyDefinition
 import com.booleworks.prl.model.serialize
 import com.booleworks.prl.parser.parseRuleFile
+import org.antlr.v4.runtime.misc.ParseCancellationException
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStreamReader
@@ -26,6 +27,8 @@ import java.util.zip.GZIPOutputStream
 internal fun storeRuleFile(fileName: String, bytes: ByteArray): UploadSummaryDO {
     val prlRuleFile = try {
         parseRuleFile(InputStreamReader(ByteArrayInputStream(bytes)), fileName)
+    } catch (e: ParseCancellationException) {
+        return parseError(fileName, e.toString())
     } catch (e: RuntimeException) {
         return parseError(fileName, "Parse Error ${e.cause}")
     }
@@ -87,7 +90,7 @@ private fun parseError(fileName: String, message: String) = UploadSummaryDO(
     hasIntFeatures = false,
     listOf(),
     setOf(),
-    errors = listOf("Parse Error: $message")
+    errors = listOf(message)
 )
 
 private fun compilerError(fileName: String, compiler: PrlCompiler) = UploadSummaryDO(
