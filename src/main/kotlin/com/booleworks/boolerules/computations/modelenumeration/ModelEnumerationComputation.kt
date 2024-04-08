@@ -16,9 +16,10 @@ import com.booleworks.boolerules.computations.generic.NON_CACHING_USE_FF
 import com.booleworks.boolerules.computations.generic.NON_PT_CONFIG
 import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.boolerules.computations.generic.computeRelevantVars
-import com.booleworks.boolerules.computations.generic.extractModel
+import com.booleworks.boolerules.computations.generic.extractModelWithInt
 import com.booleworks.boolerules.computations.modelenumeration.ModelEnumerationComputation.ModelEnumerationElementResult
 import com.booleworks.boolerules.computations.modelenumeration.ModelEnumerationComputation.ModelEnumerationInternalResult
+import com.booleworks.logicng.csp.encodings.OrderDecoding
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.formulas.Variable
 import com.booleworks.logicng.solvers.MiniSat
@@ -90,7 +91,8 @@ internal object ModelEnumerationComputation : ListComputation<
         addTautologyClauses(solver, relevantVars)
 
         val models = solver.enumerateAllModels(relevantVars).map {
-            extractModel(it.positiveVariables(), info)
+            val integerSatAssignment = OrderDecoding.decode(it.assignment(), info.encodingContext)
+            extractModelWithInt(it.positiveVariables(), integerSatAssignment, info)
         }.toSet()
         return ModelEnumerationInternalResult(slice, models.associateWith { slice }.toMutableMap())
     }

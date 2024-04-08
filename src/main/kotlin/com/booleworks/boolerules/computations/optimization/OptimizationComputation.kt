@@ -16,8 +16,9 @@ import com.booleworks.boolerules.computations.generic.OptimizationType.MIN
 import com.booleworks.boolerules.computations.generic.SingleComputation
 import com.booleworks.boolerules.computations.generic.SingleComputationRunner
 import com.booleworks.boolerules.computations.generic.computationDoc
-import com.booleworks.boolerules.computations.generic.extractModel
+import com.booleworks.boolerules.computations.generic.extractModelWithInt
 import com.booleworks.boolerules.computations.optimization.OptimizationComputation.OptimizationInternalResult
+import com.booleworks.logicng.csp.encodings.OrderDecoding
 import com.booleworks.logicng.formulas.Formula
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.solvers.MaxSATSolver
@@ -29,19 +30,19 @@ import com.booleworks.prl.transpiler.TranslationInfo
 import kotlin.math.absoluteValue
 
 val OPTIMIZATION = object : ComputationType<
-        OptimizationRequest,
-        OptimizationResponse,
-        Int,
-        OptimizationDetail,
-        NoElement> {
+    OptimizationRequest,
+    OptimizationResponse,
+    Int,
+    OptimizationDetail,
+    NoElement> {
     override val path: String = "optimization"
     override val docs: ApiDocs = computationDoc<OptimizationRequest, OptimizationResponse>(
         "Configuration Optimization",
         "Compute a configuration of minimal or maximal weight for a given constraint weighting",
         "Constraints can be given weightings. If the constraint is true, the " +
-                "weighting will be considered, otherwise not. Configurations " +
-                "of minimal and maximal weightings wrt. these weightings " +
-                "can be computed."
+            "weighting will be considered, otherwise not. Configurations " +
+            "of minimal and maximal weightings wrt. these weightings " +
+            "can be computed."
     )
 
     override val request = OptimizationRequest::class.java
@@ -104,13 +105,14 @@ internal object OptimizationComputation :
             val solverModel = solver.model()
             val evaluatedWeights = mapping.filter { (k, _) -> k.evaluate(solverModel) }
             val weight = evaluatedWeights.map { it.value }.sum()
-            val example = extractModel(solverModel.positiveVariables(), info)
+            val intAssignment = OrderDecoding.decode(solverModel, info.encodingContext)
+            val example = extractModelWithInt(solverModel.positiveVariables(), intAssignment, info)
             val usedWeights = evaluatedWeights.map { WeightPair(constraintMap[it.key]!!, it.value) }
             OptimizationInternalResult(slice, request.computationType, weight, example, usedWeights)
         } else {
             status.addWarning(
                 "Rule set for the slice $slice is inconsistent. Use the 'consistency' " +
-                        "check to get an explanation, why."
+                    "check to get an explanation, why."
             )
             OptimizationInternalResult(slice, request.computationType, -1, null, listOf())
         }

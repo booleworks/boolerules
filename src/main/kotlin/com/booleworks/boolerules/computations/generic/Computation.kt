@@ -4,6 +4,7 @@
 package com.booleworks.boolerules.computations.generic
 
 import com.booleworks.boolerules.config.ComputationConfig
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.datastructures.Tristate
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.formulas.FormulaFactoryConfig
@@ -121,8 +122,9 @@ sealed class Computation<
         status: ComputationStatusBuilder
     ): Map<Slice, INTRES> {
         val factory: FormulaFactory = FormulaFactory.caching()
+        val cspFactory = CspFactory(factory)
         request.validateAndAugmentSliceSelection(model, allowedSliceTypes())
-        val modelTranslation = transpileModel(factory, model, request.modelSliceSelection())
+        val modelTranslation = transpileModel(cspFactory, model, request.modelSliceSelection())
         status.numberOfSlices = modelTranslation.allSlices.size
         status.sliceSets = computeProjectedSliceSets(modelTranslation.computations, request)
         val slice2Translation = modelTranslation.sliceMap()
@@ -137,7 +139,7 @@ sealed class Computation<
             splitComputations.forEach { splitSlice ->
                 execute(
                     request,
-                    factory,
+                    cspFactory,
                     model,
                     modelTranslation,
                     splitSlice,
@@ -156,7 +158,7 @@ sealed class Computation<
                         launch(dispatcher) {
                             execute(
                                 request,
-                                ffProvider(),
+                                CspFactory(ffProvider()),
                                 model,
                                 modelTranslation,
                                 splitSlice,
@@ -184,7 +186,7 @@ sealed class Computation<
 
     private fun execute(
         request: REQUEST,
-        f: FormulaFactory,
+        cf: CspFactory,
         model: PrlModel,
         modelTranslation: ModelTranslation,
         splitSlice: Slice,
@@ -200,7 +202,7 @@ sealed class Computation<
             if (sliceTranslations.size == 1) {
                 val sliceTranslation = sliceTranslations[0]
                 if (anySlice in slicesToCompute) {
-                    val result = computeForSlice(request, anySlice, sliceTranslation.info, model, f, status)
+                    val result = computeForSlice(request, anySlice, sliceTranslation.info, model, cf.formulaFactory, status)
                     numExecs.incrementAndGet()
                     val newResult = mergeInternalResult(sliceResults[splitSlice], result)
                     sliceResults[splitSlice] = newResult
@@ -211,8 +213,8 @@ sealed class Computation<
 //                    }
                 }
             } else {
-                val merged = mergeSlices(f, sliceTranslations)
-                val result = computeForSlice(request, anySlice, merged.info, model, f, status)
+                val merged = mergeSlices(cf.formulaFactory, sliceTranslations)
+                val result = computeForSlice(request, anySlice, merged.info, model, cf.formulaFactory, status)
                 numExecs.incrementAndGet()
                 val newResult = mergeInternalResult(sliceResults[splitSlice], result)
                 sliceResults[splitSlice] = newResult
@@ -285,10 +287,9 @@ sealed class Computation<
 
     internal fun processConstraint(
         f: FormulaFactory,
-        constraint:
-        String, model:
-        PrlModel, info:
-        TranslationInfo,
+        constraint: String,
+        model: PrlModel,
+        info: TranslationInfo,
         status: ComputationStatusBuilder
     ): PrlProposition? {
         val parsed = parseConstraint<PrlConstraint>(constraint)
@@ -357,7 +358,8 @@ abstract class SingleComputation<
         splitProperties: Set<String>
     ): SplitComputationDetail<DETAIL> {
         val f = FormulaFactory.caching()
-        val modelTranslation = transpileModel(f, model, sliceSelection)
+        val cf = CspFactory(f)
+        val modelTranslation = transpileModel(cf, model, sliceSelection)
         assert(modelTranslation.computations.size == 1) { "Expected to get exactly one slice" }
         val slice = modelTranslation.allSlices.first()
         val translation = modelTranslation.computations.first().info

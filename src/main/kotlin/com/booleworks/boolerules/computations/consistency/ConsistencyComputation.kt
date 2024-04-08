@@ -19,7 +19,8 @@ import com.booleworks.boolerules.computations.generic.SingleComputationRunner
 import com.booleworks.boolerules.computations.generic.SplitComputationDetail
 import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.boolerules.computations.generic.computeExplanation
-import com.booleworks.boolerules.computations.generic.extractModel
+import com.booleworks.boolerules.computations.generic.extractModelWithInt
+import com.booleworks.logicng.csp.encodings.OrderDecoding
 import com.booleworks.logicng.datastructures.Tristate
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.solvers.MiniSat
@@ -36,11 +37,11 @@ val CONSISTENCY = object : ComputationType<
         NoElement> {
     override val path = "consistency"
     override val docs: ApiDocs = computationDoc<ConsistencyRequest, ConsistencyResponse>(
-        "Consistency",
-        "Compute the consistency of a rule file",
-        "A rule set is consistent if it has at least one solution satisfying " +
-                "all rules. If it is inconsistent, an optional explanation " +
-                "can be computed."
+            "Consistency",
+            "Compute the consistency of a rule file",
+            "A rule set is consistent if it has at least one solution satisfying " +
+                    "all rules. If it is inconsistent, an optional explanation " +
+                    "can be computed."
     )
 
     override val request = ConsistencyRequest::class.java
@@ -53,52 +54,53 @@ val CONSISTENCY = object : ComputationType<
 }
 
 internal object ConsistencyComputation :
-    SingleComputation<ConsistencyRequest, Boolean, ConsistencyDetail, ConsistencyInternalResult>(NON_CACHING_USE_FF) {
+        SingleComputation<ConsistencyRequest, Boolean, ConsistencyDetail, ConsistencyInternalResult>(NON_CACHING_USE_FF) {
 
     override fun mergeInternalResult(
-        existingResult: ConsistencyInternalResult?,
-        newResult: ConsistencyInternalResult
+            existingResult: ConsistencyInternalResult?,
+            newResult: ConsistencyInternalResult
     ) =
-        if (existingResult == null || !existingResult.consistent) {
-            newResult
-        } else {
-            existingResult
-        }
+            if (existingResult == null || !existingResult.consistent) {
+                newResult
+            } else {
+                existingResult
+            }
 
     override fun computeForSlice(
-        request: ConsistencyRequest,
-        slice: Slice,
-        info: TranslationInfo,
-        model: PrlModel,
-        f: FormulaFactory,
-        status: ComputationStatusBuilder,
+            request: ConsistencyRequest,
+            slice: Slice,
+            info: TranslationInfo,
+            model: PrlModel,
+            f: FormulaFactory,
+            status: ComputationStatusBuilder,
     ): ConsistencyInternalResult {
         val solver = prepareSolver(f, request.computeAllDetails, info, request.additionalConstraints, model, status)
         if (!status.successful()) return ConsistencyInternalResult(slice, false, null, null)
         return if (solver.sat() == Tristate.TRUE) {
-            val example = extractModel(solver.model(info.knownVariables).positiveVariables(), info)
+            val integerSatAssignment = OrderDecoding.decode(solver.model(info.encodingContext.relevantSatVariables), info.encodingContext)
+            val example = extractModelWithInt(solver.model(info.knownVariables).positiveVariables(), integerSatAssignment, info)
             ConsistencyInternalResult(slice, true, example, null)
         } else {
             //TODO beautify explanation
             ConsistencyInternalResult(
-                slice,
-                false,
-                null,
-                if (request.computeAllDetails) computeExplanation(
-                    solver,
-                    model.propertyStore.allDefinitions()
-                ) else null
+                    slice,
+                    false,
+                    null,
+                    if (request.computeAllDetails) computeExplanation(
+                            solver,
+                            model.propertyStore.allDefinitions()
+                    ) else null
             )
         }
     }
 
     override fun computeDetailForSlice(
-        slice: Slice,
-        model: PrlModel,
-        info: TranslationInfo,
-        additionalConstraints: List<String>,
-        splitProperties: Set<String>,
-        f: FormulaFactory
+            slice: Slice,
+            model: PrlModel,
+            info: TranslationInfo,
+            additionalConstraints: List<String>,
+            splitProperties: Set<String>,
+            f: FormulaFactory
     ): SplitComputationDetail<ConsistencyDetail> {
         val solver = prepareSolver(f, true, info, additionalConstraints, model, ComputationStatus("", "", SINGLE))
         val sat = solver.sat()
@@ -109,21 +111,21 @@ internal object ConsistencyComputation :
     }
 
     private fun prepareSolver(
-        f: FormulaFactory,
-        proofTracing: Boolean,
-        info: TranslationInfo,
-        additionalConstraints: List<String>,
-        model: PrlModel,
-        status: ComputationStatusBuilder
+            f: FormulaFactory,
+            proofTracing: Boolean,
+            info: TranslationInfo,
+            additionalConstraints: List<String>,
+            model: PrlModel,
+            status: ComputationStatusBuilder
     ): MiniSat {
         val solver = MiniSat.miniSat(f, MiniSatConfig.builder().proofGeneration(proofTracing).build()).apply {
             addPropositions(info.propositions)
         }
         if (solver.sat() == Tristate.TRUE) {
             val additionalFormulas =
-                additionalConstraints.mapNotNull { constraint ->
-                    processConstraint(f, constraint, model, info, status)
-                }
+                    additionalConstraints.mapNotNull { constraint ->
+                        processConstraint(f, constraint, model, info, status)
+                    }
             if (!status.successful()) return solver
             solver.addPropositions(additionalFormulas)
 
@@ -132,12 +134,12 @@ internal object ConsistencyComputation :
     }
 
     data class ConsistencyInternalResult(
-        override val slice: Slice,
-        val consistent: Boolean,
-        val example: FeatureModelDO?,
-        val explanation: List<RuleDO>?
+            override val slice: Slice,
+            val consistent: Boolean,
+            val example: FeatureModelDO?,
+            val explanation: List<RuleDO>?
     ) :
-        InternalResult<Boolean, ConsistencyDetail>(slice) {
+            InternalResult<Boolean, ConsistencyDetail>(slice) {
         override fun extractMainResult() = consistent
         override fun extractDetails() = ConsistencyDetail(example, explanation)
     }

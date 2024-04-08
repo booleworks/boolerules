@@ -11,6 +11,7 @@ import com.booleworks.boolerules.computations.generic.PropertySelectionDO
 import com.booleworks.boolerules.computations.generic.SliceTypeDO
 import com.booleworks.boolerules.rulefile.PropertyRangeDO
 import com.booleworks.boolerules.rulefile.PropertyTypeDO
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.prl.compiler.PrlCompiler
 import com.booleworks.prl.model.slices.Slice
@@ -29,7 +30,8 @@ internal class ModelEnumerationTest : TestWithConfig() {
     @Test
     fun testComputeForSlice() {
         val f = FormulaFactory.nonCaching()
-        val modelTranslation = transpileModel(f, model, listOf())
+        val cf = CspFactory(f)
+        val modelTranslation = transpileModel(cf, model, listOf())
 
         val request = ModelEnumerationRequest("any", mutableListOf(), listOf(), listOf())
         val info1 = modelTranslation[0].info
@@ -84,7 +86,8 @@ internal class ModelEnumerationTest : TestWithConfig() {
     fun testComputeForSliceWithAdditionalConstraints(tc: TestConfig) {
         setUp(tc)
         val f = FormulaFactory.nonCaching()
-        val modelTranslation = transpileModel(f, model, listOf())
+        val cf = CspFactory(f)
+        val modelTranslation = transpileModel(cf, model, listOf())
 
         val request = ModelEnumerationRequest("any", mutableListOf(), listOf("[c = \"c1\"]"), listOf())
         val info1 = modelTranslation[0].info

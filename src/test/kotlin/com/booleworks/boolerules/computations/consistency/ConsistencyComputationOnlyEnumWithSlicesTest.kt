@@ -12,6 +12,7 @@ import com.booleworks.boolerules.computations.generic.toDO
 import com.booleworks.boolerules.rulefile.PropertyRangeDO
 import com.booleworks.boolerules.rulefile.PropertyTypeDO
 import com.booleworks.boolerules.rulefile.SlicingPropertyDO
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.prl.compiler.PrlCompiler
 import com.booleworks.prl.model.EnumProperty
@@ -41,7 +42,8 @@ internal class ConsistencyComputationOnlyEnumWithSlicesTest : TestWithConfig() {
     @Test
     fun testComputeForSliceWithoutExplanation() {
         val f = FormulaFactory.nonCaching()
-        val modelTranslation = transpileModel(f, model, listOf())
+        val cf = CspFactory(f)
+        val modelTranslation = transpileModel(cf, model, listOf())
 
         val request = ConsistencyRequest("any", mutableListOf(), listOf())
         val info = modelTranslation[0].info
@@ -77,7 +79,8 @@ internal class ConsistencyComputationOnlyEnumWithSlicesTest : TestWithConfig() {
     @Test
     fun testComputeForSliceWithExplanation() {
         val f = FormulaFactory.nonCaching()
-        val modelTranslation = transpileModel(f, model, listOf())
+        val cf = CspFactory(f)
+        val modelTranslation = transpileModel(cf, model, listOf())
 
         val request = ConsistencyRequest("any", mutableListOf(), listOf(), true)
         val info = modelTranslation[0].info

@@ -65,7 +65,7 @@ internal object ModelCountComputation :
     ): ModelCountInternalResult {
         // currently no projected model counting
 //        val variables = computeRelevantVars(f, info, listOf())
-        val variables = info.knownVariables.toSortedSet()
+        val variables = (info.knownVariables + info.intPredicateMapping.values.map { it.first } + info.encodingContext.relevantSatVariables).toSortedSet()
         val formulas = info.propositions.map { it.formula() }
         val additionalConstraints =
             request.additionalConstraints.map { constraint -> processConstraint(f, constraint, model, info, status) }

@@ -12,12 +12,15 @@ import java.util.TreeSet
 fun computeRelevantVars(
     f: FormulaFactory,
     info: TranslationInfo,
-    features: List<String>
+    features: List<String>,
 ): SortedSet<Variable> =
     if (features.isEmpty()) {
-        info.knownVariables.toSortedSet()
+        (info.knownVariables + info.encodingContext.relevantSatVariables).toSortedSet()
     } else {
         val vars = TreeSet<Variable>()
+        info.integerVariables
+            .filter { features.contains(it.name) }
+            .forEach { vars.addAll(info.encodingContext.variableMap[it]?.values.orEmpty()) }
         features.forEach {
             val v = f.variable(it)
             if (v in info.booleanVariables) {

@@ -3,6 +3,7 @@ package com.booleworks.boolerules.computations.modelcount
 import com.booleworks.boolerules.TestWithConfig
 import com.booleworks.boolerules.computations.generic.ComputationStatusBuilder
 import com.booleworks.boolerules.computations.generic.ComputationVariant.SINGLE
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.prl.compiler.PrlCompiler
 import com.booleworks.prl.model.slices.Slice
@@ -20,7 +21,8 @@ internal class ModelCountTest : TestWithConfig() {
     @Test
     fun testComputeForSlice() {
         val f = FormulaFactory.nonCaching()
-        val modelTranslation = transpileModel(f, model, listOf())
+        val cf = CspFactory(f)
+        val modelTranslation = transpileModel(cf, model, listOf())
 
         val request = ModelCountRequest("any", mutableListOf(), listOf())
         val info1 = modelTranslation[0].info
@@ -42,7 +44,8 @@ internal class ModelCountTest : TestWithConfig() {
     @Test
     fun testComputeForSliceWithAdditionalConstraints() {
         val f = FormulaFactory.nonCaching()
-        val modelTranslation = transpileModel(f, model, listOf())
+        val cf = CspFactory(f)
+        val modelTranslation = transpileModel(cf, model, listOf())
 
         val request = ModelCountRequest("any", mutableListOf(), listOf("[c = \"c1\"]"))
         val info1 = modelTranslation[0].info
