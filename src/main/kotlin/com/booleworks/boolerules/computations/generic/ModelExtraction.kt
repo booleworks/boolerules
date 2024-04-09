@@ -28,6 +28,7 @@ data class FeatureModelDO(
                 } else {
                     "-${it.code}"
                 }
+
             FeatureTypeDO.VERSIONED_BOOLEAN -> "${it.code}=${it.version}"
             FeatureTypeDO.ENUM -> "${it.code}=${it.enumValue}"
             FeatureTypeDO.INT -> "${it.code}=${it.intValue}"

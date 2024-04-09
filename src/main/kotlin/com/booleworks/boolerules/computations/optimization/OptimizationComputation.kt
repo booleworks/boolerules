@@ -80,32 +80,42 @@ internal object OptimizationComputation :
         val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, request, f, model, info, status)
         val mapping = mutableMapOf<Formula, Int>()
         val constraintMap = mutableMapOf<Formula, String>()
-        request.weightings.forEach { wp ->
-            val constraint = processConstraint(f, wp.constraint, model, info, status)
-            if (constraint == null) {
+        val additionalDefinitions = request.weightings.mapNotNull { wp ->
+            val p = processConstraint(f, wp.constraint, model, info, status)
+            if (p == null) {
                 status.addError("Could not process constraint ${wp.constraint}")
+                null
             } else {
-                val formula =
-                    if (request.computationType == MIN && wp.weight >= 0 ||
-                        request.computationType == MAX && wp.weight < 0
-                    ) {
-                        constraint.formula().negate(f)
-                    } else {
-                        constraint.formula()
-                    }
-                mapping[constraint.formula()] = wp.weight
-                constraintMap[constraint.formula()] = wp.constraint
-                val weight = wp.weight.absoluteValue
-                solver.addSoftFormula(formula, weight)
+                Pair(Pair(p.first, wp), p.second)
             }
         }
-        return if (!status.successful()) {
-            OptimizationInternalResult(slice, request.computationType, -1, null, listOf())
-        } else if (solver.solve() == OPTIMUM) {
+
+        if (!status.successful()) {
+            return OptimizationInternalResult(slice, request.computationType, -1, null, listOf())
+        }
+        additionalDefinitions.map { it.first }.forEach { (constraint, wp) ->
+            val formula =
+                if (request.computationType == MIN && wp.weight >= 0 ||
+                    request.computationType == MAX && wp.weight < 0
+                ) {
+                    constraint.formula().negate(f)
+                } else {
+                    constraint.formula()
+                }
+            mapping[constraint.formula()] = wp.weight
+            constraintMap[constraint.formula()] = wp.constraint
+            val weight = wp.weight.absoluteValue
+            solver.addSoftFormula(formula, weight)
+        }
+        additionalDefinitions.flatMap { it.second }.toSet().forEach { v ->
+            solver.addHardFormula(info.intVarDefinitions[v]!!)
+        }
+
+        return if (solver.solve() == OPTIMUM) {
             val solverModel = solver.model()
             val evaluatedWeights = mapping.filter { (k, _) -> k.evaluate(solverModel) }
             val weight = evaluatedWeights.map { it.value }.sum()
-            val intAssignment = OrderDecoding.decode(solverModel, info.encodingContext)
+            val intAssignment = OrderDecoding.decode(solverModel, info.integerVariables, info.encodingContext)
             val example = extractModelWithInt(solverModel.positiveVariables(), intAssignment, info)
             val usedWeights = evaluatedWeights.map { WeightPair(constraintMap[it.key]!!, it.value) }
             OptimizationInternalResult(slice, request.computationType, weight, example, usedWeights)

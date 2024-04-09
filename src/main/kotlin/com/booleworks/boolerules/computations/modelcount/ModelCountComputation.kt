@@ -23,11 +23,11 @@ import com.booleworks.prl.transpiler.TranslationInfo
 import java.math.BigInteger
 
 val MODELCOUNT = object : ComputationType<
-        ModelCountRequest,
-        ModelCountResponse,
-        BigInteger,
-        NoComputationDetail,
-        NoElement> {
+    ModelCountRequest,
+    ModelCountResponse,
+    BigInteger,
+    NoComputationDetail,
+    NoElement> {
     override val path: String = "modelcount"
     override val docs: ApiDocs = computationDoc<ModelCountRequest, ModelCountResponse>(
         "Configuration Counting",
@@ -67,14 +67,16 @@ internal object ModelCountComputation :
 //        val variables = computeRelevantVars(f, info, listOf())
         val variables = (info.knownVariables + info.intPredicateMapping.values.map { it.first } + info.encodingContext.relevantSatVariables).toSortedSet()
         val formulas = info.propositions.map { it.formula() }
-        val additionalConstraints =
+        val additionalDefinitions =
             request.additionalConstraints.map { constraint -> processConstraint(f, constraint, model, info, status) }
+        val additionalConstraints = additionalDefinitions.map { it!!.first.formula() }
+        val additionalVarDefinitions = additionalDefinitions.flatMap { it!!.second }.toSet().map { info.intVarDefinitions[it]!! }
         if (!status.successful()) {
             return ModelCountInternalResult(slice, BigInteger.ZERO)
         }
         return ModelCountInternalResult(
             slice,
-            ModelCounter.count(f, formulas + additionalConstraints.map { it!!.formula() }, variables)
+            ModelCounter.count(f, formulas + additionalConstraints + additionalVarDefinitions, variables)
         )
     }
 

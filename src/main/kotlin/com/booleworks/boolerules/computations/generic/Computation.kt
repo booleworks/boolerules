@@ -5,6 +5,7 @@ package com.booleworks.boolerules.computations.generic
 
 import com.booleworks.boolerules.config.ComputationConfig
 import com.booleworks.logicng.csp.CspFactory
+import com.booleworks.logicng.csp.terms.IntegerVariable
 import com.booleworks.logicng.datastructures.Tristate
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.formulas.FormulaFactoryConfig
@@ -18,6 +19,7 @@ import com.booleworks.prl.compiler.ConstraintCompiler
 import com.booleworks.prl.compiler.FeatureStore
 import com.booleworks.prl.model.AnyFeatureDef
 import com.booleworks.prl.model.FeatureDefinition
+import com.booleworks.prl.model.IntFeatureDefinition
 import com.booleworks.prl.model.Module.Companion.MODULE_SEPARATOR
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.AnySliceSelection
@@ -28,6 +30,7 @@ import com.booleworks.prl.parser.parseConstraint
 import com.booleworks.prl.transpiler.ModelTranslation
 import com.booleworks.prl.transpiler.PrlProposition
 import com.booleworks.prl.transpiler.RuleInformation
+import com.booleworks.prl.transpiler.RuleType
 import com.booleworks.prl.transpiler.SliceTranslation
 import com.booleworks.prl.transpiler.TranslationInfo
 import com.booleworks.prl.transpiler.mergeSlices
@@ -66,10 +69,10 @@ val NON_PT_CONFIG: MiniSatConfig = MiniSatConfig.builder().proofGeneration(false
  * @param INTRES the type of the internal result
  */
 sealed class Computation<
-        REQUEST : ComputationRequest,
-        MAIN,
-        DETAIL : ComputationDetail,
-        INTRES : InternalResult<MAIN, DETAIL>>(
+    REQUEST : ComputationRequest,
+    MAIN,
+    DETAIL : ComputationDetail,
+    INTRES : InternalResult<MAIN, DETAIL>>(
     open val ffProvider: () -> FormulaFactory
 ) {
     internal val logger: Logger = LoggerFactory.getLogger(this::class.java)
@@ -236,7 +239,7 @@ sealed class Computation<
         if (solver.sat() == Tristate.FALSE) {
             status.addWarning(
                 "Original rule set for the slice $slice is inconsistent. " +
-                        "Use the 'consistency' check to get an explanation, why."
+                    "Use the 'consistency' check to get an explanation, why."
             )
             return solver
         }
@@ -250,11 +253,16 @@ sealed class Computation<
             )
         }
         if (status.successful()) {
-            solver.addPropositions(additionalFormulas)
+            solver.addPropositions(additionalFormulas.map { it.first })
+            solver.addPropositions(additionalFormulas
+                .flatMap { it.second }
+                .toSet()
+                .map { PrlProposition(RuleInformation(RuleType.INTEGER_VARIABLE), info.intVarDefinitions[it]!!) }
+            )
             if (solver.sat() == Tristate.FALSE) {
                 status.addWarning(
                     "The additional constraints turned the rule set for for the slice $slice inconsistent. " +
-                            "Use the 'consistency' check to get an explanation, why."
+                        "Use the 'consistency' check to get an explanation, why."
                 )
             }
         }
@@ -281,7 +289,10 @@ sealed class Computation<
                 status
             )
         }
-        if (status.successful()) additionalFormulas.forEach { solver.addHardFormula(it.formula()) }
+        if (status.successful()) {
+            additionalFormulas.forEach { solver.addHardFormula(it.first.formula()) }
+            additionalFormulas.flatMap { it.second }.toSet().forEach { solver.addHardFormula(info.intVarDefinitions[it]!!) }
+        }
         return solver
     }
 
@@ -291,12 +302,22 @@ sealed class Computation<
         model: PrlModel,
         info: TranslationInfo,
         status: ComputationStatusBuilder
-    ): PrlProposition? {
+    ): Pair<PrlProposition, Set<IntegerVariable>>? {
         val parsed = parseConstraint<PrlConstraint>(constraint)
         val featureMap = createFeatureMap(parsed, model.featureStore, status) ?: return null
         val compiled = ConstraintCompiler().compileConstraint(parsed, featureMap)
         val formula = transpileConstraint(f, compiled, info)
-        return PrlProposition(RuleInformation.fromAdditionRestriction(compiled), formula)
+        val intVarDefs = featureMap.values
+            .filterIsInstance<IntFeatureDefinition>()
+            .map { def ->
+                info.intVarDefinitions.keys.find { v -> def.feature.fullName == v.name } ?: run {
+                    status.addError("Feature is not defined in current rule files")
+                    return null
+                }
+            }
+            .filter { !info.integerVariables.contains(it) }
+            .toSet()
+        return Pair(PrlProposition(RuleInformation.fromAdditionRestriction(compiled), formula), intVarDefs)
     }
 
     private fun createFeatureMap(
@@ -333,10 +354,10 @@ sealed class Computation<
 }
 
 abstract class SingleComputation<
-        REQUEST : ComputationRequest,
-        MAIN,
-        DETAIL : ComputationDetail,
-        INTRES : InternalResult<MAIN, DETAIL>>(
+    REQUEST : ComputationRequest,
+    MAIN,
+    DETAIL : ComputationDetail,
+    INTRES : InternalResult<MAIN, DETAIL>>(
     override val ffProvider: () -> FormulaFactory,
 ) : Computation<REQUEST, MAIN, DETAIL, INTRES>(ffProvider) {
 
@@ -378,15 +399,15 @@ abstract class SingleComputation<
 }
 
 abstract class ListComputation<
-        REQUEST : ComputationRequest,
-        MAIN,
-        DETAIL : ComputationDetail,
-        ELEMMAIN : Comparable<ELEMMAIN>,
-        ELEMDETAIL : ComputationDetail,
-        INTRES : InternalResult<MAIN, DETAIL>,
-        ELEMRES : InternalResult<ELEMMAIN, ELEMDETAIL>,
-        ELEMENT : Comparable<ELEMENT>,
-        >(
+    REQUEST : ComputationRequest,
+    MAIN,
+    DETAIL : ComputationDetail,
+    ELEMMAIN : Comparable<ELEMMAIN>,
+    ELEMDETAIL : ComputationDetail,
+    INTRES : InternalResult<MAIN, DETAIL>,
+    ELEMRES : InternalResult<ELEMMAIN, ELEMDETAIL>,
+    ELEMENT : Comparable<ELEMENT>,
+    >(
     override val ffProvider: () -> FormulaFactory
 ) : Computation<REQUEST, MAIN, DETAIL, INTRES>(ffProvider) {
 
@@ -406,7 +427,7 @@ abstract class ListComputation<
      * model and merges the slice results afterward.
      */
     internal fun computeResponse(request: REQUEST, model: PrlModel, status: ComputationStatusBuilder):
-            Map<ComputationElement<ELEMENT>, MergeResult<ELEMMAIN, ELEMDETAIL>> {
+        Map<ComputationElement<ELEMENT>, MergeResult<ELEMMAIN, ELEMDETAIL>> {
         val computationResult = computeForModel(request, model, status)
         val allElements = computationResult.values.flatMap { extractElements(it) }.toSet()
         val elementMap = allElements.associateWith { resultMapForElement(it, computationResult) }.toSortedMap()
