@@ -65,12 +65,12 @@ internal object ModelCountComputation :
     ): ModelCountInternalResult {
         // currently no projected model counting
 //        val variables = computeRelevantVars(f, info, listOf())
-        val variables = (info.knownVariables + info.intPredicateMapping.values.map { it.first } + info.encodingContext.relevantSatVariables).toSortedSet()
+        val variables = (info.knownVariables + info.intPredicateMapping.values + info.encodingContext.relevantSatVariables).toSortedSet()
         val formulas = info.propositions.map { it.formula() }
         val additionalDefinitions =
             request.additionalConstraints.map { constraint -> processConstraint(f, constraint, model, info, status) }
         val additionalConstraints = additionalDefinitions.map { it!!.first.formula() }
-        val additionalVarDefinitions = additionalDefinitions.flatMap { it!!.second }.toSet().map { info.intVarDefinitions[it]!! }
+        val additionalVarDefinitions = additionalDefinitions.flatMap { it!!.second }.toSet().map { info.integerEncodings.getEncoding(it)!! }
         if (!status.successful()) {
             return ModelCountInternalResult(slice, BigInteger.ZERO)
         }

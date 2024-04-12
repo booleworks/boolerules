@@ -108,14 +108,14 @@ internal object OptimizationComputation :
             solver.addSoftFormula(formula, weight)
         }
         additionalDefinitions.flatMap { it.second }.toSet().forEach { v ->
-            solver.addHardFormula(info.intVarDefinitions[v]!!)
+            solver.addHardFormula(info.integerEncodings.getEncoding(v)!!)
         }
 
         return if (solver.solve() == OPTIMUM) {
             val solverModel = solver.model()
             val evaluatedWeights = mapping.filter { (k, _) -> k.evaluate(solverModel) }
             val weight = evaluatedWeights.map { it.value }.sum()
-            val intAssignment = OrderDecoding.decode(solverModel, info.integerVariables, info.encodingContext)
+            val intAssignment = OrderDecoding.decode(solverModel, info.integerVariables.map { it.variable }, info.encodingContext)
             val example = extractModelWithInt(solverModel.positiveVariables(), intAssignment, info)
             val usedWeights = evaluatedWeights.map { WeightPair(constraintMap[it.key]!!, it.value) }
             OptimizationInternalResult(slice, request.computationType, weight, example, usedWeights)

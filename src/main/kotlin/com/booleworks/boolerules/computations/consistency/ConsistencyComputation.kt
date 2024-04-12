@@ -27,6 +27,7 @@ import com.booleworks.logicng.solvers.MiniSat
 import com.booleworks.logicng.solvers.sat.MiniSatConfig
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
+import com.booleworks.prl.transpiler.LngIntVariable
 import com.booleworks.prl.transpiler.PrlProposition
 import com.booleworks.prl.transpiler.RuleInformation
 import com.booleworks.prl.transpiler.RuleType
@@ -80,7 +81,8 @@ internal object ConsistencyComputation :
         val solver = prepareSolver(f, request.computeAllDetails, info, request.additionalConstraints, model, status)
         if (!status.successful()) return ConsistencyInternalResult(slice, false, null, null)
         return if (solver.sat() == Tristate.TRUE) {
-            val integerSatAssignment = OrderDecoding.decode(solver.model(info.encodingContext.relevantSatVariables), info.integerVariables, info.encodingContext)
+            val integerSatAssignment =
+                OrderDecoding.decode(solver.model(info.encodingContext.relevantSatVariables), info.integerVariables.map(LngIntVariable::variable), info.encodingContext)
             val example = extractModelWithInt(solver.model(info.knownVariables).positiveVariables(), integerSatAssignment, info)
             ConsistencyInternalResult(slice, true, example, null)
         } else {
@@ -134,7 +136,7 @@ internal object ConsistencyComputation :
             solver.addPropositions(additionalFormulas
                 .flatMap { it.second }
                 .toSet()
-                .map { PrlProposition(RuleInformation(RuleType.INTEGER_VARIABLE), info.intVarDefinitions[it]!!) }
+                .map { PrlProposition(RuleInformation(RuleType.INTEGER_VARIABLE), info.integerEncodings.getEncoding(it)!!) }
             )
         }
         return solver

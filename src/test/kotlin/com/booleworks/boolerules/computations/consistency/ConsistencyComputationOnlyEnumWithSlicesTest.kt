@@ -47,7 +47,7 @@ internal class ConsistencyComputationOnlyEnumWithSlicesTest : TestWithConfig() {
 
         val request = ConsistencyRequest("any", mutableListOf(), listOf())
         val info = modelTranslation[0].info
-        val mergedInfo = mergeSlices(f, modelTranslation.computations).info
+        val mergedInfo = mergeSlices(cf, modelTranslation.computations).info
         val resultTrue = cut.computeForSlice(
             request,
             Slice.empty(),
@@ -84,7 +84,7 @@ internal class ConsistencyComputationOnlyEnumWithSlicesTest : TestWithConfig() {
 
         val request = ConsistencyRequest("any", mutableListOf(), listOf(), true)
         val info = modelTranslation[0].info
-        val mergedInfo = mergeSlices(f, modelTranslation.computations).info
+        val mergedInfo = mergeSlices(cf, modelTranslation.computations).info
         val resultTrue = cut.computeForSlice(
             request,
             Slice.empty(),

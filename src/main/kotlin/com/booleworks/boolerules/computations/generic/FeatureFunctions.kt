@@ -19,8 +19,8 @@ fun computeRelevantVars(
     } else {
         val vars = TreeSet<Variable>()
         info.integerVariables
-            .filter { features.contains(it.name) }
-            .forEach { vars.addAll(info.encodingContext.variableMap[it]?.values.orEmpty()) }
+            .filter { features.contains(it.feature) }
+            .forEach { vars.addAll(info.encodingContext.variableMap[it.variable]?.values.orEmpty()) }
         features.forEach {
             val v = f.variable(it)
             if (v in info.booleanVariables) {

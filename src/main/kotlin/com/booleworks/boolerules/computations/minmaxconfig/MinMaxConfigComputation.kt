@@ -78,10 +78,8 @@ internal object MinMaxConfigComputation :
         val relevantIntVars = if (request.features.isEmpty()) {
             info.integerVariables
         } else {
-            info.integerVariables.filter { request.features.contains(it.name) }
-        }
-        println(relevantIntVars)
-        println(request.features)
+            info.integerVariables.filter { request.features.contains(it.feature) }
+        }.map { it.variable }
         val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::incWBO, request, f, model, info, status)
         relevantVars.forEach { solver.addSoftFormula(f.literal(it.name(), request.computationType == MAX), 1) }
         return if (solver.solve() == OPTIMUM) {

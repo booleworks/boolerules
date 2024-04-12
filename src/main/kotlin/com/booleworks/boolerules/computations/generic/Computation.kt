@@ -5,7 +5,6 @@ package com.booleworks.boolerules.computations.generic
 
 import com.booleworks.boolerules.config.ComputationConfig
 import com.booleworks.logicng.csp.CspFactory
-import com.booleworks.logicng.csp.terms.IntegerVariable
 import com.booleworks.logicng.datastructures.Tristate
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.formulas.FormulaFactoryConfig
@@ -27,6 +26,7 @@ import com.booleworks.prl.model.slices.Slice
 import com.booleworks.prl.parser.PrlConstraint
 import com.booleworks.prl.parser.PrlFeature
 import com.booleworks.prl.parser.parseConstraint
+import com.booleworks.prl.transpiler.LngIntVariable
 import com.booleworks.prl.transpiler.ModelTranslation
 import com.booleworks.prl.transpiler.PrlProposition
 import com.booleworks.prl.transpiler.RuleInformation
@@ -216,7 +216,7 @@ sealed class Computation<
 //                    }
                 }
             } else {
-                val merged = mergeSlices(cf.formulaFactory, sliceTranslations)
+                val merged = mergeSlices(cf, sliceTranslations)
                 val result = computeForSlice(request, anySlice, merged.info, model, cf.formulaFactory, status)
                 numExecs.incrementAndGet()
                 val newResult = mergeInternalResult(sliceResults[splitSlice], result)
@@ -257,7 +257,7 @@ sealed class Computation<
             solver.addPropositions(additionalFormulas
                 .flatMap { it.second }
                 .toSet()
-                .map { PrlProposition(RuleInformation(RuleType.INTEGER_VARIABLE), info.intVarDefinitions[it]!!) }
+                .map { PrlProposition(RuleInformation(RuleType.INTEGER_VARIABLE), info.integerEncodings.getEncoding(it)!!) }
             )
             if (solver.sat() == Tristate.FALSE) {
                 status.addWarning(
@@ -291,7 +291,7 @@ sealed class Computation<
         }
         if (status.successful()) {
             additionalFormulas.forEach { solver.addHardFormula(it.first.formula()) }
-            additionalFormulas.flatMap { it.second }.toSet().forEach { solver.addHardFormula(info.intVarDefinitions[it]!!) }
+            additionalFormulas.flatMap { it.second }.toSet().forEach { solver.addHardFormula(info.integerEncodings.getEncoding(it)) }
         }
         return solver
     }
@@ -302,15 +302,15 @@ sealed class Computation<
         model: PrlModel,
         info: TranslationInfo,
         status: ComputationStatusBuilder
-    ): Pair<PrlProposition, Set<IntegerVariable>>? {
+    ): Pair<PrlProposition, Set<LngIntVariable>>? {
         val parsed = parseConstraint<PrlConstraint>(constraint)
         val featureMap = createFeatureMap(parsed, model.featureStore, status) ?: return null
         val compiled = ConstraintCompiler().compileConstraint(parsed, featureMap)
-        val formula = transpileConstraint(f, compiled, info)
+        val formula = transpileConstraint(f, compiled, info, info.integerEncodings)
         val intVarDefs = featureMap.values
             .filterIsInstance<IntFeatureDefinition>()
             .map { def ->
-                info.intVarDefinitions.keys.find { v -> def.feature.fullName == v.name } ?: run {
+                info.integerEncodings.getVariable(def.feature) ?: run {
                     status.addError("Feature is not defined in current rule files")
                     return null
                 }

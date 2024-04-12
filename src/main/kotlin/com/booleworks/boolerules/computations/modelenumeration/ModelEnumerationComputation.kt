@@ -87,8 +87,8 @@ internal object ModelEnumerationComputation : ListComputation<
         val relevantIntVars = if (request.features.isEmpty()) {
             info.integerVariables
         } else {
-            info.integerVariables.filter { request.features.contains(it.name) }
-        }
+            info.integerVariables.filter { request.features.contains(it.feature) }
+        }.map { it.variable }
 
         val solver = miniSat(NON_PT_CONFIG, request, f, model, info, slice, status).also {
             if (!status.successful()) return ModelEnumerationInternalResult(slice, mutableMapOf())
