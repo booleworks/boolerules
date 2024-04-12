@@ -6,6 +6,8 @@ package com.booleworks.boolerules.computations.generic
 import com.booleworks.logicng.csp.CspAssignment
 import com.booleworks.logicng.formulas.Variable
 import com.booleworks.prl.model.Module
+import com.booleworks.prl.transpiler.FEATURE_DEF_PREFIX
+import com.booleworks.prl.transpiler.S
 import com.booleworks.prl.transpiler.TranslationInfo
 import com.fasterxml.jackson.annotation.JsonIgnore
 import io.swagger.v3.oas.annotations.media.Schema
@@ -38,7 +40,7 @@ data class FeatureModelDO(
 
 internal fun extractModelWithInt(variables: Collection<Variable>, integerAssignment: CspAssignment, info: TranslationInfo): FeatureModelDO =
     FeatureModelDO(variables.filter { info.knownVariables.contains(it) }
-        .map { variable -> extractFeature(variable, info) }.sorted() + extractIntFeatures(integerAssignment))
+        .map { variable -> extractFeature(variable, info) }.sorted() + extractIntFeatures(integerAssignment, info))
 
 /**
  * Extracts a model of a given set of variables (which are the positive
@@ -48,8 +50,12 @@ internal fun extractModel(variables: Collection<Variable>, info: TranslationInfo
     FeatureModelDO(variables.filter { info.knownVariables.contains(it) }
         .map { variable -> extractFeature(variable, info) }.sorted())
 
-internal fun extractIntFeatures(integerAssignment: CspAssignment): Collection<FeatureDO> =
-    integerAssignment.integerAssignments.map { (variable, value) -> FeatureDO.int(extractFeatureCode(variable.name), variable.name, value) }
+internal fun extractIntFeatures(integerAssignment: CspAssignment, info: TranslationInfo): Collection<FeatureDO> =
+    integerAssignment.integerAssignments.map { (variable, value) ->
+        val v = info.integerVariables.find { it.variable.name == variable.name }!!
+        FeatureDO.int(extractIntFeatureCode(variable.name), v.feature, value)
+    }
+
 
 internal fun extractFeature(variable: Variable, info: TranslationInfo) =
     if (info.booleanVariables.contains(variable)) {
@@ -63,3 +69,10 @@ internal fun extractFeature(variable: Variable, info: TranslationInfo) =
 
 private fun extractFeatureCode(fullName: String) =
     fullName.substring(fullName.lastIndexOf(Module.MODULE_SEPARATOR) + 1)
+
+private fun extractIntFeatureCode(fullName: String) =
+    if (fullName.startsWith(FEATURE_DEF_PREFIX)) {
+        extractFeatureCode(fullName.substring(fullName.indexOf(S) + 1))
+    } else {
+        extractFeatureCode(fullName)
+    }
