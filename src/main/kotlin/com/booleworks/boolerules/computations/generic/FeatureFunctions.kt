@@ -15,7 +15,8 @@ fun computeRelevantVars(
     features: List<String>,
 ): SortedSet<Variable> =
     if (features.isEmpty()) {
-        (info.knownVariables + info.encodingContext.relevantSatVariables).toSortedSet()
+        val intSatVariables = info.integerVariables.flatMap { info.encodingContext.variableMap[it.variable]?.values ?: emptySet() }
+        (info.knownVariables + intSatVariables).toSortedSet()
     } else {
         val vars = TreeSet<Variable>()
         info.integerVariables
