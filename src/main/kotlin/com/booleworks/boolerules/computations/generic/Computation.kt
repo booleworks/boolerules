@@ -304,7 +304,7 @@ sealed class Computation<
         status: ComputationStatusBuilder
     ): Pair<PrlProposition, Set<LngIntVariable>>? {
         val parsed = parseConstraint<PrlConstraint>(constraint)
-        val featureMap = createFeatureMap(parsed, model.featureStore, status) ?: return null
+        val featureMap = createFeatureMap(parsed, model.featureStore, info, status) ?: return null
         val compiled = ConstraintCompiler().compileConstraint(parsed, featureMap)
         val formula = transpileConstraint(f, compiled, info, info.integerEncodings)
         val intVarDefs = featureMap.values
@@ -323,23 +323,34 @@ sealed class Computation<
     private fun createFeatureMap(
         parsed: PrlConstraint,
         featureStore: FeatureStore,
+        info: TranslationInfo,
         status: ComputationStatusBuilder
     ): Map<PrlFeature, FeatureDefinition<*, *>>? {
         val featureMap: MutableMap<PrlFeature, AnyFeatureDef> = mutableMapOf()
         val nonUniqueFeatures: Set<String> = featureStore.nonUniqueFeatures()
         val allDefinitions = featureStore.allDefinitions()
+        val allIntDefinitions = allDefinitions.filterIsInstance<IntFeatureDefinition>()
         parsed.features().forEach { feature ->
-            val featureDefinition: AnyFeatureDef =
-                if (feature.featureCode.contains(MODULE_SEPARATOR)) {
-                    allDefinitions.find { featureDef -> featureDef.feature.fullName == feature.featureCode }
-                        ?: return errorResult(status, "Feature is not defined in current rule files")
-                } else if (nonUniqueFeatures.contains(feature.featureCode)) {
-                    return errorResult(status, "Feature is not unique and not full qualified")
-                } else {
-                    allDefinitions.find { featureDef -> featureDef.feature.featureCode == feature.featureCode }
-                        ?: return errorResult(status, "Feature is not defined in current rule files")
-                }
-            featureMap[feature] = featureDefinition
+            val intVariable = info.integerVariables.find { it.feature == feature.featureCode }
+            val intFeatureDef: IntFeatureDefinition? = if (intVariable != null) {
+                val intFeature = info.integerEncodings.store[intVariable.feature]?.featureToVar?.entries?.find { it.value == intVariable }?.key
+                if (intFeature != null) allIntDefinitions.find { intFeature == it.feature } else null
+            } else null
+            if (intFeatureDef != null) {
+                featureMap[feature] = intFeatureDef
+            } else {
+                val featureDefinition: AnyFeatureDef =
+                    if (feature.featureCode.contains(MODULE_SEPARATOR)) {
+                        allDefinitions.find { featureDef -> featureDef.feature.fullName == feature.featureCode }
+                            ?: return errorResult(status, "Feature is not defined in current rule files")
+                    } else if (nonUniqueFeatures.contains(feature.featureCode)) {
+                        return errorResult(status, "Feature is not unique and not full qualified")
+                    } else {
+                        allDefinitions.find { featureDef -> featureDef.feature.featureCode == feature.featureCode }
+                            ?: return errorResult(status, "Feature is not defined in current rule files")
+                    }
+                featureMap[feature] = featureDefinition
+            }
         }
         return featureMap
     }
