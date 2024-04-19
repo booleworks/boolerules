@@ -21,6 +21,7 @@ import com.booleworks.prl.model.FeatureDefinition
 import com.booleworks.prl.model.IntFeatureDefinition
 import com.booleworks.prl.model.Module.Companion.MODULE_SEPARATOR
 import com.booleworks.prl.model.PrlModel
+import com.booleworks.prl.model.constraints.Feature
 import com.booleworks.prl.model.slices.AnySliceSelection
 import com.booleworks.prl.model.slices.Slice
 import com.booleworks.prl.parser.PrlConstraint
@@ -331,11 +332,7 @@ sealed class Computation<
         val allDefinitions = featureStore.allDefinitions()
         val allIntDefinitions = allDefinitions.filterIsInstance<IntFeatureDefinition>()
         parsed.features().forEach { feature ->
-            val intVariable = info.integerVariables.find { it.feature == feature.featureCode }
-            val intFeatureDef: IntFeatureDefinition? = if (intVariable != null) {
-                val intFeature = info.integerEncodings.store[intVariable.feature]?.featureToVar?.entries?.find { it.value == intVariable }?.key
-                if (intFeature != null) allIntDefinitions.find { intFeature == it.feature } else null
-            } else null
+            val intFeatureDef = getIntFeatureDef(feature, nonUniqueFeatures, allIntDefinitions, info, status)
             if (intFeatureDef != null) {
                 featureMap[feature] = intFeatureDef
             } else {
@@ -355,10 +352,30 @@ sealed class Computation<
         return featureMap
     }
 
-    private fun errorResult(
+    private fun getIntFeatureDef(
+        parsed: PrlFeature,
+        nonUniqueFeatures: Set<String>,
+        allIntDefinitions: List<IntFeatureDefinition>,
+        info: TranslationInfo,
+        status: ComputationStatusBuilder
+    ): IntFeatureDefinition? {
+        val intVariable = if (parsed.featureCode.contains(MODULE_SEPARATOR)) {
+            info.integerVariables.find { it.feature == parsed.featureCode }
+        } else if (nonUniqueFeatures.contains(parsed.featureCode)) {
+            return errorResult(status, "Feature is not unique and not full qualified")
+        } else {
+            info.integerVariables.find { Feature.featureCodeOfFullName(it.feature) == parsed.featureCode }
+        }
+        return if (intVariable != null) {
+            val intFeature = info.integerEncodings.store[intVariable.feature]?.featureToVar?.entries?.find { it.value == intVariable }?.key
+            if (intFeature != null) allIntDefinitions.find { intFeature == it.feature } else null
+        } else null
+    }
+
+    private fun <R> errorResult(
         status: ComputationStatusBuilder,
         message: String
-    ): Map<PrlFeature, FeatureDefinition<*, *>>? {
+    ): R? {
         status.addError(message)
         return null
     }
