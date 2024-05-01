@@ -21,9 +21,13 @@ import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.boolerules.computations.generic.computeRelevantVars
 import com.booleworks.boolerules.computations.generic.extractFeature
 import com.booleworks.logicng.csp.CspFactory
+import com.booleworks.logicng.formulas.Formula
 import com.booleworks.logicng.formulas.FormulaFactory
+import com.booleworks.logicng.formulas.InternalAuxVarType
+import com.booleworks.logicng.formulas.Variable
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
+import com.booleworks.prl.transpiler.LngIntVariable
 import com.booleworks.prl.transpiler.TranslationInfo
 
 val BACKBONE =
@@ -80,6 +84,7 @@ internal object BackboneComputation : ListComputation<
     ): BackboneInternalResult {
         val result = BackboneInternalResult(slice, LinkedHashMap())
         val relevantVars = computeRelevantVars(cf.formulaFactory(), info, request.features)
+        val (translationFormula, translationMap) = computeTranslatedIntVars(cf.formulaFactory(), info)
         val solver = miniSat(
                 NON_PT_CONFIG,
                 request,
@@ -89,8 +94,9 @@ internal object BackboneComputation : ListComputation<
                 slice,
                 status
         ).also { if (!status.successful()) return result }
+        solver.add(translationFormula)
 
-        val backbone = solver.backbone(relevantVars)
+        val backbone = solver.backbone(relevantVars + translationMap.keys)
         if (backbone.isSat) {
             backbone.positiveBackbone.intersect(info.knownVariables).forEach {
                 result.backbone[extractFeature(it, info)] = BackboneType.MANDATORY
@@ -121,6 +127,39 @@ internal object BackboneComputation : ListComputation<
                     internalResult.slice,
                     internalResult.backbone.getOrDefault(element, BackboneType.FORBIDDEN)
             )
+
+    private fun computeTranslatedIntVars(f: FormulaFactory, info: TranslationInfo): Pair<Formula, Map<Variable, Pair<LngIntVariable, Int>>> {
+        val clauses = mutableListOf<Formula>()
+        val map = mutableMapOf<Variable, Pair<LngIntVariable, Int>>()
+        info.integerVariables.forEach { intVar ->
+            val satVars = info.encodingContext.variableMap[intVar.variable]!!
+            val domain = intVar.variable.domain
+            var previousVar: Variable? = null
+            var index = 0
+            var c = domain.lb()
+            while (c < domain.ub()) {
+                if (domain.contains(c)) {
+                    val originalVar = satVars[index]!!
+                    val translatedVar = f.newAuxVariable(InternalAuxVarType.CSP)
+                    if (previousVar == null) {
+                        clauses.add(f.equivalence(originalVar, translatedVar))
+                    } else {
+                        clauses.add(f.equivalence(f.and(previousVar.negate(f), originalVar), translatedVar))
+                    }
+                    map[translatedVar] = Pair(intVar, c)
+                    previousVar = originalVar;
+                    ++index
+                }
+                ++c
+            }
+            if (previousVar != null) {
+                val translatedVar = f.newAuxVariable(InternalAuxVarType.CSP)
+                clauses.add(f.equivalence(previousVar.negate(f), translatedVar))
+                map[translatedVar] = Pair(intVar, domain.ub())
+            }
+        }
+        return Pair(f.and(clauses), map)
+    }
 
     data class BackboneInternalResult(
             override val slice: Slice,
