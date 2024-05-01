@@ -20,9 +20,8 @@ import com.booleworks.boolerules.computations.generic.SplitComputationDetail
 import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.boolerules.computations.generic.computeExplanation
 import com.booleworks.boolerules.computations.generic.extractModelWithInt
-import com.booleworks.logicng.csp.encodings.OrderDecoding
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.datastructures.Tristate
-import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.solvers.MiniSat
 import com.booleworks.logicng.solvers.sat.MiniSatConfig
 import com.booleworks.prl.model.PrlModel
@@ -34,18 +33,18 @@ import com.booleworks.prl.transpiler.RuleType
 import com.booleworks.prl.transpiler.TranslationInfo
 
 val CONSISTENCY = object : ComputationType<
-    ConsistencyRequest,
-    ConsistencyResponse,
-    Boolean,
-    ConsistencyDetail,
-    NoElement> {
+        ConsistencyRequest,
+        ConsistencyResponse,
+        Boolean,
+        ConsistencyDetail,
+        NoElement> {
     override val path = "consistency"
     override val docs: ApiDocs = computationDoc<ConsistencyRequest, ConsistencyResponse>(
         "Consistency",
         "Compute the consistency of a rule file",
         "A rule set is consistent if it has at least one solution satisfying " +
-            "all rules. If it is inconsistent, an optional explanation " +
-            "can be computed."
+                "all rules. If it is inconsistent, an optional explanation " +
+                "can be computed."
     )
 
     override val request = ConsistencyRequest::class.java
@@ -75,14 +74,13 @@ internal object ConsistencyComputation :
         slice: Slice,
         info: TranslationInfo,
         model: PrlModel,
-        f: FormulaFactory,
+        cf: CspFactory,
         status: ComputationStatusBuilder,
     ): ConsistencyInternalResult {
-        val solver = prepareSolver(f, request.computeAllDetails, info, request.additionalConstraints, model, status)
+        val solver = prepareSolver(cf, request.computeAllDetails, info, request.additionalConstraints, model, status)
         if (!status.successful()) return ConsistencyInternalResult(slice, false, null, null)
         return if (solver.sat() == Tristate.TRUE) {
-            val integerSatAssignment =
-                OrderDecoding.decode(solver.model(info.encodingContext.relevantSatVariables), info.integerVariables.map(LngIntVariable::variable), info.encodingContext)
+            val integerSatAssignment = cf.decode(solver.model(info.encodingContext.relevantSatVariables), info.integerVariables.map(LngIntVariable::variable), info.encodingContext)
             val example = extractModelWithInt(solver.model(info.knownVariables).positiveVariables(), integerSatAssignment, info)
             ConsistencyInternalResult(slice, true, example, null)
         } else {
@@ -105,9 +103,9 @@ internal object ConsistencyComputation :
         info: TranslationInfo,
         additionalConstraints: List<String>,
         splitProperties: Set<String>,
-        f: FormulaFactory
+        cf: CspFactory
     ): SplitComputationDetail<ConsistencyDetail> {
-        val solver = prepareSolver(f, true, info, additionalConstraints, model, ComputationStatus("", "", SINGLE))
+        val solver = prepareSolver(cf, true, info, additionalConstraints, model, ComputationStatus("", "", SINGLE))
         val sat = solver.sat()
         assert(sat == Tristate.FALSE) { "Detail computation should only be called for inconsistent slices" }
         val explanation = computeExplanation(solver, model.propertyStore.allDefinitions())
@@ -116,20 +114,20 @@ internal object ConsistencyComputation :
     }
 
     private fun prepareSolver(
-        f: FormulaFactory,
+        cf: CspFactory,
         proofTracing: Boolean,
         info: TranslationInfo,
         additionalConstraints: List<String>,
         model: PrlModel,
         status: ComputationStatusBuilder
     ): MiniSat {
-        val solver = MiniSat.miniSat(f, MiniSatConfig.builder().proofGeneration(proofTracing).build()).apply {
+        val solver = MiniSat.miniSat(cf.formulaFactory(), MiniSatConfig.builder().proofGeneration(proofTracing).build()).apply {
             addPropositions(info.propositions)
         }
         if (solver.sat() == Tristate.TRUE) {
             val additionalFormulas =
                 additionalConstraints.mapNotNull { constraint ->
-                    processConstraint(f, constraint, model, info, status)
+                    processConstraint(cf, constraint, model, info, status)
                 }
             if (!status.successful()) return solver
             solver.addPropositions(additionalFormulas.map { it.first })

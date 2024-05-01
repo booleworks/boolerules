@@ -18,9 +18,8 @@ import com.booleworks.boolerules.computations.generic.SingleComputationRunner
 import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.boolerules.computations.generic.extractModelWithInt
 import com.booleworks.boolerules.computations.optimization.OptimizationComputation.OptimizationInternalResult
-import com.booleworks.logicng.csp.encodings.OrderDecoding
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.Formula
-import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.solvers.MaxSATSolver
 import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSAT.MaxSATResult.OPTIMUM
 import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSATConfig
@@ -74,14 +73,14 @@ internal object OptimizationComputation :
         slice: Slice,
         info: TranslationInfo,
         model: PrlModel,
-        f: FormulaFactory,
+        cf: CspFactory,
         status: ComputationStatusBuilder,
     ): OptimizationInternalResult {
-        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, request, f, model, info, status)
+        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, request, cf, model, info, status)
         val mapping = mutableMapOf<Formula, Int>()
         val constraintMap = mutableMapOf<Formula, String>()
         val additionalDefinitions = request.weightings.mapNotNull { wp ->
-            val p = processConstraint(f, wp.constraint, model, info, status)
+            val p = processConstraint(cf, wp.constraint, model, info, status)
             if (p == null) {
                 status.addError("Could not process constraint ${wp.constraint}")
                 null
@@ -98,7 +97,7 @@ internal object OptimizationComputation :
                 if (request.computationType == MIN && wp.weight >= 0 ||
                     request.computationType == MAX && wp.weight < 0
                 ) {
-                    constraint.formula().negate(f)
+                    constraint.formula().negate(cf.formulaFactory())
                 } else {
                     constraint.formula()
                 }
@@ -115,7 +114,7 @@ internal object OptimizationComputation :
             val solverModel = solver.model()
             val evaluatedWeights = mapping.filter { (k, _) -> k.evaluate(solverModel) }
             val weight = evaluatedWeights.map { it.value }.sum()
-            val intAssignment = OrderDecoding.decode(solverModel, info.integerVariables.map { it.variable }, info.encodingContext)
+            val intAssignment = cf.decode(solverModel, info.integerVariables.map { it.variable }, info.encodingContext)
             val example = extractModelWithInt(solverModel.positiveVariables(), intAssignment, info)
             val usedWeights = evaluatedWeights.map { WeightPair(constraintMap[it.key]!!, it.value) }
             OptimizationInternalResult(slice, request.computationType, weight, example, usedWeights)
@@ -134,7 +133,7 @@ internal object OptimizationComputation :
         info: TranslationInfo,
         additionalConstraints: List<String>,
         splitProperties: Set<String>,
-        f: FormulaFactory
+        cf: CspFactory
     ) = error("details are always computed in main computation")
 
     data class OptimizationInternalResult(

@@ -19,8 +19,7 @@ import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.boolerules.computations.generic.computeRelevantVars
 import com.booleworks.boolerules.computations.generic.extractModelWithInt
 import com.booleworks.boolerules.computations.minmaxconfig.MinMaxConfigComputation.MinMaxInternalResult
-import com.booleworks.logicng.csp.encodings.OrderDecoding
-import com.booleworks.logicng.formulas.FormulaFactory
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.solvers.MaxSATSolver
 import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSAT.MaxSATResult.OPTIMUM
 import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSATConfig
@@ -35,10 +34,10 @@ val MINMAXCONFIG =
             "Min/Max Configurations",
             "Compute a minimal or maximal configuration for a rule file",
             "A configuration is minimal if there is no other configuration with " +
-                "fewer selected features, it is maximal if there is no " +
-                "other configuration with more selected features. A list " +
-                "of feautures can be provided over which the optimization " +
-                "is computed."
+                    "fewer selected features, it is maximal if there is no " +
+                    "other configuration with more selected features. A list " +
+                    "of feautures can be provided over which the optimization " +
+                    "is computed."
         )
 
         override val request = MinMaxConfigRequest::class.java
@@ -71,26 +70,26 @@ internal object MinMaxConfigComputation :
         slice: Slice,
         info: TranslationInfo,
         model: PrlModel,
-        f: FormulaFactory,
+        cf: CspFactory,
         status: ComputationStatusBuilder,
     ): MinMaxInternalResult {
-        val relevantVars = computeRelevantVars(f, info, request.features)
+        val relevantVars = computeRelevantVars(cf.formulaFactory(), info, request.features)
         val relevantIntVars = if (request.features.isEmpty()) {
             info.integerVariables
         } else {
             info.integerVariables.filter { request.features.contains(it.feature) }
         }.map { it.variable }
-        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::incWBO, request, f, model, info, status)
-        relevantVars.forEach { solver.addSoftFormula(f.literal(it.name(), request.computationType == MAX), 1) }
+        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::incWBO, request, cf, model, info, status)
+        relevantVars.forEach { solver.addSoftFormula(cf.formulaFactory().literal(it.name(), request.computationType == MAX), 1) }
         return if (solver.solve() == OPTIMUM) {
-            val integerAssignment = OrderDecoding.decode(solver.model(), relevantIntVars, info.encodingContext)
+            val integerAssignment = cf.decode(solver.model(), relevantIntVars, info.encodingContext)
             val example = extractModelWithInt(solver.model().positiveVariables(), integerAssignment, info)
             val numberOfFeatures = example.size
             MinMaxInternalResult(slice, request.computationType, numberOfFeatures, example)
         } else {
             status.addWarning(
                 "Rule set for the slice $slice is inconsistent. Use the 'consistency' " +
-                    "check to get an explanation, why."
+                        "check to get an explanation, why."
             )
             MinMaxInternalResult(slice, request.computationType, -1, null)
         }
@@ -102,7 +101,7 @@ internal object MinMaxConfigComputation :
         info: TranslationInfo,
         additionalConstraints: List<String>,
         splitProperties: Set<String>,
-        f: FormulaFactory
+        cf: CspFactory
     ) = error("details are always computed in main computation")
 
     data class MinMaxInternalResult(

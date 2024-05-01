@@ -19,8 +19,7 @@ import com.booleworks.boolerules.computations.generic.computeRelevantVars
 import com.booleworks.boolerules.computations.generic.extractModelWithInt
 import com.booleworks.boolerules.computations.modelenumeration.ModelEnumerationComputation.ModelEnumerationElementResult
 import com.booleworks.boolerules.computations.modelenumeration.ModelEnumerationComputation.ModelEnumerationInternalResult
-import com.booleworks.logicng.csp.encodings.OrderDecoding
-import com.booleworks.logicng.formulas.FormulaFactory
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.Variable
 import com.booleworks.logicng.solvers.MiniSat
 import com.booleworks.prl.model.PrlModel
@@ -29,18 +28,18 @@ import com.booleworks.prl.transpiler.TranslationInfo
 import java.util.SortedSet
 
 val MODELENUMERATION = object : ComputationType<
-    ModelEnumerationRequest,
-    ModelEnumerationResponse,
-    Boolean,
-    NoComputationDetail,
-    FeatureModelDO> {
+        ModelEnumerationRequest,
+        ModelEnumerationResponse,
+        Boolean,
+        NoComputationDetail,
+        FeatureModelDO> {
     override val path: String = "modelenumeration"
     override val docs: ApiDocs = computationDoc<ModelEnumerationRequest, ModelEnumerationResponse>(
         "Buildable Configurations",
         "Compute a set of all buildable configuration wrt. a set of features",
         "All buildable configuration in the given features are computed.  " +
-            "If this set of features is a sub-set of all features, " +
-            "it is called projected model enumeration"
+                "If this set of features is a sub-set of all features, " +
+                "it is called projected model enumeration"
     )
 
     override val request = ModelEnumerationRequest::class.java
@@ -53,14 +52,14 @@ val MODELENUMERATION = object : ComputationType<
 }
 
 internal object ModelEnumerationComputation : ListComputation<
-    ModelEnumerationRequest,
-    Map<FeatureModelDO, Slice>,
-    NoComputationDetail,
-    Boolean,
-    NoComputationDetail,
-    ModelEnumerationInternalResult,
-    ModelEnumerationElementResult,
-    FeatureModelDO>(NON_CACHING_USE_FF) {
+        ModelEnumerationRequest,
+        Map<FeatureModelDO, Slice>,
+        NoComputationDetail,
+        Boolean,
+        NoComputationDetail,
+        ModelEnumerationInternalResult,
+        ModelEnumerationElementResult,
+        FeatureModelDO>(NON_CACHING_USE_FF) {
 
     private const val SEL_TAUTOLOGY = "@SEL_TAUTOLOGY"
 
@@ -80,23 +79,23 @@ internal object ModelEnumerationComputation : ListComputation<
         slice: Slice,
         info: TranslationInfo,
         model: PrlModel,
-        f: FormulaFactory,
+        cf: CspFactory,
         status: ComputationStatusBuilder,
     ): ModelEnumerationInternalResult {
-        val relevantVars = computeRelevantVars(f, info, request.features)
+        val relevantVars = computeRelevantVars(cf.formulaFactory(), info, request.features)
         val relevantIntVars = if (request.features.isEmpty()) {
             info.integerVariables
         } else {
             info.integerVariables.filter { request.features.contains(it.feature) }
         }.map { it.variable }
 
-        val solver = miniSat(NON_PT_CONFIG, request, f, model, info, slice, status).also {
+        val solver = miniSat(NON_PT_CONFIG, request, cf, model, info, slice, status).also {
             if (!status.successful()) return ModelEnumerationInternalResult(slice, mutableMapOf())
         }
         addTautologyClauses(solver, relevantVars)
 
         val models = solver.enumerateAllModels(relevantVars).map {
-            val integerSatAssignment = OrderDecoding.decode(it.assignment(), relevantIntVars, info.encodingContext)
+            val integerSatAssignment = cf.decode(it.assignment(), relevantIntVars, info.encodingContext)
             extractModelWithInt(it.positiveVariables(), integerSatAssignment, info)
         }.toSet()
         return ModelEnumerationInternalResult(slice, models.associateWith { slice }.toMutableMap())

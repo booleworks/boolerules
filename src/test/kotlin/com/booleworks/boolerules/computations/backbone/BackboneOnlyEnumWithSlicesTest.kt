@@ -50,7 +50,7 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
         val cf = CspFactory(f)
         val request = BackboneRequest("any", mutableListOf(), listOf(), listOf())
         val modelTranslation = transpileModel(cf, model, listOf())
-        val res = cut.computeForSlice(request, Slice.empty(), modelTranslation[0].info, model, f, ComputationStatusBuilder("fileId", "jobId", LIST))
+        val res = cut.computeForSlice(request, Slice.empty(), modelTranslation[0].info, model, cf, ComputationStatusBuilder("fileId", "jobId", LIST))
 
         assertThat(res.slice).isEqualTo(Slice.empty())
         assertThat(res.backbone).hasSize(9)

@@ -25,7 +25,7 @@ import org.junit.jupiter.params.provider.MethodSource
 internal class ModelEnumerationTest : TestWithConfig() {
 
     private val cut = ModelEnumerationComputation
-    private val model = PrlCompiler().compile(parseRuleFile("test-files/prl/transpiler/merge3.prl"))
+    private val model = PrlCompiler().compile(parseRuleFile("test-files/prl/transpiler/merge3_with_int.prl"))
 
     @Test
     fun testComputeForSlice() {
@@ -35,13 +35,13 @@ internal class ModelEnumerationTest : TestWithConfig() {
 
         val request = ModelEnumerationRequest("any", mutableListOf(), listOf(), listOf())
         val info1 = modelTranslation[0].info
-        val info2 = modelTranslation[1].info
-        val info3 = modelTranslation[2].info
-        val info4 = modelTranslation[3].info
-        val result1 = cut.computeForSlice(request, Slice.empty(), info1, model, f, ComputationStatusBuilder("fileId", "jobId", LIST))
-        val result2 = cut.computeForSlice(request, Slice.empty(), info2, model, f, ComputationStatusBuilder("fileId", "jobId", LIST))
-        val result3 = cut.computeForSlice(request, Slice.empty(), info3, model, f, ComputationStatusBuilder("fileId", "jobId", LIST))
-        val result4 = cut.computeForSlice(request, Slice.empty(), info4, model, f, ComputationStatusBuilder("fileId", "jobId", LIST))
+        val info2 = modelTranslation[2].info
+        val info3 = modelTranslation[4].info
+        val info4 = modelTranslation[6].info
+        val result1 = cut.computeForSlice(request, Slice.empty(), info1, model, cf, ComputationStatusBuilder("fileId", "jobId", LIST))
+        val result2 = cut.computeForSlice(request, Slice.empty(), info2, model, cf, ComputationStatusBuilder("fileId", "jobId", LIST))
+        val result3 = cut.computeForSlice(request, Slice.empty(), info3, model, cf, ComputationStatusBuilder("fileId", "jobId", LIST))
+        val result4 = cut.computeForSlice(request, Slice.empty(), info4, model, cf, ComputationStatusBuilder("fileId", "jobId", LIST))
 
         assertThat(result1.slice).isEqualTo(Slice.empty())
         assertThat(result1.models.size).isEqualTo(2)
@@ -69,11 +69,11 @@ internal class ModelEnumerationTest : TestWithConfig() {
         setUp(tc)
         val sliceSelection = mutableListOf(
             PropertySelectionDO("series", PropertyTypeDO.ENUM, PropertyRangeDO(enumValues = setOf("S1", "S2")), SliceTypeDO.SPLIT),
-            PropertySelectionDO("version", PropertyTypeDO.INT, PropertyRangeDO(intMin = 1, intMax = 2), SliceTypeDO.SPLIT)
+            PropertySelectionDO("version", PropertyTypeDO.INT, PropertyRangeDO(intMin = 1, intMax = 2), SliceTypeDO.SPLIT),
+            PropertySelectionDO("v", PropertyTypeDO.INT, PropertyRangeDO(intMin = 1, intMax = 2), SliceTypeDO.ALL)
         )
         val request = ModelEnumerationRequest("any", sliceSelection, listOf(), listOf())
         val response = cut.computeResponse(request, model, ComputationStatusBuilder("fileId", "jobId", LIST))
-
         assertThat(response).hasSize(15)
         response.values.forEach { res ->
             assertThat(res.merge).hasSize(2)
@@ -94,10 +94,10 @@ internal class ModelEnumerationTest : TestWithConfig() {
         val info2 = modelTranslation[1].info
         val info3 = modelTranslation[2].info
         val info4 = modelTranslation[3].info
-        val result1 = cut.computeForSlice(request, Slice.empty(), info1, model, f, ComputationStatusBuilder("fileId", "jobId", LIST))
-        val result2 = cut.computeForSlice(request, Slice.empty(), info2, model, f, ComputationStatusBuilder("fileId", "jobId", LIST))
-        val result3 = cut.computeForSlice(request, Slice.empty(), info3, model, f, ComputationStatusBuilder("fileId", "jobId", LIST))
-        val result4 = cut.computeForSlice(request, Slice.empty(), info4, model, f, ComputationStatusBuilder("fileId", "jobId", LIST))
+        val result1 = cut.computeForSlice(request, Slice.empty(), info1, model, cf, ComputationStatusBuilder("fileId", "jobId", LIST))
+        val result2 = cut.computeForSlice(request, Slice.empty(), info2, model, cf, ComputationStatusBuilder("fileId", "jobId", LIST))
+        val result3 = cut.computeForSlice(request, Slice.empty(), info3, model, cf, ComputationStatusBuilder("fileId", "jobId", LIST))
+        val result4 = cut.computeForSlice(request, Slice.empty(), info4, model, cf, ComputationStatusBuilder("fileId", "jobId", LIST))
 
         assertThat(result1.slice).isEqualTo(Slice.empty())
         assertThat(result1.models.size).isEqualTo(1)

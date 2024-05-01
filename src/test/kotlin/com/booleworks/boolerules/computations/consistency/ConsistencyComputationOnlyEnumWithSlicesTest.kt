@@ -53,7 +53,7 @@ internal class ConsistencyComputationOnlyEnumWithSlicesTest : TestWithConfig() {
             Slice.empty(),
             info,
             model,
-            f,
+            cf,
             ComputationStatusBuilder("fileId", "jobId", SINGLE)
         )
         val resultFalse = cut.computeForSlice(
@@ -61,7 +61,7 @@ internal class ConsistencyComputationOnlyEnumWithSlicesTest : TestWithConfig() {
             Slice.empty(),
             mergedInfo,
             model,
-            f,
+            cf,
             ComputationStatusBuilder("fileId", "jobId", SINGLE)
         )
 
@@ -90,7 +90,7 @@ internal class ConsistencyComputationOnlyEnumWithSlicesTest : TestWithConfig() {
             Slice.empty(),
             info,
             model,
-            f,
+            cf,
             ComputationStatusBuilder("fileId", "jobId", SINGLE)
         )
         val resultFalse = cut.computeForSlice(
@@ -98,7 +98,7 @@ internal class ConsistencyComputationOnlyEnumWithSlicesTest : TestWithConfig() {
             Slice.empty(),
             mergedInfo,
             model,
-            f,
+            cf,
             ComputationStatusBuilder("fileId", "jobId", SINGLE)
         )
 

@@ -15,7 +15,7 @@ import com.booleworks.boolerules.computations.generic.SingleComputationRunner
 import com.booleworks.boolerules.computations.generic.SliceTypeDO
 import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.boolerules.computations.modelcount.ModelCountComputation.ModelCountInternalResult
-import com.booleworks.logicng.formulas.FormulaFactory
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.modelcounting.ModelCounter
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
@@ -23,11 +23,11 @@ import com.booleworks.prl.transpiler.TranslationInfo
 import java.math.BigInteger
 
 val MODELCOUNT = object : ComputationType<
-    ModelCountRequest,
-    ModelCountResponse,
-    BigInteger,
-    NoComputationDetail,
-    NoElement> {
+        ModelCountRequest,
+        ModelCountResponse,
+        BigInteger,
+        NoComputationDetail,
+        NoElement> {
     override val path: String = "modelcount"
     override val docs: ApiDocs = computationDoc<ModelCountRequest, ModelCountResponse>(
         "Configuration Counting",
@@ -60,7 +60,7 @@ internal object ModelCountComputation :
         slice: Slice,
         info: TranslationInfo,
         model: PrlModel,
-        f: FormulaFactory,
+        cf: CspFactory,
         status: ComputationStatusBuilder,
     ): ModelCountInternalResult {
         // currently no projected model counting
@@ -69,17 +69,17 @@ internal object ModelCountComputation :
         val variables = (info.knownVariables + info.intPredicateMapping.values + intSatVariables).toSortedSet()
         val formulas = info.propositions.map { it.formula() }
         val additionalDefinitions =
-            request.additionalConstraints.map { constraint -> processConstraint(f, constraint, model, info, status) }
+            request.additionalConstraints.map { constraint -> processConstraint(cf, constraint, model, info, status) }
         val additionalConstraints = additionalDefinitions.map { it!!.first.formula() }
         val additionalVarDefinitions = additionalDefinitions.flatMap { it!!.second }.toSet().map { info.integerEncodings.getEncoding(it)!! }
         val allFormulas = formulas + additionalConstraints + additionalVarDefinitions
-        val allVariables = (allFormulas.flatMap { it.variables(f) } + variables).toSortedSet()
+        val allVariables = (allFormulas.flatMap { it.variables(cf.formulaFactory()) } + variables).toSortedSet()
         if (!status.successful()) {
             return ModelCountInternalResult(slice, BigInteger.ZERO)
         }
         return ModelCountInternalResult(
             slice,
-            ModelCounter.count(f, formulas + additionalConstraints + additionalVarDefinitions, allVariables)
+            ModelCounter.count(cf.formulaFactory(), formulas + additionalConstraints + additionalVarDefinitions, allVariables)
         )
     }
 
@@ -89,7 +89,7 @@ internal object ModelCountComputation :
         info: TranslationInfo,
         additionalConstraints: List<String>,
         splitProperties: Set<String>,
-        f: FormulaFactory
+        cf: CspFactory
     ) = error("details are always computed in main computation")
 
     data class ModelCountInternalResult(override val slice: Slice, val count: BigInteger) :

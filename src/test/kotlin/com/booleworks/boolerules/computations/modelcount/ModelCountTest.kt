@@ -29,10 +29,10 @@ internal class ModelCountTest : TestWithConfig() {
         val info2 = modelTranslation[1].info
         val info3 = modelTranslation[2].info
         val info4 = modelTranslation[3].info
-        val result1 = cut.computeForSlice(request, Slice.empty(), info1, model, f, ComputationStatusBuilder("fileId", "jobId", SINGLE))
-        val result2 = cut.computeForSlice(request, Slice.empty(), info2, model, f, ComputationStatusBuilder("fileId", "jobId", SINGLE))
-        val result3 = cut.computeForSlice(request, Slice.empty(), info3, model, f, ComputationStatusBuilder("fileId", "jobId", SINGLE))
-        val result4 = cut.computeForSlice(request, Slice.empty(), info4, model, f, ComputationStatusBuilder("fileId", "jobId", SINGLE))
+        val result1 = cut.computeForSlice(request, Slice.empty(), info1, model, cf, ComputationStatusBuilder("fileId", "jobId", SINGLE))
+        val result2 = cut.computeForSlice(request, Slice.empty(), info2, model, cf, ComputationStatusBuilder("fileId", "jobId", SINGLE))
+        val result3 = cut.computeForSlice(request, Slice.empty(), info3, model, cf, ComputationStatusBuilder("fileId", "jobId", SINGLE))
+        val result4 = cut.computeForSlice(request, Slice.empty(), info4, model, cf, ComputationStatusBuilder("fileId", "jobId", SINGLE))
 
         assertThat(result1.slice).isEqualTo(Slice.empty())
         assertThat(result1.count).isEqualTo(BigInteger.valueOf(2))
@@ -52,10 +52,10 @@ internal class ModelCountTest : TestWithConfig() {
         val info2 = modelTranslation[1].info
         val info3 = modelTranslation[2].info
         val info4 = modelTranslation[3].info
-        val result1 = cut.computeForSlice(request, Slice.empty(), info1, model, f, ComputationStatusBuilder("fileId", "jobId", SINGLE))
-        val result2 = cut.computeForSlice(request, Slice.empty(), info2, model, f, ComputationStatusBuilder("fileId", "jobId", SINGLE))
-        val result3 = cut.computeForSlice(request, Slice.empty(), info3, model, f, ComputationStatusBuilder("fileId", "jobId", SINGLE))
-        val result4 = cut.computeForSlice(request, Slice.empty(), info4, model, f, ComputationStatusBuilder("fileId", "jobId", SINGLE))
+        val result1 = cut.computeForSlice(request, Slice.empty(), info1, model, cf, ComputationStatusBuilder("fileId", "jobId", SINGLE))
+        val result2 = cut.computeForSlice(request, Slice.empty(), info2, model, cf, ComputationStatusBuilder("fileId", "jobId", SINGLE))
+        val result3 = cut.computeForSlice(request, Slice.empty(), info3, model, cf, ComputationStatusBuilder("fileId", "jobId", SINGLE))
+        val result4 = cut.computeForSlice(request, Slice.empty(), info4, model, cf, ComputationStatusBuilder("fileId", "jobId", SINGLE))
 
         assertThat(result1.slice).isEqualTo(Slice.empty())
         assertThat(result1.count).isEqualTo(BigInteger.valueOf(1))

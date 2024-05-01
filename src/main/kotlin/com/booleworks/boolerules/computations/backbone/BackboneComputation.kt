@@ -20,6 +20,7 @@ import com.booleworks.boolerules.computations.generic.SliceTypeDO
 import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.boolerules.computations.generic.computeRelevantVars
 import com.booleworks.boolerules.computations.generic.extractFeature
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
@@ -74,16 +75,15 @@ internal object BackboneComputation : ListComputation<
             slice: Slice,
             info: TranslationInfo,
             model: PrlModel,
-            f: FormulaFactory,
+            cf: CspFactory,
             status: ComputationStatusBuilder,
     ): BackboneInternalResult {
         val result = BackboneInternalResult(slice, LinkedHashMap())
-        val relevantVars = computeRelevantVars(f, info, request.features)
-
+        val relevantVars = computeRelevantVars(cf.formulaFactory(), info, request.features)
         val solver = miniSat(
                 NON_PT_CONFIG,
                 request,
-                f,
+                cf,
                 model,
                 info,
                 slice,

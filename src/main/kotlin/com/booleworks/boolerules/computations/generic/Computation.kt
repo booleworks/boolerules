@@ -112,7 +112,7 @@ sealed class Computation<
         slice: Slice,
         info: TranslationInfo,
         model: PrlModel,
-        f: FormulaFactory,
+        cf: CspFactory,
         status: ComputationStatusBuilder,
     ): INTRES
 
@@ -162,7 +162,7 @@ sealed class Computation<
                         launch(dispatcher) {
                             execute(
                                 request,
-                                CspFactory(ffProvider()),
+                                CspFactory(cspFactory, ffProvider()),
                                 model,
                                 modelTranslation,
                                 splitSlice,
@@ -206,7 +206,7 @@ sealed class Computation<
             if (sliceTranslations.size == 1) {
                 val sliceTranslation = sliceTranslations[0]
                 if (anySlice in slicesToCompute) {
-                    val result = computeForSlice(request, anySlice, sliceTranslation.info, model, cf.formulaFactory, status)
+                    val result = computeForSlice(request, anySlice, sliceTranslation.info, model, cf, status)
                     numExecs.incrementAndGet()
                     val newResult = mergeInternalResult(sliceResults[splitSlice], result)
                     sliceResults[splitSlice] = newResult
@@ -218,7 +218,7 @@ sealed class Computation<
                 }
             } else {
                 val merged = mergeSlices(cf, sliceTranslations)
-                val result = computeForSlice(request, anySlice, merged.info, model, cf.formulaFactory, status)
+                val result = computeForSlice(request, anySlice, merged.info, model, cf, status)
                 numExecs.incrementAndGet()
                 val newResult = mergeInternalResult(sliceResults[splitSlice], result)
                 sliceResults[splitSlice] = newResult
@@ -229,13 +229,13 @@ sealed class Computation<
     internal fun miniSat(
         config: MiniSatConfig,
         request: REQUEST,
-        f: FormulaFactory,
+        cf: CspFactory,
         model: PrlModel,
         info: TranslationInfo,
         slice: Slice,
         status: ComputationStatusBuilder
     ): MiniSat {
-        val solver = MiniSat.miniSat(f, config)
+        val solver = MiniSat.miniSat(cf.formulaFactory(), config)
         solver.addPropositions(info.propositions)
         if (solver.sat() == Tristate.FALSE) {
             status.addWarning(
@@ -246,7 +246,7 @@ sealed class Computation<
         }
         val additionalFormulas = request.additionalConstraints.mapNotNull { constraint ->
             processConstraint(
-                f,
+                cf,
                 constraint,
                 model,
                 info,
@@ -274,16 +274,16 @@ sealed class Computation<
         config: MaxSATConfig,
         algo: (FormulaFactory, MaxSATConfig) -> MaxSATSolver,
         request: REQUEST,
-        f: FormulaFactory,
+        cf: CspFactory,
         model: PrlModel,
         info: TranslationInfo,
         status: ComputationStatusBuilder
     ): MaxSATSolver {
-        val solver = algo(f, config)
+        val solver = algo(cf.formulaFactory(), config)
         info.propositions.forEach { solver.addHardFormula(it.formula()) }
         val additionalFormulas = request.additionalConstraints.mapNotNull { constraint ->
             processConstraint(
-                f,
+                cf,
                 constraint,
                 model,
                 info,
@@ -298,7 +298,7 @@ sealed class Computation<
     }
 
     internal fun processConstraint(
-        f: FormulaFactory,
+        cf: CspFactory,
         constraint: String,
         model: PrlModel,
         info: TranslationInfo,
@@ -307,7 +307,7 @@ sealed class Computation<
         val parsed = parseConstraint<PrlConstraint>(constraint)
         val featureMap = createFeatureMap(parsed, model.featureStore, info, status) ?: return null
         val compiled = ConstraintCompiler().compileConstraint(parsed, featureMap)
-        val formula = transpileConstraint(f, compiled, info, info.integerEncodings)
+        val formula = transpileConstraint(cf, compiled, info, info.integerEncodings)
         val intVarDefs = featureMap.values
             .filterIsInstance<IntFeatureDefinition>()
             .map { def ->
@@ -412,7 +412,7 @@ abstract class SingleComputation<
         assert(modelTranslation.computations.size == 1) { "Expected to get exactly one slice" }
         val slice = modelTranslation.allSlices.first()
         val translation = modelTranslation.computations.first().info
-        return computeDetailForSlice(slice, model, translation, additionalConstraints, splitProperties, f)
+        return computeDetailForSlice(slice, model, translation, additionalConstraints, splitProperties, cf)
     }
 
     abstract fun computeDetailForSlice(
@@ -421,7 +421,7 @@ abstract class SingleComputation<
         info: TranslationInfo,
         additionalConstraints: List<String>,
         splitProperties: Set<String>,
-        f: FormulaFactory
+        cf: CspFactory
     ): SplitComputationDetail<DETAIL>
 
 }
