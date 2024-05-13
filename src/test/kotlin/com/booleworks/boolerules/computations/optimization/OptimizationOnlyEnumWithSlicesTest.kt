@@ -156,7 +156,7 @@ internal class OptimizationOnlyEnumWithSlicesTest : TestWithConfig() {
         )
         details = detailsForSlice(slice4, result.detailMap[4])
         assertThat(details.detail.exampleConfiguration!!.size).isEqualTo(5)
-        assertThat(details.detail.exampleConfiguration!!.toString()).isEqualTo("a=a2, b=b2, c=c1, p=p2, q=q2")
+        assertThat(details.detail.exampleConfiguration!!.toString()).isEqualTo("a=a2, b=b2, c=c1, p=p2, q=q1")
     }
 
     @ParameterizedTest
@@ -273,7 +273,7 @@ internal class OptimizationOnlyEnumWithSlicesTest : TestWithConfig() {
         )
         details = detailsForSlice(slice4, result.detailMap[4])
         assertThat(details.detail.exampleConfiguration!!.size).isEqualTo(5)
-        assertThat(details.detail.exampleConfiguration!!.toString()).isEqualTo("a=a2, b=b2, c=c3, p=p2, q=q2")
+        assertThat(details.detail.exampleConfiguration!!.toString()).isEqualTo("a=a2, b=b2, c=c3, p=p2, q=q1")
     }
 
     @ParameterizedTest

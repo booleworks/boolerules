@@ -4,15 +4,14 @@
 package com.booleworks.boolerules.computations.generic
 
 import com.booleworks.boolerules.config.ComputationConfig
-import com.booleworks.logicng.datastructures.Tristate
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.formulas.FormulaFactoryConfig
 import com.booleworks.logicng.formulas.FormulaFactoryConfig.FormulaMergeStrategy.IMPORT
 import com.booleworks.logicng.formulas.FormulaFactoryConfig.FormulaMergeStrategy.USE_BUT_NO_IMPORT
 import com.booleworks.logicng.solvers.MaxSATSolver
-import com.booleworks.logicng.solvers.MiniSat
+import com.booleworks.logicng.solvers.SATSolver
 import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSATConfig
-import com.booleworks.logicng.solvers.sat.MiniSatConfig
+import com.booleworks.logicng.solvers.sat.SATSolverConfig
 import com.booleworks.prl.compiler.ConstraintCompiler
 import com.booleworks.prl.compiler.FeatureStore
 import com.booleworks.prl.model.AnyFeatureDef
@@ -47,8 +46,8 @@ val NON_CACHING_USE_FF: () -> FormulaFactory =
 val CACHING_IMPORT_FF: () -> FormulaFactory =
     { FormulaFactory.caching(FormulaFactoryConfig.builder().formulaMergeStrategy(IMPORT).build()) }
 
-val PT_CONFIG: MiniSatConfig = MiniSatConfig.builder().proofGeneration(true).build()
-val NON_PT_CONFIG: MiniSatConfig = MiniSatConfig.builder().proofGeneration(false).build()
+val PT_CONFIG: SATSolverConfig = SATSolverConfig.builder().proofGeneration(true).build()
+val NON_PT_CONFIG: SATSolverConfig = SATSolverConfig.builder().proofGeneration(false).build()
 
 /**
  * Super class for all internal computations.
@@ -221,17 +220,17 @@ sealed class Computation<
     }
 
     internal fun miniSat(
-        config: MiniSatConfig,
+        config: SATSolverConfig,
         request: REQUEST,
         f: FormulaFactory,
         model: PrlModel,
         info: TranslationInfo,
         slice: Slice,
         status: ComputationStatusBuilder
-    ): MiniSat {
-        val solver = MiniSat.miniSat(f, config)
+    ): SATSolver {
+        val solver = SATSolver.newSolver(f, config)
         solver.addPropositions(info.propositions)
-        if (solver.sat() == Tristate.FALSE) {
+        if (!solver.sat()) {
             status.addWarning(
                 "Original rule set for the slice $slice is inconsistent. " +
                         "Use the 'consistency' check to get an explanation, why."
@@ -249,7 +248,7 @@ sealed class Computation<
         }
         if (status.successful()) {
             solver.addPropositions(additionalFormulas)
-            if (solver.sat() == Tristate.FALSE) {
+            if (!solver.sat()) {
                 status.addWarning(
                     "The additional constraints turned the rule set for for the slice $slice inconsistent. " +
                             "Use the 'consistency' check to get an explanation, why."

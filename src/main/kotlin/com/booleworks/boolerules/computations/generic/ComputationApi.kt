@@ -342,7 +342,7 @@ data class ComputationStatus(
     @field:Schema(description = "A flag whether the computation was successful or not")
     val success: Boolean,
 
-    @field:Schema(description = "The Job ID whithin the kjobs framework")
+    @field:Schema(description = "The Job ID within the kjobs framework")
     val jobId: String,
 
     @field:Schema(description = "The Rule file ID used for this computation")

@@ -22,8 +22,8 @@ import com.booleworks.boolerules.computations.generic.computeExplanation
 import com.booleworks.boolerules.computations.generic.extractModel
 import com.booleworks.logicng.datastructures.Tristate
 import com.booleworks.logicng.formulas.FormulaFactory
-import com.booleworks.logicng.solvers.MiniSat
-import com.booleworks.logicng.solvers.sat.MiniSatConfig
+import com.booleworks.logicng.solvers.SATSolver
+import com.booleworks.logicng.solvers.sat.SATSolverConfig
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
 import com.booleworks.prl.transpiler.TranslationInfo
@@ -75,20 +75,23 @@ internal object ConsistencyComputation :
     ): ConsistencyInternalResult {
         val solver = prepareSolver(f, request.computeAllDetails, info, request.additionalConstraints, model, status)
         if (!status.successful()) return ConsistencyInternalResult(slice, false, null, null)
-        return if (solver.sat() == Tristate.TRUE) {
-            val example = extractModel(solver.model(info.knownVariables).positiveVariables(), info)
-            ConsistencyInternalResult(slice, true, example, null)
-        } else {
-            //TODO beautify explanation
-            ConsistencyInternalResult(
-                slice,
-                false,
-                null,
-                if (request.computeAllDetails) computeExplanation(
-                    solver,
-                    model.propertyStore.allDefinitions()
-                ) else null
-            )
+        return solver.satCall().solve().use { satCall ->
+            if (satCall.satResult == Tristate.TRUE) {
+                val example = extractModel(satCall.model(info.knownVariables).positiveVariables(), info)
+                ConsistencyInternalResult(slice, true, example, null)
+            } else {
+                //TODO beautify explanation
+                ConsistencyInternalResult(
+                    slice,
+                    false,
+                    null,
+                    if (request.computeAllDetails) computeExplanation(
+                        satCall,
+                        model.propertyStore.allDefinitions(),
+                        f
+                    ) else null
+                )
+            }
         }
     }
 
@@ -101,11 +104,12 @@ internal object ConsistencyComputation :
         f: FormulaFactory
     ): SplitComputationDetail<ConsistencyDetail> {
         val solver = prepareSolver(f, true, info, additionalConstraints, model, ComputationStatus("", "", SINGLE))
-        val sat = solver.sat()
-        assert(sat == Tristate.FALSE) { "Detail computation should only be called for inconsistent slices" }
-        val explanation = computeExplanation(solver, model.propertyStore.allDefinitions())
-        val result = ConsistencyInternalResult(slice, false, null, explanation)
-        return SplitComputationDetail(result, splitProperties)
+        return solver.satCall().solve().use { satCall ->
+            assert(satCall.satResult == Tristate.FALSE) { "Detail computation should only be called for inconsistent slices" }
+            val explanation = computeExplanation(satCall, model.propertyStore.allDefinitions(), f)
+            val result = ConsistencyInternalResult(slice, false, null, explanation)
+            SplitComputationDetail(result, splitProperties)
+        }
     }
 
     private fun prepareSolver(
@@ -115,11 +119,11 @@ internal object ConsistencyComputation :
         additionalConstraints: List<String>,
         model: PrlModel,
         status: ComputationStatusBuilder
-    ): MiniSat {
-        val solver = MiniSat.miniSat(f, MiniSatConfig.builder().proofGeneration(proofTracing).build()).apply {
+    ): SATSolver {
+        val solver = SATSolver.newSolver(f, SATSolverConfig.builder().proofGeneration(proofTracing).build()).apply {
             addPropositions(info.propositions)
         }
-        if (solver.sat() == Tristate.TRUE) {
+        if (solver.sat()) {
             val additionalFormulas =
                 additionalConstraints.mapNotNull { constraint ->
                     processConstraint(f, constraint, model, info, status)

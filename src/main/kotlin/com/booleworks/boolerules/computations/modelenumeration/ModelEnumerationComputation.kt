@@ -21,7 +21,7 @@ import com.booleworks.boolerules.computations.modelenumeration.ModelEnumerationC
 import com.booleworks.boolerules.computations.modelenumeration.ModelEnumerationComputation.ModelEnumerationInternalResult
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.formulas.Variable
-import com.booleworks.logicng.solvers.MiniSat
+import com.booleworks.logicng.solvers.SATSolver
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
 import com.booleworks.prl.transpiler.TranslationInfo
@@ -95,7 +95,7 @@ internal object ModelEnumerationComputation : ListComputation<
         return ModelEnumerationInternalResult(slice, models.associateWith { slice }.toMutableMap())
     }
 
-    private fun addTautologyClauses(solver: MiniSat, variables: SortedSet<Variable>) {
+    private fun addTautologyClauses(solver: SATSolver, variables: SortedSet<Variable>) {
         val f = solver.factory()
         val selTautology = f.variable(SEL_TAUTOLOGY)
         variables.forEach { solver.add(f.or(selTautology, it)) }
