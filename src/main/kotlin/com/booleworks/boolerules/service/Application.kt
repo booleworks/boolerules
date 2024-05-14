@@ -4,6 +4,7 @@
 package com.booleworks.boolerules.service
 
 import com.booleworks.boolerules.computations.backbone.BACKBONE
+import com.booleworks.boolerules.computations.bomcheck.BOMCHECK
 import com.booleworks.boolerules.computations.computationManagementRoute
 import com.booleworks.boolerules.computations.consistency.CONSISTENCY
 import com.booleworks.boolerules.computations.details.detailsRoute
@@ -107,6 +108,9 @@ fun Application.module() {
 
             route(PATH_COMPUTATION) { addComputationApi(OPTIMIZATION, this@route) }
             route(PATH_COMPUTATION) { detailsRoute(OPTIMIZATION) }
+
+            route(PATH_COMPUTATION) { addComputationApi(BOMCHECK, this@route) }
+            route(PATH_COMPUTATION) { detailsRoute(BOMCHECK) }
 
             // Rulefile management
             route(PATH_RULEFILE) { rulefileRoute() }
