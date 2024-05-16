@@ -30,7 +30,7 @@ data class ConsistencyRequest(
 ) : ComputationRequest
 
 @JsonInclude(Include.NON_NULL)
-@Schema(description = "The details for a concistency computation")
+@Schema(description = "The details for a consistency computation")
 data class ConsistencyDetail(
 
     @field:Schema(
