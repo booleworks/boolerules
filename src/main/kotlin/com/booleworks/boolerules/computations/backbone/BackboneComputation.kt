@@ -108,7 +108,7 @@ internal object BackboneComputation : ListComputation<
                 result.backbone[extractFeature(it, info)] = BackboneType.OPTIONAL
             }
         } else {
-            relevantVars.forEach {
+            relevantVars.intersect(info.knownVariables).forEach {
                 result.backbone[extractFeature(it, info)] = BackboneType.FORBIDDEN
             }
         }
