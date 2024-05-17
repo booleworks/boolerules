@@ -20,7 +20,7 @@ fun computeRelevantVars(
     } else {
         val vars = TreeSet<Variable>()
         info.integerVariables
-            .filter { features.contains(it.feature) }
+            .filter { features.contains(it.feature.fullName) }
             .forEach { vars.addAll(info.encodingContext.variableMap[it.variable]?.values.orEmpty()) }
         features.forEach {
             val v = f.variable(it)

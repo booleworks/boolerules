@@ -6,8 +6,6 @@ package com.booleworks.boolerules.computations.generic
 import com.booleworks.logicng.csp.CspAssignment
 import com.booleworks.logicng.formulas.Variable
 import com.booleworks.prl.model.Module
-import com.booleworks.prl.transpiler.FEATURE_DEF_PREFIX
-import com.booleworks.prl.transpiler.S
 import com.booleworks.prl.transpiler.TranslationInfo
 import com.fasterxml.jackson.annotation.JsonIgnore
 import io.swagger.v3.oas.annotations.media.Schema
@@ -53,7 +51,7 @@ internal fun extractModel(variables: Collection<Variable>, info: TranslationInfo
 internal fun extractIntFeatures(integerAssignment: CspAssignment, info: TranslationInfo): Collection<FeatureDO> =
     integerAssignment.integerAssignments.map { (variable, value) ->
         val v = info.integerVariables.find { it.variable.name == variable.name }!!
-        FeatureDO.int(extractIntFeatureCode(variable.name), v.feature, value)
+        FeatureDO.int(v.feature.featureCode, v.feature.fullName, value)
     }
 
 
@@ -64,15 +62,8 @@ internal fun extractFeature(variable: Variable, info: TranslationInfo) =
         val (feature, value) = info.getFeatureAndValue(variable)!!
         FeatureDO.enum(extractFeatureCode(feature), feature, value)
     } else {
-        error("Currently only boolean and enum features are supported.")
+        error("Cannot extract unknown variable.")
     }
 
 private fun extractFeatureCode(fullName: String) =
     fullName.substring(fullName.lastIndexOf(Module.MODULE_SEPARATOR) + 1)
-
-private fun extractIntFeatureCode(fullName: String) =
-    if (fullName.startsWith(FEATURE_DEF_PREFIX)) {
-        extractFeatureCode(fullName.substring(fullName.indexOf(S) + 1))
-    } else {
-        extractFeatureCode(fullName)
-    }

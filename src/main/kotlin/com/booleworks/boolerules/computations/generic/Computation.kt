@@ -21,7 +21,6 @@ import com.booleworks.prl.model.FeatureDefinition
 import com.booleworks.prl.model.IntFeatureDefinition
 import com.booleworks.prl.model.Module.Companion.MODULE_SEPARATOR
 import com.booleworks.prl.model.PrlModel
-import com.booleworks.prl.model.constraints.Feature
 import com.booleworks.prl.model.slices.AnySliceSelection
 import com.booleworks.prl.model.slices.Slice
 import com.booleworks.prl.parser.PrlConstraint
@@ -311,7 +310,7 @@ sealed class Computation<
         val intVarDefs = featureMap.values
             .filterIsInstance<IntFeatureDefinition>()
             .map { def ->
-                info.integerEncodings.getVariable(def.feature) ?: run {
+                info.integerEncodings.getVariable(def) ?: run {
                     status.addError("Feature is not defined in current rule files")
                     return null
                 }
@@ -330,46 +329,23 @@ sealed class Computation<
         val featureMap: MutableMap<PrlFeature, AnyFeatureDef> = mutableMapOf()
         val nonUniqueFeatures: Set<String> = featureStore.nonUniqueFeatures()
         val allDefinitions = featureStore.allDefinitions()
-        val allIntDefinitions = allDefinitions.filterIsInstance<IntFeatureDefinition>()
         parsed.features().forEach { feature ->
-            val intFeatureDef = getIntFeatureDef(feature, nonUniqueFeatures, allIntDefinitions, info, status)
-            if (intFeatureDef != null) {
-                featureMap[feature] = intFeatureDef
+            val def: AnyFeatureDef? =
+                if (feature.featureCode.contains(MODULE_SEPARATOR)) {
+                    allDefinitions.find { def -> def.feature.fullName == feature.featureCode }
+                } else if (nonUniqueFeatures.contains(feature.featureCode)) {
+                    return errorResult(status, "Feature is not unique and not full qualified")
+                } else {
+                    allDefinitions.find { def -> def.code == feature.featureCode }
+                }
+            if (def == null) {
+                return errorResult(status, "Feature is not defined in current rule files")
             } else {
-                val featureDefinition: AnyFeatureDef =
-                    if (feature.featureCode.contains(MODULE_SEPARATOR)) {
-                        allDefinitions.find { featureDef -> featureDef.feature.fullName == feature.featureCode }
-                            ?: return errorResult(status, "Feature is not defined in current rule files")
-                    } else if (nonUniqueFeatures.contains(feature.featureCode)) {
-                        return errorResult(status, "Feature is not unique and not full qualified")
-                    } else {
-                        allDefinitions.find { featureDef -> featureDef.feature.featureCode == feature.featureCode }
-                            ?: return errorResult(status, "Feature is not defined in current rule files")
-                    }
-                featureMap[feature] = featureDefinition
+                val instantiation = info.featureInstantiations[def.feature] ?: return errorResult(status, "Feature has no instantiation")
+                featureMap[feature] = instantiation
             }
         }
         return featureMap
-    }
-
-    private fun getIntFeatureDef(
-        parsed: PrlFeature,
-        nonUniqueFeatures: Set<String>,
-        allIntDefinitions: List<IntFeatureDefinition>,
-        info: TranslationInfo,
-        status: ComputationStatusBuilder
-    ): IntFeatureDefinition? {
-        val intVariable = if (parsed.featureCode.contains(MODULE_SEPARATOR)) {
-            info.integerVariables.find { it.feature == parsed.featureCode }
-        } else if (nonUniqueFeatures.contains(parsed.featureCode)) {
-            return errorResult(status, "Feature is not unique and not full qualified")
-        } else {
-            info.integerVariables.find { Feature.featureCodeOfFullName(it.feature) == parsed.featureCode }
-        }
-        return if (intVariable != null) {
-            val intFeature = info.integerEncodings.store[intVariable.feature]?.featureToVar?.entries?.find { it.value == intVariable }?.key
-            if (intFeature != null) allIntDefinitions.find { intFeature == it.feature } else null
-        } else null
     }
 
     private fun <R> errorResult(
