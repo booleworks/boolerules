@@ -284,10 +284,9 @@ sealed class Computation<
 
     internal fun processConstraint(
         f: FormulaFactory,
-        constraint:
-        String, model:
-        PrlModel, info:
-        TranslationInfo,
+        constraint: String,
+        model: PrlModel,
+        info: TranslationInfo,
         status: ComputationStatusBuilder
     ): PrlProposition? {
         val parsed = parseConstraint<PrlConstraint>(constraint)
@@ -309,12 +308,12 @@ sealed class Computation<
             val featureDefinition: AnyFeatureDef =
                 if (feature.featureCode.contains(MODULE_SEPARATOR)) {
                     allDefinitions.find { featureDef -> featureDef.feature.fullName == feature.featureCode }
-                        ?: return errorResult(status, "Feature is not defined in current rule files")
+                        ?: return errorResult(status, "Feature '${feature.featureCode}' is not defined in current rule files")
                 } else if (nonUniqueFeatures.contains(feature.featureCode)) {
-                    return errorResult(status, "Feature is not unique and not full qualified")
+                    return errorResult(status, "Feature '${feature.featureCode}' is not unique and not full qualified")
                 } else {
                     allDefinitions.find { featureDef -> featureDef.feature.featureCode == feature.featureCode }
-                        ?: return errorResult(status, "Feature is not defined in current rule files")
+                        ?: return errorResult(status, "Feature '${feature.featureCode}' not defined in current rule files")
                 }
             featureMap[feature] = featureDefinition
         }

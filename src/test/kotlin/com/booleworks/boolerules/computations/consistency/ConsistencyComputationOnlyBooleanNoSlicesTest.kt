@@ -46,7 +46,7 @@ internal class ConsistencyComputationOnlyBooleanNoSlicesTest : TestWithConfig() 
         setUp(tc)
         val request = ConsistencyRequest("any", mutableListOf(), listOf())
         val sb = ComputationStatusBuilder("fileId", "jobId", SINGLE)
-        val respone = cut.computeResponse(request, model, sb)
+        val response = cut.computeResponse(request, model, sb)
         val status = sb.build()
 
         assertThat(status.success).isTrue
@@ -58,16 +58,16 @@ internal class ConsistencyComputationOnlyBooleanNoSlicesTest : TestWithConfig() 
         assertThat(status.warnings).isEmpty()
         assertThat(status.infos).isEmpty()
 
-        assertThat(respone.merge).hasSize(1)
-        assertThat(respone.merge[0].result).isTrue()
-        assertThat(respone.merge[0].slices).hasSize(1)
+        assertThat(response.merge).hasSize(1)
+        assertThat(response.merge[0].result).isTrue()
+        assertThat(response.merge[0].slices).hasSize(1)
 
-        assertThat(respone.merge[0].slices[0]).isEqualTo(SliceDO(listOf()))
+        assertThat(response.merge[0].slices[0]).isEqualTo(SliceDO(listOf()))
 
-        assertThat(respone.detailMap).hasSize(1)
-        assertThat(respone.detailMap[1]).hasSize(1)
-        assertThat(respone.detailMap[1]!![0].slice).isEqualTo(SliceDO(listOf()))
-        assertThat(respone.detailMap[1]!![0].detail.exampleConfiguration!!.features).isNotEmpty
-        assertThat(respone.detailMap[1]!![0].detail.explanation).isNull()
+        assertThat(response.detailMap).hasSize(1)
+        assertThat(response.detailMap[1]).hasSize(1)
+        assertThat(response.detailMap[1]!![0].slice).isEqualTo(SliceDO(listOf()))
+        assertThat(response.detailMap[1]!![0].detail.exampleConfiguration!!.features).isNotEmpty
+        assertThat(response.detailMap[1]!![0].detail.explanation).isNull()
     }
 }

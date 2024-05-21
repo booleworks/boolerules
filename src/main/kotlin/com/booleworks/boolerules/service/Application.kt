@@ -7,6 +7,7 @@ import com.booleworks.boolerules.computations.backbone.BACKBONE
 import com.booleworks.boolerules.computations.bomcheck.BOMCHECK
 import com.booleworks.boolerules.computations.computationManagementRoute
 import com.booleworks.boolerules.computations.consistency.CONSISTENCY
+import com.booleworks.boolerules.computations.coverage.COVERAGE
 import com.booleworks.boolerules.computations.details.detailsRoute
 import com.booleworks.boolerules.computations.generic.addComputationApi
 import com.booleworks.boolerules.computations.minmaxconfig.MINMAXCONFIG
@@ -111,6 +112,9 @@ fun Application.module() {
 
             route(PATH_COMPUTATION) { addComputationApi(BOMCHECK, this@route) }
             route(PATH_COMPUTATION) { detailsRoute(BOMCHECK) }
+
+            route(PATH_COMPUTATION) { addComputationApi(COVERAGE, this@route) }
+            route(PATH_COMPUTATION) { detailsRoute(COVERAGE) }
 
             // Rulefile management
             route(PATH_RULEFILE) { rulefileRoute() }
