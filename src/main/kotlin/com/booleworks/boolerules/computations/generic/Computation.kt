@@ -5,15 +5,14 @@ package com.booleworks.boolerules.computations.generic
 
 import com.booleworks.boolerules.config.ComputationConfig
 import com.booleworks.logicng.csp.CspFactory
-import com.booleworks.logicng.datastructures.Tristate
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.formulas.FormulaFactoryConfig
 import com.booleworks.logicng.formulas.FormulaFactoryConfig.FormulaMergeStrategy.IMPORT
 import com.booleworks.logicng.formulas.FormulaFactoryConfig.FormulaMergeStrategy.USE_BUT_NO_IMPORT
 import com.booleworks.logicng.solvers.MaxSATSolver
-import com.booleworks.logicng.solvers.MiniSat
+import com.booleworks.logicng.solvers.SATSolver
 import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSATConfig
-import com.booleworks.logicng.solvers.sat.MiniSatConfig
+import com.booleworks.logicng.solvers.sat.SATSolverConfig
 import com.booleworks.prl.compiler.ConstraintCompiler
 import com.booleworks.prl.compiler.FeatureStore
 import com.booleworks.prl.model.AnyFeatureDef
@@ -51,8 +50,8 @@ val NON_CACHING_USE_FF: () -> FormulaFactory =
 val CACHING_IMPORT_FF: () -> FormulaFactory =
     { FormulaFactory.caching(FormulaFactoryConfig.builder().formulaMergeStrategy(IMPORT).build()) }
 
-val PT_CONFIG: MiniSatConfig = MiniSatConfig.builder().proofGeneration(true).build()
-val NON_PT_CONFIG: MiniSatConfig = MiniSatConfig.builder().proofGeneration(false).build()
+val PT_CONFIG: SATSolverConfig = SATSolverConfig.builder().proofGeneration(true).build()
+val NON_PT_CONFIG: SATSolverConfig = SATSolverConfig.builder().proofGeneration(false).build()
 
 /**
  * Super class for all internal computations.
@@ -69,10 +68,10 @@ val NON_PT_CONFIG: MiniSatConfig = MiniSatConfig.builder().proofGeneration(false
  * @param INTRES the type of the internal result
  */
 sealed class Computation<
-    REQUEST : ComputationRequest,
-    MAIN,
-    DETAIL : ComputationDetail,
-    INTRES : InternalResult<MAIN, DETAIL>>(
+        REQUEST : ComputationRequest,
+        MAIN,
+        DETAIL : ComputationDetail,
+        INTRES : InternalResult<MAIN, DETAIL>>(
     open val ffProvider: () -> FormulaFactory
 ) {
     internal val logger: Logger = LoggerFactory.getLogger(this::class.java)
@@ -226,20 +225,20 @@ sealed class Computation<
     }
 
     internal fun miniSat(
-        config: MiniSatConfig,
+        config: SATSolverConfig,
         request: REQUEST,
         cf: CspFactory,
         model: PrlModel,
         info: TranslationInfo,
         slice: Slice,
         status: ComputationStatusBuilder
-    ): MiniSat {
-        val solver = MiniSat.miniSat(cf.formulaFactory(), config)
+    ): SATSolver {
+        val solver = SATSolver.newSolver(cf.formulaFactory(), config)
         solver.addPropositions(info.propositions)
-        if (solver.sat() == Tristate.FALSE) {
+        if (!solver.sat()) {
             status.addWarning(
                 "Original rule set for the slice $slice is inconsistent. " +
-                    "Use the 'consistency' check to get an explanation, why."
+                        "Use the 'consistency' check to get an explanation, why."
             )
             return solver
         }
@@ -259,10 +258,10 @@ sealed class Computation<
                 .toSet()
                 .map { PrlProposition(RuleInformation(RuleType.INTEGER_VARIABLE), info.integerEncodings.getEncoding(it)!!) }
             )
-            if (solver.sat() == Tristate.FALSE) {
+            if (!solver.sat()) {
                 status.addWarning(
                     "The additional constraints turned the rule set for for the slice $slice inconsistent. " +
-                        "Use the 'consistency' check to get an explanation, why."
+                            "Use the 'consistency' check to get an explanation, why."
                 )
             }
         }
@@ -358,10 +357,10 @@ sealed class Computation<
 }
 
 abstract class SingleComputation<
-    REQUEST : ComputationRequest,
-    MAIN,
-    DETAIL : ComputationDetail,
-    INTRES : InternalResult<MAIN, DETAIL>>(
+        REQUEST : ComputationRequest,
+        MAIN,
+        DETAIL : ComputationDetail,
+        INTRES : InternalResult<MAIN, DETAIL>>(
     override val ffProvider: () -> FormulaFactory,
 ) : Computation<REQUEST, MAIN, DETAIL, INTRES>(ffProvider) {
 
@@ -403,15 +402,15 @@ abstract class SingleComputation<
 }
 
 abstract class ListComputation<
-    REQUEST : ComputationRequest,
-    MAIN,
-    DETAIL : ComputationDetail,
-    ELEMMAIN : Comparable<ELEMMAIN>,
-    ELEMDETAIL : ComputationDetail,
-    INTRES : InternalResult<MAIN, DETAIL>,
-    ELEMRES : InternalResult<ELEMMAIN, ELEMDETAIL>,
-    ELEMENT : Comparable<ELEMENT>,
-    >(
+        REQUEST : ComputationRequest,
+        MAIN,
+        DETAIL : ComputationDetail,
+        ELEMMAIN : Comparable<ELEMMAIN>,
+        ELEMDETAIL : ComputationDetail,
+        INTRES : InternalResult<MAIN, DETAIL>,
+        ELEMRES : InternalResult<ELEMMAIN, ELEMDETAIL>,
+        ELEMENT : Comparable<ELEMENT>,
+        >(
     override val ffProvider: () -> FormulaFactory
 ) : Computation<REQUEST, MAIN, DETAIL, INTRES>(ffProvider) {
 
@@ -431,7 +430,7 @@ abstract class ListComputation<
      * model and merges the slice results afterward.
      */
     internal fun computeResponse(request: REQUEST, model: PrlModel, status: ComputationStatusBuilder):
-        Map<ComputationElement<ELEMENT>, MergeResult<ELEMMAIN, ELEMDETAIL>> {
+            Map<ComputationElement<ELEMENT>, MergeResult<ELEMMAIN, ELEMDETAIL>> {
         val computationResult = computeForModel(request, model, status)
         val allElements = computationResult.values.flatMap { extractElements(it) }.toSet()
         val elementMap = allElements.associateWith { resultMapForElement(it, computationResult) }.toSortedMap()

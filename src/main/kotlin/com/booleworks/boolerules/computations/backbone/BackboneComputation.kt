@@ -21,9 +21,9 @@ import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.boolerules.computations.generic.computeRelevantVars
 import com.booleworks.boolerules.computations.generic.extractFeature
 import com.booleworks.logicng.csp.CspFactory
+import com.booleworks.logicng.csp.encodings.CspEncodingContext
 import com.booleworks.logicng.formulas.Formula
 import com.booleworks.logicng.formulas.FormulaFactory
-import com.booleworks.logicng.formulas.InternalAuxVarType
 import com.booleworks.logicng.formulas.Variable
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
@@ -140,7 +140,7 @@ internal object BackboneComputation : ListComputation<
             while (c < domain.ub()) {
                 if (domain.contains(c)) {
                     val originalVar = satVars[index]!!
-                    val translatedVar = f.newAuxVariable(InternalAuxVarType.CSP)
+                    val translatedVar = f.newAuxVariable(CspEncodingContext.CSP_AUX_LNG_VARIABLE)
                     if (previousVar == null) {
                         clauses.add(f.equivalence(originalVar, translatedVar))
                     } else {
@@ -153,7 +153,7 @@ internal object BackboneComputation : ListComputation<
                 ++c
             }
             if (previousVar != null) {
-                val translatedVar = f.newAuxVariable(InternalAuxVarType.CSP)
+                val translatedVar = f.newAuxVariable(CspEncodingContext.CSP_AUX_LNG_VARIABLE)
                 clauses.add(f.equivalence(previousVar.negate(f), translatedVar))
                 map[translatedVar] = Pair(intVar, domain.ub())
             }

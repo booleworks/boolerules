@@ -8,6 +8,8 @@ import com.booleworks.boolerules.computations.NoElement
 import com.booleworks.boolerules.computations.consistency.CONSISTENCY
 import com.booleworks.boolerules.computations.consistency.ConsistencyComputation
 import com.booleworks.boolerules.computations.consistency.ConsistencyDetail
+import com.booleworks.boolerules.computations.coverage.COVERAGE
+import com.booleworks.boolerules.computations.coverage.CoverageDetail
 import com.booleworks.boolerules.computations.generic.SliceDO
 import com.booleworks.boolerules.computations.minmaxconfig.MINMAXCONFIG
 import com.booleworks.boolerules.computations.minmaxconfig.MinMaxConfigDetail
@@ -32,6 +34,7 @@ fun computeDetailResponse(
         CONSISTENCY -> computeConsistencyDetail(request)
         MINMAXCONFIG -> computeMinMaxDetail(request)
         OPTIMIZATION -> computeOptimizationDetail(request)
+        COVERAGE -> computeCoverageDetail(request)
         else -> error("Cannot compute details for computation without details")
     }
 
@@ -82,6 +85,19 @@ private fun computeOptimizationDetail(request: DetailRequest): DetailResponse<No
         ).getOrThrow()
     val mainResult =
         Persistence.computation.fetchMainResult(request.jobId, computationDetail.resultId, OPTIMIZATION).getOrThrow()
+    return DetailResponse(null, mainResult, computationDetail)
+}
+
+private fun computeCoverageDetail(request: DetailRequest): DetailResponse<NoElement, Int, CoverageDetail> {
+    val computationDetail =
+        Persistence.computation.fetchDetail(
+            request.jobId,
+            SliceDO.fromSelection(request.sliceSelection),
+            request.elementId,
+            COVERAGE
+        ).getOrThrow()
+    val mainResult =
+        Persistence.computation.fetchMainResult(request.jobId, computationDetail.resultId, COVERAGE).getOrThrow()
     return DetailResponse(null, mainResult, computationDetail)
 }
 

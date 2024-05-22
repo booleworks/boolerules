@@ -10,6 +10,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
+@OptIn(ExperimentalStdlibApi::class)
 class ComputationRequestTest {
 
     private val compiler = PrlCompiler()

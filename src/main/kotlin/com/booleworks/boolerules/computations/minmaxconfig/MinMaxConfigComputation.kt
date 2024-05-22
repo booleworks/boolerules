@@ -36,7 +36,7 @@ val MINMAXCONFIG =
             "A configuration is minimal if there is no other configuration with " +
                     "fewer selected features, it is maximal if there is no " +
                     "other configuration with more selected features. A list " +
-                    "of feautures can be provided over which the optimization " +
+                    "of features can be provided over which the optimization " +
                     "is computed."
         )
 

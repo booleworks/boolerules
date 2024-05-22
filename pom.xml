@@ -54,6 +54,12 @@
 
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${version.maven-compiler}</version>
+      </plugin>
+
+      <plugin>
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-maven-plugin</artifactId>
         <executions>
@@ -62,6 +68,9 @@
             <goals>
               <goal>compile</goal>
             </goals>
+            <configuration>
+              <args>-opt-in=kotlin.time.ExperimentalTime</args>
+            </configuration>
           </execution>
           <execution>
             <id>test-compile</id>
@@ -274,7 +283,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <repositories>
     <repository>
       <id>maven-snapshots</id>
