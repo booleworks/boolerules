@@ -135,7 +135,7 @@ internal object CoverageComputation :
                         invalidCombinations += "[$constraintI, $constraintJ]"
                     } else {
                         val selector = f.variable("@COV_SELECTOR_$index")
-                        constraintsToCover[selector] = f.equivalence(selector, combination) to "$constraintI + $constraintJ"
+                        constraintsToCover[selector] = f.equivalence(selector, combination) to "[$constraintI, $constraintJ]"
                         index += 1
                     }
                 }
