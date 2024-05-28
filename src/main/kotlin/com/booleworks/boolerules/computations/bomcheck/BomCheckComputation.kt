@@ -15,6 +15,7 @@ import com.booleworks.boolerules.computations.generic.ListComputationRunner
 import com.booleworks.boolerules.computations.generic.NON_CACHING_USE_FF
 import com.booleworks.boolerules.computations.generic.NON_PT_CONFIG
 import com.booleworks.boolerules.computations.generic.computationDoc
+import com.booleworks.logicng.datastructures.Tristate
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
@@ -75,7 +76,6 @@ internal object BomCheckComputation :
         f: FormulaFactory,
         status: ComputationStatusBuilder,
     ): BomCheckInternalResult {
-        // TODO neue LogicNG Version einbinden
         val solver = miniSat(NON_PT_CONFIG, request, f, model, info, slice, status).also {
             if (!status.successful()) return BomCheckInternalResult(slice, mutableMapOf())
         }
@@ -93,14 +93,19 @@ internal object BomCheckComputation :
             var isComplete = true
 
             val pvConstraintMap =
-                position.pvs.associateWith { processConstraint(f, it.constraint, model, info, status) }
+                position.positionVariants.associateWith { processConstraint(f, it.constraint, model, info, status) }
                     .filterValues { it != null } as Map<PositionVariant, PrlProposition>
             // Search dead pvs -> Detail: List of position variants that are dead
             pvConstraintMap.forEach { (pv, pvConstraint) ->
+                solver.satCall().addPropositions(pvConstraint).solve().use { satCall ->
+                    if (satCall.satResult != Tristate.TRUE) {
+                        deadPVs.add(pv)
+                    }
+                }
                 val initialState = solver.saveState()
                 solver.add(pvConstraint)
                 if (!solver.sat()) {
-                    deadPVs.add(pv)
+                    // Do something
                 }
                 solver.loadState(initialState)
             }
@@ -117,8 +122,8 @@ internal object BomCheckComputation :
             solver.loadState(initialState)
 
             // Check if pv is unique (?) -> List of pvs and a flag that indicates if it is unique
-            // wie prüfe ich ob zwei PVs gleich sind? Syntaktisch oder Sematisch? D.h. vorher vereinfachen?
-            
+            // Add pv rule to solver and next rule to solver then check if satisfiable -> if yes, then the two rules are not unique
+
 
             // build result
             positionElements.add(

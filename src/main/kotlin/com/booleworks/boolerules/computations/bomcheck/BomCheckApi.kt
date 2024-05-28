@@ -40,14 +40,14 @@ data class Position(
     val constraint: String,
 
     @field:Schema(description = "The position variants")
-    val pvs: Set<PositionVariant>
+    val positionVariants: List<PositionVariant>
 )
 
 @JsonInclude(Include.NON_NULL)
 @Schema(description = "The position variants")
 data class PositionVariant(
     @field:Schema(description = "The position variant ID")
-    val pvId: String,
+    val positionVariantId: String,
 
     @field:Schema(description = "The description of the position variant")
     val description: String,
