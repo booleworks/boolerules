@@ -10,6 +10,7 @@ import com.booleworks.boolerules.computations.consistency.ConsistencyComputation
 import com.booleworks.boolerules.computations.consistency.ConsistencyDetail
 import com.booleworks.boolerules.computations.coverage.COVERAGE
 import com.booleworks.boolerules.computations.coverage.CoverageDetail
+import com.booleworks.boolerules.computations.coverage.CoverageMainResult
 import com.booleworks.boolerules.computations.generic.SliceDO
 import com.booleworks.boolerules.computations.minmaxconfig.MINMAXCONFIG
 import com.booleworks.boolerules.computations.minmaxconfig.MinMaxConfigDetail
@@ -88,7 +89,7 @@ private fun computeOptimizationDetail(request: DetailRequest): DetailResponse<No
     return DetailResponse(null, mainResult, computationDetail)
 }
 
-private fun computeCoverageDetail(request: DetailRequest): DetailResponse<NoElement, Int, CoverageDetail> {
+private fun computeCoverageDetail(request: DetailRequest): DetailResponse<NoElement, CoverageMainResult, CoverageDetail> {
     val computationDetail =
         Persistence.computation.fetchDetail(
             request.jobId,

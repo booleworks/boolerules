@@ -40,6 +40,7 @@ internal class CoverageComputationNoSlicesTest : TestWithConfig() {
         assertThat(sliceResult.slice).isEqualTo(Slice.empty())
         assertThat(sliceResult.result).hasSize(3)
         assertThat(sliceResult.result.flatMap { it.coveredConstraints }).containsAll(buildable)
+        assertThat(sliceResult.uncoverableConstraints).isEqualTo(4)
     }
 
     @ParameterizedTest
@@ -62,6 +63,7 @@ internal class CoverageComputationNoSlicesTest : TestWithConfig() {
         assertThat(sliceResult.result).hasSize(2)
         assertThat(sliceResult.result.flatMap { it.coveredConstraints }).containsAll(constraints)
         assertThat(sliceResult.result).allMatch { it.coveredConstraints.isNotEmpty() }
+        assertThat(sliceResult.uncoverableConstraints).isZero()
     }
 
     @ParameterizedTest
@@ -92,6 +94,7 @@ internal class CoverageComputationNoSlicesTest : TestWithConfig() {
             "[suz, bhy]",
             "[csq, emc]"
         ))
+        assertThat(sliceResult.uncoverableConstraints).isEqualTo(10)
 
         val request2 = CoverageRequest("any", mutableListOf(), listOf(), buildableCombinations.map { "${it.first} & ${it.second}" }, true)
         val result2 = cut.computeForModel(request2, model, ComputationStatusBuilder("fileId", "jobId", SINGLE))
@@ -122,7 +125,7 @@ internal class CoverageComputationNoSlicesTest : TestWithConfig() {
         assertThat(status.infos).isEmpty()
 
         assertThat(response.merge).hasSize(1)
-        assertThat(response.merge[0].result).isEqualTo(3)
+        assertThat(response.merge[0].result).isEqualTo(CoverageMainResult(3, 4))
         assertThat(response.merge[0].slices).hasSize(1)
         assertThat(response.merge[0].slices[0]).isEqualTo(SliceDO(listOf()))
 

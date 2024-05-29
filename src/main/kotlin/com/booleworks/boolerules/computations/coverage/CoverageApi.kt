@@ -19,7 +19,6 @@ data class CoverageRequest(
     @field:Schema(description = "The list of additional restrictions for the computation")
     override val additionalConstraints: List<String> = listOf(),
 
-    // TODO add option for pairwise feature coverage check
     @field:Schema(description = "The set of constraints which must be covered")
     val constraintsToCover: List<String>,
 
@@ -44,4 +43,14 @@ data class CoveringConfiguration(
     val coveredConstraints: List<String>
 )
 
-typealias CoverageResponse = SingleComputationResponse<Int>
+@Schema(description = "The main result of the coverage computation")
+data class CoverageMainResult(
+
+    @field:Schema(description = "The number of configurations required to cover all constraints (excluding the ones which cannot be covered at all)")
+    val requiredConfigurations: Int,
+
+    @field:Schema(description = "The number of constraints that cannot be covered since the constraint is not buildable")
+    val uncoverableConstraints: Int,
+)
+
+typealias CoverageResponse = SingleComputationResponse<CoverageMainResult>

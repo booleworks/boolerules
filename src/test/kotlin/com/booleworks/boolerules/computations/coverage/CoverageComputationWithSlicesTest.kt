@@ -66,5 +66,15 @@ internal class CoverageComputationWithSlicesTest : TestWithConfig() {
         assertThat(result[s13]!!.result).hasSize(1)
         assertThat(result[s23]!!.result).hasSize(1)
         assertThat(result[s33]!!.result).hasSize(2)
+
+        assertThat(result[s11]!!.uncoverableConstraints).isEqualTo(0)
+        assertThat(result[s21]!!.uncoverableConstraints).isEqualTo(0)
+        assertThat(result[s31]!!.uncoverableConstraints).isEqualTo(0)
+        assertThat(result[s12]!!.uncoverableConstraints).isEqualTo(0)
+        assertThat(result[s22]!!.uncoverableConstraints).isEqualTo(0)
+        assertThat(result[s32]!!.uncoverableConstraints).isEqualTo(0)
+        assertThat(result[s13]!!.uncoverableConstraints).isEqualTo(3)
+        assertThat(result[s23]!!.uncoverableConstraints).isEqualTo(3)
+        assertThat(result[s33]!!.uncoverableConstraints).isEqualTo(1)
     }
 }

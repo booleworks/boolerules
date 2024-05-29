@@ -28,7 +28,7 @@ import java.util.SortedSet
 val COVERAGE = object : ComputationType<
         CoverageRequest,
         CoverageResponse,
-        Int,
+        CoverageMainResult,
         CoverageDetail,
         NoElement> {
     override val path = "coverage"
@@ -39,7 +39,7 @@ val COVERAGE = object : ComputationType<
     )
 
     override val request = CoverageRequest::class.java
-    override val main = Int::class.java
+    override val main = CoverageMainResult::class.java
     override val detail = CoverageDetail::class.java
     override val element = NoElement::class.java
 
@@ -48,7 +48,7 @@ val COVERAGE = object : ComputationType<
 }
 
 internal object CoverageComputation :
-    SingleComputation<CoverageRequest, Int, CoverageDetail, CoverageInternalResult>(NON_CACHING_USE_FF) {
+    SingleComputation<CoverageRequest, CoverageMainResult, CoverageDetail, CoverageInternalResult>(NON_CACHING_USE_FF) {
 
     override fun allowedSliceTypes() = setOf(SliceTypeDO.SPLIT)
 
@@ -67,7 +67,8 @@ internal object CoverageComputation :
     ): CoverageInternalResult {
         val baseConstraints = info.propositions.map { it.formula() }.toMutableList()
         baseConstraints += request.additionalConstraints.mapNotNull { processConstraint(f, it, model, info, status)?.formula() }
-        val constraintsToCover = computeConstraintsToCover(f, baseConstraints, request, model, info, slice, status) ?: return CoverageInternalResult(slice, emptyList())
+        val (invalidConstraints, constraintsToCover) = computeConstraintsToCover(f, baseConstraints, request, model, info, slice, status)
+            ?: return CoverageInternalResult(slice, emptyList(), 0)
         baseConstraints += constraintsToCover.values.map { it.first }
 
         val selectors = constraintsToCover.keys
@@ -84,7 +85,7 @@ internal object CoverageComputation :
             val coveredConstraints = matchingModel.mapNotNull { constraintsToCover[it]?.second }
             CoveringConfiguration(configuration, coveredConstraints)
         }
-        return CoverageInternalResult(slice, covers)
+        return CoverageInternalResult(slice, covers, invalidConstraints)
     }
 
     override fun computeDetailForSlice(
@@ -104,7 +105,7 @@ internal object CoverageComputation :
         info: TranslationInfo,
         slice: Slice,
         status: ComputationStatusBuilder,
-    ): Map<Variable, Pair<Formula, String>>? {
+    ): Pair<Int, Map<Variable, Pair<Formula, String>>>? {
         val baseSolver = SATSolver.newSolver(f)
         baseConstraints.forEach { baseSolver.add(it) }
         val validConstraints = mutableListOf<Pair<Formula, String>>()
@@ -123,7 +124,10 @@ internal object CoverageComputation :
         }
 
         val constraintsToCover = mutableMapOf<Variable, Pair<Formula, String>>()
+        // k nicht baubare Constraints = (n-1)+(n-2)+...+(n-k) nicht baubare Kombinationen = k*n-(k*(k+1)/2)
+        var numInvalidCombinations: Int
         if (request.pairwiseCover) {
+            numInvalidCombinations = invalidConstraints.size * request.constraintsToCover.size - (invalidConstraints.size * (invalidConstraints.size + 1)) / 2
             var index = 0
             val invalidCombinations = mutableListOf<String>()
             for (i in 0 until validConstraints.size) {
@@ -133,6 +137,7 @@ internal object CoverageComputation :
                     val combination = f.and(formulaI, formulaJ)
                     if (baseSolver.satCall().addFormulas(combination).sat() == Tristate.FALSE) {
                         invalidCombinations += "[$constraintI, $constraintJ]"
+                        numInvalidCombinations++
                     } else {
                         val selector = f.variable("@COV_SELECTOR_$index")
                         constraintsToCover[selector] = f.equivalence(selector, combination) to "[$constraintI, $constraintJ]"
@@ -144,13 +149,14 @@ internal object CoverageComputation :
                 status.addWarning("For slice $slice the following constraint-combinations were not buildable and are therefore not covered by the result: $invalidCombinations")
             }
         } else {
+            numInvalidCombinations = invalidConstraints.size
             validConstraints.mapIndexed { index, (formula, constraint) ->
                 val selector = f.variable("@COV_SELECTOR_$index")
                 constraintsToCover[selector] = f.equivalence(selector, formula) to constraint
             }
         }
 
-        return constraintsToCover
+        return numInvalidCombinations to constraintsToCover
     }
 
     private fun computeInitialCover(
@@ -212,9 +218,10 @@ internal object CoverageComputation :
 
 data class CoverageInternalResult(
     override val slice: Slice,
-    val result: List<CoveringConfiguration>
-) : InternalResult<Int, CoverageDetail>(slice) {
-    override fun extractMainResult() = result.size
+    val result: List<CoveringConfiguration>,
+    val uncoverableConstraints: Int
+) : InternalResult<CoverageMainResult, CoverageDetail>(slice) {
+    override fun extractMainResult() = CoverageMainResult(result.size, uncoverableConstraints)
     override fun extractDetails() = CoverageDetail(result)
     override fun toString(): String {
         return "CoverageInternalResult(slice=$slice, result=[${result.joinToString { "[$it]" }}])"
