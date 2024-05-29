@@ -102,7 +102,7 @@ private fun computeCoverageDetail(request: DetailRequest): DetailResponse<NoElem
     return DetailResponse(null, mainResult, computationDetail)
 }
 
-private fun fetchModel(jobId: String): PrlModel {
+internal fun fetchModel(jobId: String): PrlModel {
     val status = Persistence.computation.fetchStatus(jobId).getOrThrow()
     val binZipped = Persistence.rulefile.getBinaryRuleFile(status.ruleFileId)
     return deserialize(

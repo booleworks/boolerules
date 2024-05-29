@@ -6,6 +6,7 @@ package com.booleworks.boolerules.service
 import com.booleworks.boolerules.computations.backbone.BACKBONE
 import com.booleworks.boolerules.computations.computationManagementRoute
 import com.booleworks.boolerules.computations.consistency.CONSISTENCY
+import com.booleworks.boolerules.computations.consistency.coverageGraphRoute
 import com.booleworks.boolerules.computations.coverage.COVERAGE
 import com.booleworks.boolerules.computations.details.detailsRoute
 import com.booleworks.boolerules.computations.generic.addComputationApi
@@ -111,6 +112,7 @@ fun Application.module() {
 
             route(PATH_COMPUTATION) { addComputationApi(COVERAGE, this@route) }
             route(PATH_COMPUTATION) { detailsRoute(COVERAGE) }
+            route(PATH_COMPUTATION) { coverageGraphRoute() }
 
             // Rulefile management
             route(PATH_RULEFILE) { rulefileRoute() }

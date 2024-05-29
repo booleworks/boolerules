@@ -356,7 +356,7 @@ abstract class SingleComputation<
     ): SplitComputationDetail<DETAIL> {
         val f = FormulaFactory.caching()
         val modelTranslation = transpileModel(f, model, sliceSelection)
-        assert(modelTranslation.computations.size == 1) { "Expected to get exactly one slice" }
+        require(modelTranslation.computations.size == 1) { "Expected to get exactly one slice" }
         val slice = modelTranslation.allSlices.first()
         val translation = modelTranslation.computations.first().info
         return computeDetailForSlice(slice, model, translation, additionalConstraints, splitProperties, f)
