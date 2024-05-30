@@ -4,6 +4,7 @@ import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.prl.compiler.PrlCompiler
 import com.booleworks.prl.parser.parseRuleFile
+import com.booleworks.prl.transpiler.RuleType.ADDITIONAL_RESTRICTION
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -175,5 +176,23 @@ class LogicNGTranspilerEnumTest {
         assertThat(modelTranslation[3].propositions[6].formula()).isEqualTo(f.parse("@ENUM_c_c1 + @ENUM_c_c2 + @ENUM_c_c3 = 1"))
         assertThat(modelTranslation[3].propositions[7].formula()).isEqualTo(f.parse("@ENUM_p_px + @ENUM_p_p2 = 1"))
         assertThat(modelTranslation[3].propositions[8].formula()).isEqualTo(f.parse("@ENUM_q_q1 + @ENUM_q_q2 = 1"))
+    }
+
+    @Test
+    fun testAdditionalConstraints() {
+        val mod = transpileModel(
+            cf, model, listOf(),
+            additionalConstraints = listOf("[b = \"b2\"]", "x", "[w = \"w1\"]")
+        )
+        assertThat(mod.skippedConstraints).containsExactly("x", "[w = \"w1\"]")
+
+        assertThat(mod[0].propositions).hasSize(8)
+        assertThat(mod[1].propositions).hasSize(9)
+        assertThat(mod[2].propositions).hasSize(9)
+        assertThat(mod[3].propositions).hasSize(10)
+        assertThat(mod[0].propositions.filter { it.backpack().ruleType == ADDITIONAL_RESTRICTION }).hasSize(1)
+        assertThat(mod[1].propositions.filter { it.backpack().ruleType == ADDITIONAL_RESTRICTION }).hasSize(1)
+        assertThat(mod[2].propositions.filter { it.backpack().ruleType == ADDITIONAL_RESTRICTION }).hasSize(1)
+        assertThat(mod[3].propositions.filter { it.backpack().ruleType == ADDITIONAL_RESTRICTION }).hasSize(1)
     }
 }

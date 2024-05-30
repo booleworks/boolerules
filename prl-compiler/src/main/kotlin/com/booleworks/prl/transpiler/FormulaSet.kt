@@ -77,9 +77,13 @@ data class MergedSliceTranslation(val sliceSelectors: Map<String, SliceTranslati
     val unknownFeatures = info.unknownFeatures
 }
 
-data class ModelTranslation(val computations: List<SliceTranslation>) : Iterable<SliceTranslation> {
+data class ModelTranslation(
+    val computations: List<SliceTranslation>,
+    val skippedConstraints: List<String>
+) : Iterable<SliceTranslation> {
     val numberOfComputations = computations.size
     val allSlices = LinkedHashSet(computations.flatMap { it.sliceSet.slices })
+
     fun sliceMap(): Map<Slice, SliceTranslation> =
         computations.flatMap { it.sliceSet.slices.map { slice -> Pair(slice, it) } }.toMap()
 

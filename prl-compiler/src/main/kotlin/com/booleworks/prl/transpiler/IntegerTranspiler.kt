@@ -155,8 +155,8 @@ fun getAllIntPredicates(f: FormulaFactory, sliceSet: SliceSet): MutableMap<IntPr
 fun getAllIntPredicates(f: FormulaFactory, map: MutableMap<IntPredicate, Variable>, constraint: Constraint) {
     when (constraint) {
         is Constant -> {}
-        is BooleanFeature -> {}
         is VersionedBooleanFeature -> {}
+        is BooleanFeature -> {}
         is Not -> getAllIntPredicates(f, map, constraint.operand)
         is Implication -> {
             getAllIntPredicates(f, map, constraint.left)
@@ -168,9 +168,7 @@ fun getAllIntPredicates(f: FormulaFactory, map: MutableMap<IntPredicate, Variabl
         }
         is And -> constraint.operands.forEach { getAllIntPredicates(f, map, it) }
         is Or -> constraint.operands.forEach { getAllIntPredicates(f, map, it) }
-        is IntComparisonPredicate, is IntInPredicate -> map.computeIfAbsent(constraint) { _ ->
-            f.variable("${PREDICATE_PREFIX}_${map.size}")
-        }
+        is IntPredicate -> map.computeIfAbsent(constraint) { f.variable("${PREDICATE_PREFIX}_${map.size}") }
         is Amo, is Exo, is EnumComparisonPredicate, is EnumInPredicate -> {}
         is VersionPredicate -> {}
     }

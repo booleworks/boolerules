@@ -59,19 +59,19 @@ class ModelTranslationTest {
     )
 
     private val st1 = SliceTranslation(
-        SliceSet(mutableListOf(s1), listOf(), listOf()), TranslationInfo(
+        SliceSet(mutableListOf(s1), listOf(), mutableListOf(), mutableSetOf()), TranslationInfo(
             listOf(), setOf(), IntegerEncodingStore.empty(), FeatureInstantiation.empty(),
             setOf(), setOf(), mapOf(), setOf(), mapOf(), CspEncodingContext(), mapOf()
         )
     )
     private val st2 = SliceTranslation(
-        SliceSet(mutableListOf(s2, s3), listOf(), listOf()), TranslationInfo(
+        SliceSet(mutableListOf(s2, s3), listOf(), mutableListOf(), mutableSetOf()), TranslationInfo(
             listOf(), setOf(), IntegerEncodingStore.empty(), FeatureInstantiation.empty(),
             setOf(), setOf(), mapOf(), setOf(), mapOf(), CspEncodingContext(), mapOf()
         )
     )
     private val st3 = SliceTranslation(
-        SliceSet(mutableListOf(s4), listOf(), listOf()), TranslationInfo(
+        SliceSet(mutableListOf(s4), listOf(), mutableListOf(), mutableSetOf()), TranslationInfo(
             listOf(), setOf(), IntegerEncodingStore.empty(), FeatureInstantiation.empty(),
             setOf(), setOf(), mapOf(), setOf(), mapOf(), CspEncodingContext(), mapOf()
         )
@@ -79,7 +79,7 @@ class ModelTranslationTest {
 
     private val computations = listOf(st1, st2, st3)
 
-    private val modelTranslation = ModelTranslation(computations)
+    private val modelTranslation = ModelTranslation(computations, emptyList())
 
     @Test
     fun testSliceMap() {

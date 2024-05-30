@@ -263,7 +263,7 @@ class ConstraintCompiler {
             }
         }
         return when {
-            theory != null -> theory
+            theory != null -> theory!!
             isInt(predicate.left) && isInt(predicate.right) -> Theory.INT
             isEnum(predicate.left) && isEnum(predicate.right) -> Theory.ENUM
             else -> throw CoCoException("Cannot determine theory of predicate")

@@ -13,16 +13,23 @@ class LogicNGTranspilerBooleanNoSlicesTest {
     )
     private val f = FormulaFactory.caching()
     private val cf = CspFactory(f)
-    private val modelTranslation = transpileModel(cf, model, listOf())
-
-    @Test
-    fun testModel() {
-        assertThat(model.rules).hasSize(339)
-    }
 
     @Test
     fun testModelTranslation() {
+        val modelTranslation = transpileModel(cf, model, listOf())
+        assertThat(model.rules).hasSize(339)
         assertThat(modelTranslation.numberOfComputations).isEqualTo(1)
         assertThat(modelTranslation[0].propositions).hasSize(model.rules.size)
+    }
+
+    @Test
+    fun testModelTranslationWithConstraints() {
+        val modelTranslation = transpileModel(cf, model, listOf(), additionalConstraints = listOf("abq => bad", "bci"))
+        assertThat(modelTranslation.skippedConstraints).isEmpty()
+        assertThat(modelTranslation.numberOfComputations).isEqualTo(1)
+        assertThat(modelTranslation[0].propositions).hasSize(model.rules.size + 2)
+        assertThat(modelTranslation[0].propositions.filter {
+            it.backpack().ruleType == RuleType.ADDITIONAL_RESTRICTION
+        }).hasSize(2)
     }
 }

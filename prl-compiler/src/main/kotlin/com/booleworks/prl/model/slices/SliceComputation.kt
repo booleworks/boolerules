@@ -29,7 +29,12 @@ const val MAXIMUM_NUMBER_OF_SLICES = 10_000
 
 class MaxNumberOfSlicesExceededException(override val message: String) : Exception(message)
 
-data class SliceSet(val slices: MutableList<Slice>, val definitions: List<AnyFeatureDef>, val rules: List<AnyRule>) {
+data class SliceSet(
+    val slices: MutableList<Slice>,
+    val definitions: List<AnyFeatureDef>,
+    val rules: MutableList<AnyRule>,
+    val additionalConstraints: MutableSet<AnyRule>
+) {
     fun hasIntFeatures() = definitions.any { it.feature is IntFeature }
     fun hasVersionFeatures() = definitions.any { it.feature is VersionedBooleanFeature }
 
@@ -60,9 +65,9 @@ fun computeSliceSets(slices: List<Slice>, model: PrlModel): List<SliceSet> {
     val sliceMap = mutableMapOf<RuleFeatureIdentitySet, SliceSet>()
     slices.forEach { slice ->
         val featureDefs = model.featureDefinitions(slice)
-        val rules = model.rules(slice)
+        val rules = model.rules(slice).toMutableList()
         sliceMap.computeIfAbsent(RuleFeatureIdentitySet(featureDefs, rules)) {
-            SliceSet(mutableListOf(), featureDefs, rules)
+            SliceSet(mutableListOf(), featureDefs, rules, mutableSetOf())
         }.slices.add(slice)
     }
     return sliceMap.values.toList()
