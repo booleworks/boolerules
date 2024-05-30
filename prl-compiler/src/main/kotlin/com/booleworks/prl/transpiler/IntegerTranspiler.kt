@@ -64,7 +64,7 @@ fun encodeIntFeatures(
 ): IntegerEncodingStore = IntegerEncodingStore(store.intFeatures.values.associate { defs ->
     val reference = defs.first().code
     val map1 = defs.mapIndexed { index, d ->
-        val def = (d as IntFeatureDefinition)
+        val def = d as IntFeatureDefinition
         Pair(
             def,
             LngIntVariable(

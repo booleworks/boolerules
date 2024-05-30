@@ -48,7 +48,7 @@ class EnumFeature internal constructor(override val featureCode: String) : Featu
         if (javaClass != other?.javaClass) return false
         if (!super.equals(other)) return false
         other as EnumFeature
-        return (featureCode == other.featureCode)
+        return featureCode == other.featureCode
     }
 }
 

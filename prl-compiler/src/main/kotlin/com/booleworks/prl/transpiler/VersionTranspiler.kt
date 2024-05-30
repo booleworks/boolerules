@@ -101,7 +101,7 @@ fun translateVersionComparison(cf: CspFactory, constraint: VersionPredicate): Fo
 fun generateIntervalVariables(f: FormulaFactory, sliceSet: SliceSet, versionStore: VersionStore): List<PrlProposition> {
     val props = mutableListOf<PrlProposition>()
     versionStore.usedValues.forEach { (fea, maxVer) ->
-        (1..maxVer).forEach {
+        for (it in 1..maxVer) {
             props.add(generateIntervalVariable(f, sliceSet, fea, it, maxVer))
         }
     }

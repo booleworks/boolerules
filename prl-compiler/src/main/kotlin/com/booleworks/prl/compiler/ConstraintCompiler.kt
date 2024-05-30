@@ -125,9 +125,8 @@ class ConstraintCompiler {
         return enumIn(compileEnumFeature(predicate.term, theoryMap), predicate.values)
     }
 
-    private fun compileIntInPredicate(predicate: PrlInIntRangePredicate, theoryMap: Tmap): Constraint {
-        return intIn(compileIntTerm(predicate.term, theoryMap), predicate.range)
-    }
+    private fun compileIntInPredicate(predicate: PrlInIntRangePredicate, theoryMap: Tmap) =
+        intIn(compileIntTerm(predicate.term, theoryMap), predicate.range)
 
     internal fun compileIntTerm(term: PrlTerm, theoryMap: Tmap): IntTerm = when (term) {
         is PrlFeature -> compileIntFeature(term, theoryMap)

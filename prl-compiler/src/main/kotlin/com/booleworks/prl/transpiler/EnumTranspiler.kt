@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright 2023 BooleWorks GmbH
+
 package com.booleworks.prl.transpiler
 
 import com.booleworks.logicng.formulas.Formula
