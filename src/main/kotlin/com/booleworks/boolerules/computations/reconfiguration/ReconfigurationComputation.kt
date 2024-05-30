@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright 2023 BooleWorks GmbH
+
 package com.booleworks.boolerules.computations.reconfiguration
 
 import com.booleworks.boolerules.computations.ComputationType

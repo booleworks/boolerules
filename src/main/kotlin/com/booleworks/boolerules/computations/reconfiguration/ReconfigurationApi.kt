@@ -3,9 +3,7 @@
 
 package com.booleworks.boolerules.computations.reconfiguration
 
-import com.booleworks.boolerules.computations.generic.ComputationDetail
 import com.booleworks.boolerules.computations.generic.ComputationRequest
-import com.booleworks.boolerules.computations.generic.FeatureModelDO
 import com.booleworks.boolerules.computations.generic.PropertySelectionDO
 import com.booleworks.boolerules.computations.generic.SingleComputationResponse
 import io.swagger.v3.oas.annotations.media.Schema
