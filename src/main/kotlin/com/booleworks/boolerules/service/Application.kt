@@ -15,6 +15,7 @@ import com.booleworks.boolerules.computations.minmaxconfig.MINMAXCONFIG
 import com.booleworks.boolerules.computations.modelcount.MODELCOUNT
 import com.booleworks.boolerules.computations.modelenumeration.MODELENUMERATION
 import com.booleworks.boolerules.computations.optimization.OPTIMIZATION
+import com.booleworks.boolerules.computations.reconfiguration.RECONFIGURATION
 import com.booleworks.boolerules.config.ApplicationConfig
 import com.booleworks.boolerules.config.ComputationConfig
 import com.booleworks.boolerules.export.exportRoute
@@ -117,6 +118,8 @@ fun Application.module() {
             route(PATH_COMPUTATION) { addComputationApi(COVERAGE, this@route) }
             route(PATH_COMPUTATION) { detailsRoute(COVERAGE) }
             route(PATH_COMPUTATION) { coverageGraphRoute() }
+
+            route(PATH_COMPUTATION) { addComputationApi(RECONFIGURATION, this@route) }
 
             // Rulefile management
             route(PATH_RULEFILE) { rulefileRoute() }
