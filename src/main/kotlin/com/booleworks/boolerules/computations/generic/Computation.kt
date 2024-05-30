@@ -5,6 +5,7 @@ package com.booleworks.boolerules.computations.generic
 
 import com.booleworks.boolerules.config.ComputationConfig
 import com.booleworks.logicng.csp.CspFactory
+import com.booleworks.logicng.formulas.Formula
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.formulas.FormulaFactoryConfig
 import com.booleworks.logicng.formulas.FormulaFactoryConfig.FormulaMergeStrategy.IMPORT
@@ -24,8 +25,6 @@ import com.booleworks.prl.parser.PrlFeature
 import com.booleworks.prl.parser.parseConstraint
 import com.booleworks.prl.transpiler.IntegerEncodingStore
 import com.booleworks.prl.transpiler.ModelTranslation
-import com.booleworks.prl.transpiler.PrlProposition
-import com.booleworks.prl.transpiler.RuleInformation
 import com.booleworks.prl.transpiler.SliceTranslation
 import com.booleworks.prl.transpiler.TranslationInfo
 import com.booleworks.prl.transpiler.mergeSlices
@@ -122,7 +121,10 @@ sealed class Computation<
         val factory: FormulaFactory = FormulaFactory.caching()
         val cspFactory = CspFactory(factory)
         request.validateAndAugmentSliceSelection(model, allowedSliceTypes())
-        val modelTranslation = transpileModel(cspFactory, model, request.modelSliceSelection())
+        val modelTranslation = transpileModel(
+            cspFactory, model, request.modelSliceSelection(),
+            additionalConstraints = request.additionalConstraints
+        )
         status.numberOfSlices = modelTranslation.allSlices.size
         status.sliceSets = computeProjectedSliceSets(modelTranslation.computations, request)
         val slice2Translation = modelTranslation.sliceMap()
@@ -220,11 +222,9 @@ sealed class Computation<
         }
     }
 
-    internal fun miniSat(
+    internal fun satSolver(
         config: SATSolverConfig,
-        request: REQUEST,
         cf: CspFactory,
-        model: PrlModel,
         info: TranslationInfo,
         slice: Slice,
         status: ComputationStatusBuilder
@@ -236,25 +236,6 @@ sealed class Computation<
                 "Original rule set for the slice $slice is inconsistent. " +
                         "Use the 'consistency' check to get an explanation, why."
             )
-            return solver
-        }
-        val additionalFormulas = request.additionalConstraints.mapNotNull { constraint ->
-            processConstraint(
-                cf,
-                constraint,
-                model,
-                info,
-                status
-            )
-        }
-        if (status.successful()) {
-            solver.addPropositions(additionalFormulas)
-            if (!solver.sat()) {
-                status.addWarning(
-                    "The additional constraints turned the rule set for for the slice $slice inconsistent. " +
-                            "Use the 'consistency' check to get an explanation, why."
-                )
-            }
         }
         return solver
     }
@@ -262,24 +243,11 @@ sealed class Computation<
     internal fun maxSat(
         config: MaxSATConfig,
         algo: (FormulaFactory, MaxSATConfig) -> MaxSATSolver,
-        request: REQUEST,
         cf: CspFactory,
-        model: PrlModel,
         info: TranslationInfo,
-        status: ComputationStatusBuilder
     ): MaxSATSolver {
         val solver = algo(cf.formulaFactory(), config)
         info.propositions.forEach { solver.addHardFormula(it.formula()) }
-        val additionalFormulas = request.additionalConstraints.mapNotNull { constraint ->
-            processConstraint(
-                cf,
-                constraint,
-                model,
-                info,
-                status
-            )
-        }
-        if (status.successful()) additionalFormulas.forEach { solver.addHardFormula(it.formula()) }
         return solver
     }
 
@@ -289,13 +257,12 @@ sealed class Computation<
         model: PrlModel,
         info: TranslationInfo,
         status: ComputationStatusBuilder
-    ): PrlProposition? {
+    ): Formula? {
         val parsed = parseConstraint<PrlConstraint>(constraint)
         val theoryMap = model.featureStore.theoryMap
         if (!checkTheoryMap(parsed, theoryMap, status)) return null
         val compiled = ConstraintCompiler().compileConstraint(parsed, theoryMap)
-        val formula = transpileConstraint(cf, compiled, info, IntegerEncodingStore.empty()) // TODO: integer store
-        return PrlProposition(RuleInformation.fromAdditionRestriction(compiled), formula)
+        return transpileConstraint(cf, compiled, info, IntegerEncodingStore.empty()) // TODO: integer store
     }
 
     private fun checkTheoryMap(
@@ -348,7 +315,7 @@ abstract class SingleComputation<
     ): SplitComputationDetail<DETAIL> {
         val f = FormulaFactory.caching()
         val cf = CspFactory(f)
-        val modelTranslation = transpileModel(cf, model, sliceSelection)
+        val modelTranslation = transpileModel(cf, model, sliceSelection, additionalConstraints = additionalConstraints)
         assert(modelTranslation.computations.size == 1) { "Expected to get exactly one slice" }
         val slice = modelTranslation.allSlices.first()
         val translation = modelTranslation.computations.first().info

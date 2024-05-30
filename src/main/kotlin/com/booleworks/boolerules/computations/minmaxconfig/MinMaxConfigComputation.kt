@@ -75,7 +75,7 @@ internal object MinMaxConfigComputation :
     ): MinMaxInternalResult {
         val f = cf.formulaFactory()
         val relevantVars = computeRelevantVars(f, info, request.features)
-        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, request, cf, model, info, status)
+        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, cf, info)
         relevantVars.forEach { solver.addSoftFormula(f.literal(it.name(), request.computationType == MAX), 1) }
         return if (solver.solve() == OPTIMUM) {
             val example = extractModel(solver.model().positiveVariables(), info)

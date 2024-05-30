@@ -7,9 +7,7 @@ import com.booleworks.boolerules.computations.ComputationType
 import com.booleworks.boolerules.computations.NoElement
 import com.booleworks.boolerules.computations.consistency.ConsistencyComputation.ConsistencyInternalResult
 import com.booleworks.boolerules.computations.generic.ApiDocs
-import com.booleworks.boolerules.computations.generic.ComputationStatus
 import com.booleworks.boolerules.computations.generic.ComputationStatusBuilder
-import com.booleworks.boolerules.computations.generic.ComputationVariant.SINGLE
 import com.booleworks.boolerules.computations.generic.FeatureModelDO
 import com.booleworks.boolerules.computations.generic.InternalResult
 import com.booleworks.boolerules.computations.generic.NON_CACHING_USE_FF
@@ -73,7 +71,7 @@ internal object ConsistencyComputation :
         cf: CspFactory,
         status: ComputationStatusBuilder,
     ): ConsistencyInternalResult {
-        val solver = prepareSolver(cf, request.computeAllDetails, info, request.additionalConstraints, model, status)
+        val solver = prepareSolver(cf, request.computeAllDetails, info)
         if (!status.successful()) return ConsistencyInternalResult(slice, false, null, null)
         return solver.satCall().solve().use { satCall ->
             if (satCall.satResult == Tristate.TRUE) {
@@ -103,7 +101,7 @@ internal object ConsistencyComputation :
         splitProperties: Set<String>,
         cf: CspFactory
     ): SplitComputationDetail<ConsistencyDetail> {
-        val solver = prepareSolver(cf, true, info, additionalConstraints, model, ComputationStatus("", "", SINGLE))
+        val solver = prepareSolver(cf, true, info)
         return solver.satCall().solve().use { satCall ->
             assert(satCall.satResult == Tristate.FALSE) { "Detail computation should only be called for inconsistent slices" }
             val explanation = computeExplanation(satCall, model.propertyStore.allDefinitions(), cf)
@@ -116,22 +114,10 @@ internal object ConsistencyComputation :
         cf: CspFactory,
         proofTracing: Boolean,
         info: TranslationInfo,
-        additionalConstraints: List<String>,
-        model: PrlModel,
-        status: ComputationStatusBuilder
     ): SATSolver {
         val f = cf.formulaFactory()
         val solver = SATSolver.newSolver(f, SATSolverConfig.builder().proofGeneration(proofTracing).build()).apply {
             addPropositions(info.propositions)
-        }
-        if (solver.sat()) {
-            val additionalFormulas =
-                additionalConstraints.mapNotNull { constraint ->
-                    processConstraint(cf, constraint, model, info, status)
-                }
-            if (!status.successful()) return solver
-            solver.addPropositions(additionalFormulas)
-
         }
         return solver
     }

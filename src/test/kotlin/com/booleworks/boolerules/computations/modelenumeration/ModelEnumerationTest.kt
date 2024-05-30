@@ -125,9 +125,10 @@ internal class ModelEnumerationTest : TestWithConfig() {
         setUp(tc)
         val f = FormulaFactory.nonCaching()
         val cf = CspFactory(f)
-        val modelTranslation = transpileModel(cf, model, listOf())
+        val additionalConstraints = listOf("[c = \"c1\"]")
+        val modelTranslation = transpileModel(cf, model, listOf(), additionalConstraints = additionalConstraints)
 
-        val request = ModelEnumerationRequest("any", mutableListOf(), listOf("[c = \"c1\"]"), listOf())
+        val request = ModelEnumerationRequest("any", mutableListOf(), additionalConstraints, listOf())
         val info1 = modelTranslation[0].info
         val info2 = modelTranslation[1].info
         val info3 = modelTranslation[2].info

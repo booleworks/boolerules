@@ -76,7 +76,7 @@ internal object OptimizationComputation :
         cf: CspFactory,
         status: ComputationStatusBuilder,
     ): OptimizationInternalResult {
-        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, request, cf, model, info, status)
+        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, cf, info)
         val mapping = mutableMapOf<Formula, Int>()
         val constraintMap = mutableMapOf<Formula, String>()
         request.weightings.forEach { wp ->
@@ -88,12 +88,12 @@ internal object OptimizationComputation :
                     if (request.computationType == MIN && wp.weight >= 0 ||
                         request.computationType == MAX && wp.weight < 0
                     ) {
-                        constraint.formula().negate(cf.formulaFactory())
+                        constraint.negate(cf.formulaFactory())
                     } else {
-                        constraint.formula()
+                        constraint
                     }
-                mapping[constraint.formula()] = wp.weight
-                constraintMap[constraint.formula()] = wp.constraint
+                mapping[constraint] = wp.weight
+                constraintMap[constraint] = wp.constraint
                 val weight = wp.weight.absoluteValue
                 solver.addSoftFormula(formula, weight)
             }

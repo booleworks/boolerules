@@ -115,7 +115,7 @@ internal object CoverageComputation :
     ): CoverageInitialization? {
         val baseConstraints = translation.propositions.map { it.formula() }.toMutableList()
         baseConstraints += request.additionalConstraints.mapNotNull {
-            processConstraint(cf, it, model, translation, status)?.formula()
+            processConstraint(cf, it, model, translation, status)
         }
         val (invalidConstraints, constraintsToCover) = computeConstraintsToCover(
             cf,
@@ -146,7 +146,7 @@ internal object CoverageComputation :
         val validConstraints = mutableListOf<Pair<Formula, String>>()
         val invalidConstraints = mutableListOf<String>()
         for (constraint in request.constraintsToCover) {
-            val formula = processConstraint(cf, constraint, model, info, status)?.formula() ?: return null
+            val formula = processConstraint(cf, constraint, model, info, status) ?: return null
             if (baseSolver.satCall().addFormulas(formula).sat() == Tristate.FALSE) {
                 invalidConstraints.add(constraint)
             } else {

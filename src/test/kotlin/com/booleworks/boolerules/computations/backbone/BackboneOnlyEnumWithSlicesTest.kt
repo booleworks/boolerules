@@ -289,8 +289,7 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
             ),
             PropertySelectionDO("version", PropertyTypeDO.INT, PropertyRangeDO(intValues = setOf(1)), SliceTypeDO.SPLIT)
         )
-        val request =
-            BackboneRequest("any", sliceSelection, listOf("[c = \"c1\"]"), listOf("a", "b", "c"))
+        val request = BackboneRequest("any", sliceSelection, listOf("[c = \"c1\"]"), listOf("a", "b", "c"))
 
         val result = cut.computeForModel(request, model, ComputationStatusBuilder("fileId", "jobId", LIST))
 

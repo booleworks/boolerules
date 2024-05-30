@@ -68,15 +68,10 @@ internal object ModelCountComputation :
         val f = cf.formulaFactory()
         val variables = info.knownVariables.toSortedSet()
         val formulas = info.propositions.map { it.formula() }
-        val additionalConstraints =
-            request.additionalConstraints.map { constraint -> processConstraint(cf, constraint, model, info, status) }
         if (!status.successful()) {
             return ModelCountInternalResult(slice, BigInteger.ZERO)
         }
-        return ModelCountInternalResult(
-            slice,
-            ModelCounter.count(f, formulas + additionalConstraints.map { it!!.formula() }, variables)
-        )
+        return ModelCountInternalResult(slice, ModelCounter.count(f, formulas, variables))
     }
 
     override fun computeDetailForSlice(

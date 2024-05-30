@@ -73,9 +73,10 @@ internal class ModelCountTest : TestWithConfig() {
     fun testComputeForSliceWithAdditionalConstraints() {
         val f = FormulaFactory.nonCaching()
         val cf = CspFactory(f)
-        val modelTranslation = transpileModel(cf, model, listOf())
+        val additionalConstraint = listOf("[c = \"c1\"]")
+        val modelTranslation = transpileModel(cf, model, listOf(), additionalConstraints = additionalConstraint)
 
-        val request = ModelCountRequest("any", mutableListOf(), listOf("[c = \"c1\"]"))
+        val request = ModelCountRequest("any", mutableListOf(), additionalConstraint)
         val info1 = modelTranslation[0].info
         val info2 = modelTranslation[1].info
         val info3 = modelTranslation[2].info

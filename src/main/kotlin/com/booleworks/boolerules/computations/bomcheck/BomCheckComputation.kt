@@ -76,7 +76,7 @@ internal object BomCheckComputation :
         cf: CspFactory,
         status: ComputationStatusBuilder,
     ): BomCheckInternalResult {
-        val solver = miniSat(NON_PT_CONFIG, request, cf, model, info, slice, status).also {
+        val solver = satSolver(NON_PT_CONFIG, cf, info, slice, status).also {
             if (!status.successful()) return BomCheckInternalResult(slice, mutableMapOf())
         }
         val positionElements: MutableList<PositionElementDO> = mutableListOf()

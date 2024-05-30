@@ -85,7 +85,7 @@ internal object ModelEnumerationComputation : ListComputation<
         val f = cf.formulaFactory()
         val relevantVars = computeRelevantVars(f, info, request.features)
 
-        val solver = miniSat(NON_PT_CONFIG, request, cf, model, info, slice, status).also {
+        val solver = satSolver(NON_PT_CONFIG, cf, info, slice, status).also {
             if (!status.successful()) return ModelEnumerationInternalResult(slice, mutableMapOf())
         }
         addTautologyClauses(solver, relevantVars)

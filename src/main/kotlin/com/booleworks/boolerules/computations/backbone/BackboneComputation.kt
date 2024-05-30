@@ -80,27 +80,12 @@ internal object BackboneComputation : ListComputation<
         val result = BackboneInternalResult(slice, LinkedHashMap())
         val relevantVars = computeRelevantVars(cf.formulaFactory(), info, request.features)
 
-        val solver = miniSat(
-            NON_PT_CONFIG,
-            request,
-            cf,
-            model,
-            info,
-            slice,
-            status
-        ).also { if (!status.successful()) return result }
-
+        val solver = satSolver(NON_PT_CONFIG, cf, info, slice, status).also { if (!status.successful()) return result }
         val backbone = solver.backbone(relevantVars)
         if (backbone.isSat) {
-            backbone.positiveBackbone.forEach {
-                result.backbone[extractFeature(it, info)] = BackboneType.MANDATORY
-            }
-            backbone.negativeBackbone.forEach {
-                result.backbone[extractFeature(it, info)] = BackboneType.FORBIDDEN
-            }
-            backbone.optionalVariables.forEach {
-                result.backbone[extractFeature(it, info)] = BackboneType.OPTIONAL
-            }
+            backbone.positiveBackbone.forEach { result.backbone[extractFeature(it, info)] = BackboneType.MANDATORY }
+            backbone.negativeBackbone.forEach { result.backbone[extractFeature(it, info)] = BackboneType.FORBIDDEN }
+            backbone.optionalVariables.forEach { result.backbone[extractFeature(it, info)] = BackboneType.OPTIONAL }
         } else {
             relevantVars.forEach {
                 result.backbone[extractFeature(it, info)] = BackboneType.FORBIDDEN
