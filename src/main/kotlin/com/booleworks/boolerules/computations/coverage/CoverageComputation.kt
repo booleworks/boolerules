@@ -23,7 +23,6 @@ import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.formulas.Variable
 import com.booleworks.logicng.solvers.MaxSATSolver
 import com.booleworks.logicng.solvers.SATSolver
-import com.booleworks.logicng.solvers.functions.OptimizationFunction
 import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSAT
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
@@ -209,7 +208,10 @@ internal object CoverageComputation :
         var initialCoverSize = 0
         while (remainingSelectors.isNotEmpty()) {
             initialCoverSize += 1
-            val maxSelectors = solver.execute(OptimizationFunction.maximize(remainingSelectors)).positiveVariables()
+            val maxSelectors = solver.satCall()
+                .addFormulas(remainingSelectors.first())
+                .selectionOrder(remainingSelectors.drop(1))
+                .model(remainingSelectors).positiveVariables()
             remainingSelectors -= maxSelectors
         }
         return initialCoverSize
