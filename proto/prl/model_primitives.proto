@@ -1,0 +1,38 @@
+// SPDX-License-Identifier: MIT
+// Copyright 2023 BooleWorks GmbH
+
+syntax = "proto3";
+package boolerules.primitives;
+option java_package = "com.booleworks.prl.model.protobuf";
+option java_outer_classname = "ProtoBufPrimitives";
+
+message PbBooleanRange {
+  repeated bool values = 1;
+}
+
+message PbIntRange {
+  optional int32 lowerBound = 1;
+  optional int32 upperBound = 2;
+  repeated int32 values = 3;
+}
+
+message PbDateRange {
+  optional int64 start = 1;
+  optional int64 end = 2;
+  repeated int64 dates = 3;
+}
+
+message PbEnumRange {
+  optional string start = 1;
+  optional string end = 2;
+  repeated string values = 3;
+}
+
+enum PbComparisonOperator {
+  EQ = 0;
+  NE = 1;
+  LT = 2;
+  LE = 3;
+  GT = 4;
+  GE = 5;
+}

@@ -1,0 +1,27 @@
+// SPDX-License-Identifier: MIT
+// Copyright 2023 BooleWorks GmbH
+
+syntax = "proto3";
+package boolerules.rules;
+import "model_properties.proto";
+import "model_constraints.proto";
+option java_package = "com.booleworks.prl.model.protobuf";
+option java_outer_classname = "ProtoBufRules";
+
+message PbRule {
+  optional string id = 2;
+  optional string description = 3;
+  repeated boolerules.properties.PbProperty properties = 4;
+  optional int32 lineNumber = 5;
+  optional boolerules.constraints.PbConstraint constraint = 6; // constraint rule
+  optional int32 feature = 7; // definition rule
+  optional boolerules.constraints.PbConstraint ifPart = 8;
+  optional boolerules.constraints.PbConstraint thenPart = 9;
+  optional boolerules.constraints.PbConstraint thenNotPart = 10; // exclusion
+  optional boolerules.constraints.PbConstraint elsePart = 11; // if-then-else
+  optional bool isForbidden = 12; // feature rule
+  optional string enumValue = 13;
+  optional int32 intValueOrVersion = 14;
+  optional bool isAmo = 15; // group rule
+  repeated int32 groupFeatures = 16; // group rule
+}

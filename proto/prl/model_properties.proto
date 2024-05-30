@@ -1,0 +1,52 @@
+// SPDX-License-Identifier: MIT
+// Copyright 2023 BooleWorks GmbH
+
+syntax = "proto3";
+package boolerules.properties;
+import "model_primitives.proto";
+option java_package = "com.booleworks.prl.model.protobuf";
+option java_outer_classname = "ProtoBufProperties";
+
+message PbProperty {
+  string name = 1;
+  optional int32 lineNumber = 2;
+  optional boolerules.primitives.PbBooleanRange boolRange = 3;
+  optional boolerules.primitives.PbIntRange intRange = 4;
+  optional boolerules.primitives.PbDateRange dateRange = 5;
+  optional boolerules.primitives.PbEnumRange enumRange = 6;
+}
+
+message PbSlicingBooleanPropertyDefinition {
+  string name = 1;
+  optional int32 lineNumber = 2;
+  repeated bool values = 3;
+}
+
+message PbSlicingIntPropertyDefinition {
+  string name = 1;
+  optional int32 lineNumber = 2;
+  repeated int32 startValues = 3;
+  repeated int32 endValues = 4;
+  repeated int32 singleValues = 5;
+}
+
+message PbSlicingDatePropertyDefinition {
+  string name = 1;
+  optional int32 lineNumber = 2;
+  repeated int64 startValues = 3;
+  repeated int64 endValues = 4;
+  repeated int64 singleValues = 5;
+}
+
+message PbSlicingEnumPropertyDefinition {
+  string name = 1;
+  optional int32 lineNumber = 2;
+  repeated string values = 3;
+}
+
+message PbPropertyStore {
+  repeated PbSlicingBooleanPropertyDefinition booleanProperties = 1;
+  repeated PbSlicingIntPropertyDefinition intProperties = 2;
+  repeated PbSlicingDatePropertyDefinition dateProperties = 3;
+  repeated PbSlicingEnumPropertyDefinition enumProperties = 4;
+}

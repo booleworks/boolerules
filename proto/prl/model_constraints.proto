@@ -1,0 +1,67 @@
+// SPDX-License-Identifier: MIT
+// Copyright 2023 BooleWorks GmbH
+
+syntax = "proto3";
+package boolerules.constraints;
+import "model_primitives.proto";
+option java_package = "com.booleworks.prl.model.protobuf";
+option java_outer_classname = "ProtoBufConstraints";
+
+///////////
+// Atoms //
+///////////
+message PbEnumTerm {
+  optional int32 enumFeature = 1;
+  optional string enumValue = 2;
+}
+
+message PbIntMul {
+  int32 coefficient = 1;
+  int32 feature = 2;
+}
+
+message PbIntTerm {
+  optional int32 feature = 1;
+  optional int32 value = 2;
+  optional PbIntMul mul = 3;
+  repeated PbIntTerm muls = 4;
+  optional int32 offset = 5;
+}
+
+message PbEnumPredicate {
+  optional int32 feature = 1;
+  optional primitives.PbComparisonOperator comp = 2;
+  optional string value = 3;
+  repeated string values = 4;
+}
+
+message PbIntPredicate {
+  optional int32 feature = 1;
+  optional PbIntTerm term1 = 3;
+  optional PbIntTerm term2 = 4;
+  optional primitives.PbComparisonOperator comp = 5;
+  optional boolerules.primitives.PbIntRange range = 6;
+  optional int32 version = 7;
+}
+
+/////////////////
+// Constraints //
+/////////////////
+enum PbConstraintType {
+  AMO = 0;
+  EXO = 1;
+  NOT = 2;
+  IMPL = 3;
+  EQUIV = 4;
+  AND = 5;
+  OR = 6;
+}
+
+message PbConstraint {
+  optional PbConstraintType type = 1;
+  optional bool value = 2; // constants
+  optional int32 boolFeature = 3; // bool feature
+  optional PbEnumPredicate enumPredicate = 4; // enum predicate
+  optional PbIntPredicate intPredicate = 5; // int predicate
+  repeated PbConstraint operands = 6; // not = 1, impl/equiv = 2, amo/exo/and/or = n
+}

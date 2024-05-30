@@ -1,0 +1,53 @@
+// SPDX-License-Identifier: MIT
+// Copyright 2023 BooleWorks GmbH
+
+syntax = "proto3";
+package boolerules.features;
+import "model_properties.proto";
+import "model_primitives.proto";
+option java_package = "com.booleworks.prl.model.protobuf";
+option java_outer_classname = "ProtoBufFeatureStore";
+
+enum PbTheory {
+  BOOL = 0;
+  VERSIONED_BOOL = 1;
+  ENUM = 2;
+  INT = 3;
+}
+
+message PbFeature {
+  int32 id = 1;
+}
+
+message PbFullFeature {
+  int32 id = 1;
+  string featureCode = 2;
+  PbTheory theory = 3;
+}
+
+message PbAllFeatures {
+  repeated PbFullFeature feature = 1;
+}
+
+message PbFeatureDefinition {
+  string code = 2;
+  optional string description = 4;
+  repeated boolerules.properties.PbProperty properties = 5;
+  optional int32 lineNumber = 6;
+  bool used = 7;
+  optional bool versioned = 8; // boolean/versioned boolean features
+  optional boolerules.primitives.PbIntRange intDomain = 9; // int feature
+  repeated string enumValues = 10; // enum feature
+}
+
+message PbFeatureDefinitionList {
+  repeated PbFeatureDefinition list = 1;
+}
+
+message PbFeatureStore {
+  map<string, PbFeatureDefinitionList> booleanFeatures = 1;
+  map<string, PbFeatureDefinitionList> intFeatures = 2;
+  map<string, PbFeatureDefinitionList> enumFeatures = 3;
+  repeated PbFeature group = 4;
+  repeated string nonUniqueFeatures = 5;
+}
