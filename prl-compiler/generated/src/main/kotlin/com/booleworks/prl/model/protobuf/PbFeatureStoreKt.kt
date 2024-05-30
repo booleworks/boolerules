@@ -281,77 +281,7 @@ public object PbFeatureStoreKt {
       _builder.clearGroup()
     }
 
-
-    /**
-     * An uninstantiable, behaviorless type to represent the field in
-     * generics.
-     */
-    @kotlin.OptIn(com.google.protobuf.kotlin.OnlyForUseByGeneratedProtoCode::class)
-    public class NonUniqueFeaturesProxy private constructor() : com.google.protobuf.kotlin.DslProxy()
-    /**
-     * `repeated string nonUniqueFeatures = 5;`
-     * @return A list containing the nonUniqueFeatures.
-     */
-    public val nonUniqueFeatures: com.google.protobuf.kotlin.DslList<kotlin.String, NonUniqueFeaturesProxy>
-      @kotlin.jvm.JvmSynthetic
-      get() = com.google.protobuf.kotlin.DslList(
-        _builder.getNonUniqueFeaturesList()
-      )
-    /**
-     * `repeated string nonUniqueFeatures = 5;`
-     * @param value The nonUniqueFeatures to add.
-     */
-    @kotlin.jvm.JvmSynthetic
-    @kotlin.jvm.JvmName("addNonUniqueFeatures")
-    public fun com.google.protobuf.kotlin.DslList<kotlin.String, NonUniqueFeaturesProxy>.add(value: kotlin.String) {
-      _builder.addNonUniqueFeatures(value)
-    }
-    /**
-     * `repeated string nonUniqueFeatures = 5;`
-     * @param value The nonUniqueFeatures to add.
-     */
-    @kotlin.jvm.JvmSynthetic
-    @kotlin.jvm.JvmName("plusAssignNonUniqueFeatures")
-    @Suppress("NOTHING_TO_INLINE")
-    public inline operator fun com.google.protobuf.kotlin.DslList<kotlin.String, NonUniqueFeaturesProxy>.plusAssign(value: kotlin.String) {
-      add(value)
-    }
-    /**
-     * `repeated string nonUniqueFeatures = 5;`
-     * @param values The nonUniqueFeatures to add.
-     */
-    @kotlin.jvm.JvmSynthetic
-    @kotlin.jvm.JvmName("addAllNonUniqueFeatures")
-    public fun com.google.protobuf.kotlin.DslList<kotlin.String, NonUniqueFeaturesProxy>.addAll(values: kotlin.collections.Iterable<kotlin.String>) {
-      _builder.addAllNonUniqueFeatures(values)
-    }
-    /**
-     * `repeated string nonUniqueFeatures = 5;`
-     * @param values The nonUniqueFeatures to add.
-     */
-    @kotlin.jvm.JvmSynthetic
-    @kotlin.jvm.JvmName("plusAssignAllNonUniqueFeatures")
-    @Suppress("NOTHING_TO_INLINE")
-    public inline operator fun com.google.protobuf.kotlin.DslList<kotlin.String, NonUniqueFeaturesProxy>.plusAssign(values: kotlin.collections.Iterable<kotlin.String>) {
-      addAll(values)
-    }
-    /**
-     * `repeated string nonUniqueFeatures = 5;`
-     * @param index The index to set the value at.
-     * @param value The nonUniqueFeatures to set.
-     */
-    @kotlin.jvm.JvmSynthetic
-    @kotlin.jvm.JvmName("setNonUniqueFeatures")
-    public operator fun com.google.protobuf.kotlin.DslList<kotlin.String, NonUniqueFeaturesProxy>.set(index: kotlin.Int, value: kotlin.String) {
-      _builder.setNonUniqueFeatures(index, value)
-    }/**
-     * `repeated string nonUniqueFeatures = 5;`
-     */
-    @kotlin.jvm.JvmSynthetic
-    @kotlin.jvm.JvmName("clearNonUniqueFeatures")
-    public fun com.google.protobuf.kotlin.DslList<kotlin.String, NonUniqueFeaturesProxy>.clear() {
-      _builder.clearNonUniqueFeatures()
-    }}
+  }
 }
 @kotlin.jvm.JvmSynthetic
 public inline fun com.booleworks.prl.model.protobuf.ProtoBufFeatureStore.PbFeatureStore.copy(block: `com.booleworks.prl.model.protobuf`.PbFeatureStoreKt.Dsl.() -> kotlin.Unit): com.booleworks.prl.model.protobuf.ProtoBufFeatureStore.PbFeatureStore =

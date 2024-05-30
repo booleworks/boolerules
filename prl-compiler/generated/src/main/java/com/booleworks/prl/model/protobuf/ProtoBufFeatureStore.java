@@ -4806,31 +4806,6 @@ com.booleworks.prl.model.protobuf.ProtoBufFeatureStore.PbFeatureDefinitionList d
      */
     com.booleworks.prl.model.protobuf.ProtoBufFeatureStore.PbFeatureOrBuilder getGroupOrBuilder(
         int index);
-
-    /**
-     * <code>repeated string nonUniqueFeatures = 5;</code>
-     * @return A list containing the nonUniqueFeatures.
-     */
-    java.util.List<java.lang.String>
-        getNonUniqueFeaturesList();
-    /**
-     * <code>repeated string nonUniqueFeatures = 5;</code>
-     * @return The count of nonUniqueFeatures.
-     */
-    int getNonUniqueFeaturesCount();
-    /**
-     * <code>repeated string nonUniqueFeatures = 5;</code>
-     * @param index The index of the element to return.
-     * @return The nonUniqueFeatures at the given index.
-     */
-    java.lang.String getNonUniqueFeatures(int index);
-    /**
-     * <code>repeated string nonUniqueFeatures = 5;</code>
-     * @param index The index of the value to return.
-     * @return The bytes of the nonUniqueFeatures at the given index.
-     */
-    com.google.protobuf.ByteString
-        getNonUniqueFeaturesBytes(int index);
   }
   /**
    * Protobuf type {@code boolerules.features.PbFeatureStore}
@@ -4855,8 +4830,6 @@ com.booleworks.prl.model.protobuf.ProtoBufFeatureStore.PbFeatureDefinitionList d
     }
     private PbFeatureStore() {
       group_ = java.util.Collections.emptyList();
-      nonUniqueFeatures_ =
-          com.google.protobuf.LazyStringArrayList.emptyList();
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor
@@ -5166,43 +5139,6 @@ com.booleworks.prl.model.protobuf.ProtoBufFeatureStore.PbFeatureDefinitionList d
       return group_.get(index);
     }
 
-    public static final int NONUNIQUEFEATURES_FIELD_NUMBER = 5;
-    @SuppressWarnings("serial")
-    private com.google.protobuf.LazyStringArrayList nonUniqueFeatures_ =
-        com.google.protobuf.LazyStringArrayList.emptyList();
-    /**
-     * <code>repeated string nonUniqueFeatures = 5;</code>
-     * @return A list containing the nonUniqueFeatures.
-     */
-    public com.google.protobuf.ProtocolStringList
-        getNonUniqueFeaturesList() {
-      return nonUniqueFeatures_;
-    }
-    /**
-     * <code>repeated string nonUniqueFeatures = 5;</code>
-     * @return The count of nonUniqueFeatures.
-     */
-    public int getNonUniqueFeaturesCount() {
-      return nonUniqueFeatures_.size();
-    }
-    /**
-     * <code>repeated string nonUniqueFeatures = 5;</code>
-     * @param index The index of the element to return.
-     * @return The nonUniqueFeatures at the given index.
-     */
-    public java.lang.String getNonUniqueFeatures(int index) {
-      return nonUniqueFeatures_.get(index);
-    }
-    /**
-     * <code>repeated string nonUniqueFeatures = 5;</code>
-     * @param index The index of the value to return.
-     * @return The bytes of the nonUniqueFeatures at the given index.
-     */
-    public com.google.protobuf.ByteString
-        getNonUniqueFeaturesBytes(int index) {
-      return nonUniqueFeatures_.getByteString(index);
-    }
-
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -5237,9 +5173,6 @@ com.booleworks.prl.model.protobuf.ProtoBufFeatureStore.PbFeatureDefinitionList d
           3);
       for (int i = 0; i < group_.size(); i++) {
         output.writeMessage(4, group_.get(i));
-      }
-      for (int i = 0; i < nonUniqueFeatures_.size(); i++) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 5, nonUniqueFeatures_.getRaw(i));
       }
       getUnknownFields().writeTo(output);
     }
@@ -5284,14 +5217,6 @@ com.booleworks.prl.model.protobuf.ProtoBufFeatureStore.PbFeatureDefinitionList d
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, group_.get(i));
       }
-      {
-        int dataSize = 0;
-        for (int i = 0; i < nonUniqueFeatures_.size(); i++) {
-          dataSize += computeStringSizeNoTag(nonUniqueFeatures_.getRaw(i));
-        }
-        size += dataSize;
-        size += 1 * getNonUniqueFeaturesList().size();
-      }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
@@ -5315,8 +5240,6 @@ com.booleworks.prl.model.protobuf.ProtoBufFeatureStore.PbFeatureDefinitionList d
           other.internalGetEnumFeatures())) return false;
       if (!getGroupList()
           .equals(other.getGroupList())) return false;
-      if (!getNonUniqueFeaturesList()
-          .equals(other.getNonUniqueFeaturesList())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -5343,10 +5266,6 @@ com.booleworks.prl.model.protobuf.ProtoBufFeatureStore.PbFeatureDefinitionList d
       if (getGroupCount() > 0) {
         hash = (37 * hash) + GROUP_FIELD_NUMBER;
         hash = (53 * hash) + getGroupList().hashCode();
-      }
-      if (getNonUniqueFeaturesCount() > 0) {
-        hash = (37 * hash) + NONUNIQUEFEATURES_FIELD_NUMBER;
-        hash = (53 * hash) + getNonUniqueFeaturesList().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -5519,8 +5438,6 @@ com.booleworks.prl.model.protobuf.ProtoBufFeatureStore.PbFeatureDefinitionList d
           groupBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000008);
-        nonUniqueFeatures_ =
-            com.google.protobuf.LazyStringArrayList.emptyList();
         return this;
       }
 
@@ -5576,10 +5493,6 @@ com.booleworks.prl.model.protobuf.ProtoBufFeatureStore.PbFeatureDefinitionList d
         if (((from_bitField0_ & 0x00000004) != 0)) {
           result.enumFeatures_ = internalGetEnumFeatures().build(EnumFeaturesDefaultEntryHolder.defaultEntry);
         }
-        if (((from_bitField0_ & 0x00000010) != 0)) {
-          nonUniqueFeatures_.makeImmutable();
-          result.nonUniqueFeatures_ = nonUniqueFeatures_;
-        }
       }
 
       @java.lang.Override
@@ -5628,16 +5541,6 @@ com.booleworks.prl.model.protobuf.ProtoBufFeatureStore.PbFeatureDefinitionList d
               groupBuilder_.addAllMessages(other.group_);
             }
           }
-        }
-        if (!other.nonUniqueFeatures_.isEmpty()) {
-          if (nonUniqueFeatures_.isEmpty()) {
-            nonUniqueFeatures_ = other.nonUniqueFeatures_;
-            bitField0_ |= 0x00000010;
-          } else {
-            ensureNonUniqueFeaturesIsMutable();
-            nonUniqueFeatures_.addAll(other.nonUniqueFeatures_);
-          }
-          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -5705,12 +5608,6 @@ com.booleworks.prl.model.protobuf.ProtoBufFeatureStore.PbFeatureDefinitionList d
                 }
                 break;
               } // case 34
-              case 42: {
-                java.lang.String s = input.readStringRequireUtf8();
-                ensureNonUniqueFeaturesIsMutable();
-                nonUniqueFeatures_.add(s);
-                break;
-              } // case 42
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -6433,117 +6330,6 @@ com.booleworks.prl.model.protobuf.ProtoBufFeatureStore.PbFeatureDefinitionList d
         return groupBuilder_;
       }
 
-      private com.google.protobuf.LazyStringArrayList nonUniqueFeatures_ =
-          com.google.protobuf.LazyStringArrayList.emptyList();
-      private void ensureNonUniqueFeaturesIsMutable() {
-        if (!nonUniqueFeatures_.isModifiable()) {
-          nonUniqueFeatures_ = new com.google.protobuf.LazyStringArrayList(nonUniqueFeatures_);
-        }
-        bitField0_ |= 0x00000010;
-      }
-      /**
-       * <code>repeated string nonUniqueFeatures = 5;</code>
-       * @return A list containing the nonUniqueFeatures.
-       */
-      public com.google.protobuf.ProtocolStringList
-          getNonUniqueFeaturesList() {
-        nonUniqueFeatures_.makeImmutable();
-        return nonUniqueFeatures_;
-      }
-      /**
-       * <code>repeated string nonUniqueFeatures = 5;</code>
-       * @return The count of nonUniqueFeatures.
-       */
-      public int getNonUniqueFeaturesCount() {
-        return nonUniqueFeatures_.size();
-      }
-      /**
-       * <code>repeated string nonUniqueFeatures = 5;</code>
-       * @param index The index of the element to return.
-       * @return The nonUniqueFeatures at the given index.
-       */
-      public java.lang.String getNonUniqueFeatures(int index) {
-        return nonUniqueFeatures_.get(index);
-      }
-      /**
-       * <code>repeated string nonUniqueFeatures = 5;</code>
-       * @param index The index of the value to return.
-       * @return The bytes of the nonUniqueFeatures at the given index.
-       */
-      public com.google.protobuf.ByteString
-          getNonUniqueFeaturesBytes(int index) {
-        return nonUniqueFeatures_.getByteString(index);
-      }
-      /**
-       * <code>repeated string nonUniqueFeatures = 5;</code>
-       * @param index The index to set the value at.
-       * @param value The nonUniqueFeatures to set.
-       * @return This builder for chaining.
-       */
-      public Builder setNonUniqueFeatures(
-          int index, java.lang.String value) {
-        if (value == null) { throw new NullPointerException(); }
-        ensureNonUniqueFeaturesIsMutable();
-        nonUniqueFeatures_.set(index, value);
-        bitField0_ |= 0x00000010;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated string nonUniqueFeatures = 5;</code>
-       * @param value The nonUniqueFeatures to add.
-       * @return This builder for chaining.
-       */
-      public Builder addNonUniqueFeatures(
-          java.lang.String value) {
-        if (value == null) { throw new NullPointerException(); }
-        ensureNonUniqueFeaturesIsMutable();
-        nonUniqueFeatures_.add(value);
-        bitField0_ |= 0x00000010;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated string nonUniqueFeatures = 5;</code>
-       * @param values The nonUniqueFeatures to add.
-       * @return This builder for chaining.
-       */
-      public Builder addAllNonUniqueFeatures(
-          java.lang.Iterable<java.lang.String> values) {
-        ensureNonUniqueFeaturesIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, nonUniqueFeatures_);
-        bitField0_ |= 0x00000010;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated string nonUniqueFeatures = 5;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearNonUniqueFeatures() {
-        nonUniqueFeatures_ =
-          com.google.protobuf.LazyStringArrayList.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000010);;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated string nonUniqueFeatures = 5;</code>
-       * @param value The bytes of the nonUniqueFeatures to add.
-       * @return This builder for chaining.
-       */
-      public Builder addNonUniqueFeaturesBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) { throw new NullPointerException(); }
-        checkByteStringIsUtf8(value);
-        ensureNonUniqueFeaturesIsMutable();
-        nonUniqueFeatures_.add(value);
-        bitField0_ |= 0x00000010;
-        onChanged();
-        return this;
-      }
-
       // @@protoc_insertion_point(builder_scope:boolerules.features.PbFeatureStore)
     }
 
@@ -6666,26 +6452,25 @@ com.booleworks.prl.model.protobuf.ProtoBufFeatureStore.PbFeatureDefinitionList d
       "tionB\r\n\013_lineNumberB\014\n\n_versionedB\014\n\n_in" +
       "tDomain\"Q\n\027PbFeatureDefinitionList\0226\n\004li" +
       "st\030\001 \003(\0132(.boolerules.features.PbFeature" +
-      "Definition\"\360\004\n\016PbFeatureStore\022Q\n\017boolean" +
+      "Definition\"\325\004\n\016PbFeatureStore\022Q\n\017boolean" +
       "Features\030\001 \003(\01328.boolerules.features.PbF" +
       "eatureStore.BooleanFeaturesEntry\022I\n\013intF" +
       "eatures\030\002 \003(\01324.boolerules.features.PbFe" +
       "atureStore.IntFeaturesEntry\022K\n\014enumFeatu" +
       "res\030\003 \003(\01325.boolerules.features.PbFeatur" +
       "eStore.EnumFeaturesEntry\022-\n\005group\030\004 \003(\0132" +
-      "\036.boolerules.features.PbFeature\022\031\n\021nonUn" +
-      "iqueFeatures\030\005 \003(\t\032d\n\024BooleanFeaturesEnt" +
-      "ry\022\013\n\003key\030\001 \001(\t\022;\n\005value\030\002 \001(\0132,.booleru" +
-      "les.features.PbFeatureDefinitionList:\0028\001" +
-      "\032`\n\020IntFeaturesEntry\022\013\n\003key\030\001 \001(\t\022;\n\005val" +
-      "ue\030\002 \001(\0132,.boolerules.features.PbFeature" +
-      "DefinitionList:\0028\001\032a\n\021EnumFeaturesEntry\022" +
-      "\013\n\003key\030\001 \001(\t\022;\n\005value\030\002 \001(\0132,.boolerules" +
-      ".features.PbFeatureDefinitionList:\0028\001*;\n" +
-      "\010PbTheory\022\010\n\004BOOL\020\000\022\022\n\016VERSIONED_BOOL\020\001\022" +
-      "\010\n\004ENUM\020\002\022\007\n\003INT\020\003B9\n!com.booleworks.prl" +
-      ".model.protobufB\024ProtoBufFeatureStoreb\006p" +
-      "roto3"
+      "\036.boolerules.features.PbFeature\032d\n\024Boole" +
+      "anFeaturesEntry\022\013\n\003key\030\001 \001(\t\022;\n\005value\030\002 " +
+      "\001(\0132,.boolerules.features.PbFeatureDefin" +
+      "itionList:\0028\001\032`\n\020IntFeaturesEntry\022\013\n\003key" +
+      "\030\001 \001(\t\022;\n\005value\030\002 \001(\0132,.boolerules.featu" +
+      "res.PbFeatureDefinitionList:\0028\001\032a\n\021EnumF" +
+      "eaturesEntry\022\013\n\003key\030\001 \001(\t\022;\n\005value\030\002 \001(\013" +
+      "2,.boolerules.features.PbFeatureDefiniti" +
+      "onList:\0028\001*;\n\010PbTheory\022\010\n\004BOOL\020\000\022\022\n\016VERS" +
+      "IONED_BOOL\020\001\022\010\n\004ENUM\020\002\022\007\n\003INT\020\003B9\n!com.b" +
+      "ooleworks.prl.model.protobufB\024ProtoBufFe" +
+      "atureStoreb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -6728,7 +6513,7 @@ com.booleworks.prl.model.protobuf.ProtoBufFeatureStore.PbFeatureDefinitionList d
     internal_static_boolerules_features_PbFeatureStore_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_boolerules_features_PbFeatureStore_descriptor,
-        new java.lang.String[] { "BooleanFeatures", "IntFeatures", "EnumFeatures", "Group", "NonUniqueFeatures", });
+        new java.lang.String[] { "BooleanFeatures", "IntFeatures", "EnumFeatures", "Group", });
     internal_static_boolerules_features_PbFeatureStore_BooleanFeaturesEntry_descriptor =
       internal_static_boolerules_features_PbFeatureStore_descriptor.getNestedTypes().get(0);
     internal_static_boolerules_features_PbFeatureStore_BooleanFeaturesEntry_fieldAccessorTable = new

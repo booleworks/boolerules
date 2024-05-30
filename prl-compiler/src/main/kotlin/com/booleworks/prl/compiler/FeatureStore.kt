@@ -26,7 +26,6 @@ data class FeatureStore internal constructor(
     internal val intFeatures: MutableMap<String, MutableList<AnyFeatureDef>> = mutableMapOf(),
     internal val enumFeatures: MutableMap<String, MutableList<AnyFeatureDef>> = mutableMapOf(),
     internal val groups: MutableList<BooleanFeature> = mutableListOf(),
-    internal val nonUniqueFeatures: MutableSet<String> = mutableSetOf()
 ) {
     /**
      * Adds a given feature definition to the feature store.
@@ -82,7 +81,6 @@ data class FeatureStore internal constructor(
     fun booleanFeatures() = booleanFeatures.flatMap { it.value }.map { it.feature as BooleanFeature }.toSortedSet()
     fun enumFeatures() = enumFeatures.flatMap { it.value }.map { it.feature as EnumFeature }.toSortedSet()
     fun intFeatures() = intFeatures.flatMap { it.value }.map { it.feature as IntFeature }.toSortedSet()
-    fun nonUniqueFeatures() = nonUniqueFeatures.toSortedSet()
     fun enumDefinitions() = enumFeatures.flatMap { it.value }.map { it as EnumFeatureDefinition }
     fun containsBooleanFeatures() = booleanFeatures.isNotEmpty()
     fun containsEnumFeatures() = enumFeatures.isNotEmpty()

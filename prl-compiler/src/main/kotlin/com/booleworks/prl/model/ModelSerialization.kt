@@ -122,7 +122,6 @@ fun serialize(fs: FeatureStore, featureMap: Map<Feature, Int>) = pbFeatureStore 
     intFeatures.putAll(fs.intFeatures.map { it.key to serialize(it.value) }.toMap())
     enumFeatures.putAll(fs.enumFeatures.map { it.key to serialize(it.value) }.toMap())
     group.addAll(fs.groups.map { pbFeature { id = featureMap[it]!! } })
-    nonUniqueFeatures.addAll(fs.nonUniqueFeatures)
 }
 
 fun serialize(ps: PropertyStore) = pbPropertyStore {
@@ -247,7 +246,6 @@ fun deserialize(bin: PbFeatureStore, featureMap: Map<Int, Feature>) = FeatureSto
     bin.intFeaturesMap.map { it.key to deserialize(it.value) }.toMap().toMutableMap(),
     bin.enumFeaturesMap.map { it.key to deserialize(it.value) }.toMap().toMutableMap(),
     bin.groupList.map { featureMap[it.id] as BooleanFeature }.toMutableList(),
-    bin.nonUniqueFeaturesList.toMutableSet()
 )
 
 fun deserialize(bin: PbConstraint, fm: Map<Int, Feature>): Constraint = when {

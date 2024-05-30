@@ -49,5 +49,4 @@ message PbFeatureStore {
   map<string, PbFeatureDefinitionList> intFeatures = 2;
   map<string, PbFeatureDefinitionList> enumFeatures = 3;
   repeated PbFeature group = 4;
-  repeated string nonUniqueFeatures = 5;
 }
