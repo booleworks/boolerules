@@ -41,8 +41,13 @@ val RECONFIGURATION = object : ComputationType<
 }
 
 object ReconfigurationComputation :
-    SingleComputation<ReconfigurationRequest, ReconfigurationResult, NoComputationDetail, ReconfigurationInternalResult>(NON_CACHING_USE_FF) {
-    override fun mergeInternalResult(existingResult: ReconfigurationInternalResult?, newResult: ReconfigurationInternalResult) =
+    SingleComputation<ReconfigurationRequest, ReconfigurationResult, NoComputationDetail, ReconfigurationInternalResult>(
+        NON_CACHING_USE_FF
+    ) {
+    override fun mergeInternalResult(
+        existingResult: ReconfigurationInternalResult?,
+        newResult: ReconfigurationInternalResult
+    ) =
         if (existingResult == null) {
             newResult
         } else {
@@ -67,14 +72,21 @@ object ReconfigurationComputation :
         status: ComputationStatusBuilder
     ): ReconfigurationInternalResult {
         val f = cf.formulaFactory()
-        val (validCodes, invalidCodes) = request.configuration.map { f.variable(it) }.partition { it in translation.knownVariables }
+        val (validCodes, invalidCodes) = request.configuration.map { f.variable(it) }
+            .partition { it in translation.knownVariables }
         if (invalidCodes.isNotEmpty()) {
-            status.addWarning("The order contains invalid codes which must always be removed: ${invalidCodes.joinToString(", ")}")
+            status.addWarning(
+                "The order contains invalid codes which must always be removed: ${
+                    invalidCodes.joinToString(
+                        ", "
+                    )
+                }"
+            )
         }
         val configuration = validCodes.toSet()
         val notInConfiguration = translation.knownVariables - configuration
 
-        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, request, cf, model, translation, status).also {
+        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, cf, translation).also {
             if (!status.successful()) return ReconfigurationInternalResult(slice, emptyList(), emptyList())
         }
         val weightForRemoval = when (request.algorithm) {
@@ -87,7 +99,11 @@ object ReconfigurationComputation :
             val reconfiguration = solver.model().positiveVariables()
             val removed = configuration - reconfiguration
             val added = notInConfiguration.intersect(reconfiguration)
-            ReconfigurationInternalResult(slice, (invalidCodes + removed).map { it.name() }.toList(), added.map { it.name() }.toList())
+            ReconfigurationInternalResult(
+                slice,
+                (invalidCodes + removed).map { it.name() }.toList(),
+                added.map { it.name() }.toList()
+            )
         } else {
             status.addWarning(
                 "Rule set for the slice $slice is inconsistent. Use the 'consistency' " +
