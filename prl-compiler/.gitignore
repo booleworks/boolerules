@@ -1,0 +1,15 @@
+# IntelliJ IDEA files
+.idea/
+.idea_modules/
+*.iml
+
+# vim swap files
+*.swp
+
+# compiled files
+target/
+
+# LSP
+.settings
+.classpath
+.project
