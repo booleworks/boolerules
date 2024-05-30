@@ -27,6 +27,9 @@ data class FeatureStore internal constructor(
     internal val enumFeatures: MutableMap<String, MutableList<AnyFeatureDef>> = mutableMapOf(),
     internal val groups: MutableList<BooleanFeature> = mutableListOf(),
 ) {
+
+    val theoryMap by lazy { fullTheoryMap() }
+
     /**
      * Adds a given feature definition to the feature store.
      * Is the definition already present, a compiler error is returned.
@@ -42,6 +45,20 @@ data class FeatureStore internal constructor(
     ) {
         val map = mapForType(definition)
         addDefinitionToMap(definition, slicingProperties, map, isGroup, state)
+    }
+
+    private fun fullTheoryMap(): Map<PrlFeature, Theory> {
+        val map = mutableMapOf<PrlFeature, Theory>()
+        booleanFeatures.forEach { (k, v) ->
+            if ((v.first() as BooleanFeatureDefinition).versioned) {
+                map[PrlFeature(k)] = Theory.VERSIONED_BOOL
+            } else {
+                map[PrlFeature(k)] = Theory.BOOL
+            }
+        }
+        enumFeatures.keys.forEach { map[PrlFeature(it)] = Theory.ENUM }
+        intFeatures.keys.forEach { map[PrlFeature(it)] = Theory.INT }
+        return map
     }
 
     internal fun generateTheoryMap(
