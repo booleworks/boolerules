@@ -11,6 +11,7 @@ import com.booleworks.boolerules.computations.generic.PropertySelectionDO
 import com.booleworks.boolerules.computations.generic.SliceTypeDO
 import com.booleworks.boolerules.rulefile.PropertyRangeDO
 import com.booleworks.boolerules.rulefile.PropertyTypeDO
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.prl.compiler.PrlCompiler
 import com.booleworks.prl.model.slices.Slice
@@ -29,17 +30,46 @@ internal class ModelEnumerationTest : TestWithConfig() {
     @Test
     fun testComputeForSlice() {
         val f = FormulaFactory.nonCaching()
-        val modelTranslation = transpileModel(f, model, listOf())
+        val cf = CspFactory(f)
+        val modelTranslation = transpileModel(cf, model, listOf())
 
         val request = ModelEnumerationRequest("any", mutableListOf(), listOf(), listOf())
         val info1 = modelTranslation[0].info
         val info2 = modelTranslation[1].info
         val info3 = modelTranslation[2].info
         val info4 = modelTranslation[3].info
-        val result1 = cut.computeForSlice(request, Slice.empty(), info1, model, f, ComputationStatusBuilder("fileId", "jobId", LIST))
-        val result2 = cut.computeForSlice(request, Slice.empty(), info2, model, f, ComputationStatusBuilder("fileId", "jobId", LIST))
-        val result3 = cut.computeForSlice(request, Slice.empty(), info3, model, f, ComputationStatusBuilder("fileId", "jobId", LIST))
-        val result4 = cut.computeForSlice(request, Slice.empty(), info4, model, f, ComputationStatusBuilder("fileId", "jobId", LIST))
+        val result1 = cut.computeForSlice(
+            request,
+            Slice.empty(),
+            info1,
+            model,
+            cf,
+            ComputationStatusBuilder("fileId", "jobId", LIST)
+        )
+        val result2 = cut.computeForSlice(
+            request,
+            Slice.empty(),
+            info2,
+            model,
+            cf,
+            ComputationStatusBuilder("fileId", "jobId", LIST)
+        )
+        val result3 = cut.computeForSlice(
+            request,
+            Slice.empty(),
+            info3,
+            model,
+            cf,
+            ComputationStatusBuilder("fileId", "jobId", LIST)
+        )
+        val result4 = cut.computeForSlice(
+            request,
+            Slice.empty(),
+            info4,
+            model,
+            cf,
+            ComputationStatusBuilder("fileId", "jobId", LIST)
+        )
 
         assertThat(result1.slice).isEqualTo(Slice.empty())
         assertThat(result1.models.size).isEqualTo(2)
@@ -66,8 +96,18 @@ internal class ModelEnumerationTest : TestWithConfig() {
     fun testComputeAllSplit(tc: TestConfig) {
         setUp(tc)
         val sliceSelection = mutableListOf(
-            PropertySelectionDO("series", PropertyTypeDO.ENUM, PropertyRangeDO(enumValues = setOf("S1", "S2")), SliceTypeDO.SPLIT),
-            PropertySelectionDO("version", PropertyTypeDO.INT, PropertyRangeDO(intMin = 1, intMax = 2), SliceTypeDO.SPLIT)
+            PropertySelectionDO(
+                "series",
+                PropertyTypeDO.ENUM,
+                PropertyRangeDO(enumValues = setOf("S1", "S2")),
+                SliceTypeDO.SPLIT
+            ),
+            PropertySelectionDO(
+                "version",
+                PropertyTypeDO.INT,
+                PropertyRangeDO(intMin = 1, intMax = 2),
+                SliceTypeDO.SPLIT
+            )
         )
         val request = ModelEnumerationRequest("any", sliceSelection, listOf(), listOf())
         val response = cut.computeResponse(request, model, ComputationStatusBuilder("fileId", "jobId", LIST))
@@ -84,17 +124,46 @@ internal class ModelEnumerationTest : TestWithConfig() {
     fun testComputeForSliceWithAdditionalConstraints(tc: TestConfig) {
         setUp(tc)
         val f = FormulaFactory.nonCaching()
-        val modelTranslation = transpileModel(f, model, listOf())
+        val cf = CspFactory(f)
+        val modelTranslation = transpileModel(cf, model, listOf())
 
         val request = ModelEnumerationRequest("any", mutableListOf(), listOf("[c = \"c1\"]"), listOf())
         val info1 = modelTranslation[0].info
         val info2 = modelTranslation[1].info
         val info3 = modelTranslation[2].info
         val info4 = modelTranslation[3].info
-        val result1 = cut.computeForSlice(request, Slice.empty(), info1, model, f, ComputationStatusBuilder("fileId", "jobId", LIST))
-        val result2 = cut.computeForSlice(request, Slice.empty(), info2, model, f, ComputationStatusBuilder("fileId", "jobId", LIST))
-        val result3 = cut.computeForSlice(request, Slice.empty(), info3, model, f, ComputationStatusBuilder("fileId", "jobId", LIST))
-        val result4 = cut.computeForSlice(request, Slice.empty(), info4, model, f, ComputationStatusBuilder("fileId", "jobId", LIST))
+        val result1 = cut.computeForSlice(
+            request,
+            Slice.empty(),
+            info1,
+            model,
+            cf,
+            ComputationStatusBuilder("fileId", "jobId", LIST)
+        )
+        val result2 = cut.computeForSlice(
+            request,
+            Slice.empty(),
+            info2,
+            model,
+            cf,
+            ComputationStatusBuilder("fileId", "jobId", LIST)
+        )
+        val result3 = cut.computeForSlice(
+            request,
+            Slice.empty(),
+            info3,
+            model,
+            cf,
+            ComputationStatusBuilder("fileId", "jobId", LIST)
+        )
+        val result4 = cut.computeForSlice(
+            request,
+            Slice.empty(),
+            info4,
+            model,
+            cf,
+            ComputationStatusBuilder("fileId", "jobId", LIST)
+        )
 
         assertThat(result1.slice).isEqualTo(Slice.empty())
         assertThat(result1.models.size).isEqualTo(1)
@@ -103,10 +172,10 @@ internal class ModelEnumerationTest : TestWithConfig() {
                 Pair(
                     FeatureModelDO(
                         listOf(
-                            FeatureDO("a", "test.a", FeatureTypeDO.ENUM, null, null, "a2", null),
-                            FeatureDO("b", "test.b", FeatureTypeDO.ENUM, null, null, "b1", null),
-                            FeatureDO("c", "test.c", FeatureTypeDO.ENUM, null, null, "c1", null),
-                            FeatureDO("p", "test.p", FeatureTypeDO.ENUM, null, null, "p1", null),
+                            FeatureDO("a", FeatureTypeDO.ENUM, null, null, "a2", null),
+                            FeatureDO("b", FeatureTypeDO.ENUM, null, null, "b1", null),
+                            FeatureDO("c", FeatureTypeDO.ENUM, null, null, "c1", null),
+                            FeatureDO("p", FeatureTypeDO.ENUM, null, null, "p1", null),
                         )
                     ), Slice.empty()
                 )
@@ -118,22 +187,22 @@ internal class ModelEnumerationTest : TestWithConfig() {
                 Pair(
                     FeatureModelDO(
                         listOf(
-                            FeatureDO("a", "test.a", FeatureTypeDO.ENUM, null, null, "a2", null),
-                            FeatureDO("b", "test.b", FeatureTypeDO.ENUM, null, null, "b1", null),
-                            FeatureDO("c", "test.c", FeatureTypeDO.ENUM, null, null, "c1", null),
-                            FeatureDO("p", "test.p", FeatureTypeDO.ENUM, null, null, "p2", null),
-                            FeatureDO("q", "test.q", FeatureTypeDO.ENUM, null, null, "q1", null),
+                            FeatureDO("a", FeatureTypeDO.ENUM, null, null, "a2", null),
+                            FeatureDO("b", FeatureTypeDO.ENUM, null, null, "b1", null),
+                            FeatureDO("c", FeatureTypeDO.ENUM, null, null, "c1", null),
+                            FeatureDO("p", FeatureTypeDO.ENUM, null, null, "p2", null),
+                            FeatureDO("q", FeatureTypeDO.ENUM, null, null, "q1", null),
                         )
                     ), Slice.empty()
                 ),
                 Pair(
                     FeatureModelDO(
                         listOf(
-                            FeatureDO("a", "test.a", FeatureTypeDO.ENUM, null, null, "a2", null),
-                            FeatureDO("b", "test.b", FeatureTypeDO.ENUM, null, null, "b1", null),
-                            FeatureDO("c", "test.c", FeatureTypeDO.ENUM, null, null, "c1", null),
-                            FeatureDO("p", "test.p", FeatureTypeDO.ENUM, null, null, "p2", null),
-                            FeatureDO("q", "test.q", FeatureTypeDO.ENUM, null, null, "q2", null),
+                            FeatureDO("a", FeatureTypeDO.ENUM, null, null, "a2", null),
+                            FeatureDO("b", FeatureTypeDO.ENUM, null, null, "b1", null),
+                            FeatureDO("c", FeatureTypeDO.ENUM, null, null, "c1", null),
+                            FeatureDO("p", FeatureTypeDO.ENUM, null, null, "p2", null),
+                            FeatureDO("q", FeatureTypeDO.ENUM, null, null, "q2", null),
                         )
                     ), Slice.empty()
                 )
@@ -145,10 +214,10 @@ internal class ModelEnumerationTest : TestWithConfig() {
                 Pair(
                     FeatureModelDO(
                         listOf(
-                            FeatureDO("a", "test.a", FeatureTypeDO.ENUM, null, null, "a2", null),
-                            FeatureDO("b", "test.b", FeatureTypeDO.ENUM, null, null, "b2", null),
-                            FeatureDO("c", "test.c", FeatureTypeDO.ENUM, null, null, "c1", null),
-                            FeatureDO("p", "test.p", FeatureTypeDO.ENUM, null, null, "p1", null),
+                            FeatureDO("a", FeatureTypeDO.ENUM, null, null, "a2", null),
+                            FeatureDO("b", FeatureTypeDO.ENUM, null, null, "b2", null),
+                            FeatureDO("c", FeatureTypeDO.ENUM, null, null, "c1", null),
+                            FeatureDO("p", FeatureTypeDO.ENUM, null, null, "p1", null),
                         )
                     ), Slice.empty()
                 )
@@ -160,22 +229,22 @@ internal class ModelEnumerationTest : TestWithConfig() {
                 Pair(
                     FeatureModelDO(
                         listOf(
-                            FeatureDO("a", "test.a", FeatureTypeDO.ENUM, null, null, "a2", null),
-                            FeatureDO("b", "test.b", FeatureTypeDO.ENUM, null, null, "b2", null),
-                            FeatureDO("c", "test.c", FeatureTypeDO.ENUM, null, null, "c1", null),
-                            FeatureDO("p", "test.p", FeatureTypeDO.ENUM, null, null, "p2", null),
-                            FeatureDO("q", "test.q", FeatureTypeDO.ENUM, null, null, "q1", null),
+                            FeatureDO("a", FeatureTypeDO.ENUM, null, null, "a2", null),
+                            FeatureDO("b", FeatureTypeDO.ENUM, null, null, "b2", null),
+                            FeatureDO("c", FeatureTypeDO.ENUM, null, null, "c1", null),
+                            FeatureDO("p", FeatureTypeDO.ENUM, null, null, "p2", null),
+                            FeatureDO("q", FeatureTypeDO.ENUM, null, null, "q1", null),
                         )
                     ), Slice.empty()
                 ),
                 Pair(
                     FeatureModelDO(
                         listOf(
-                            FeatureDO("a", "test.a", FeatureTypeDO.ENUM, null, null, "a2", null),
-                            FeatureDO("b", "test.b", FeatureTypeDO.ENUM, null, null, "b2", null),
-                            FeatureDO("c", "test.c", FeatureTypeDO.ENUM, null, null, "c1", null),
-                            FeatureDO("p", "test.p", FeatureTypeDO.ENUM, null, null, "p2", null),
-                            FeatureDO("q", "test.q", FeatureTypeDO.ENUM, null, null, "q2", null),
+                            FeatureDO("a", FeatureTypeDO.ENUM, null, null, "a2", null),
+                            FeatureDO("b", FeatureTypeDO.ENUM, null, null, "b2", null),
+                            FeatureDO("c", FeatureTypeDO.ENUM, null, null, "c1", null),
+                            FeatureDO("p", FeatureTypeDO.ENUM, null, null, "p2", null),
+                            FeatureDO("q", FeatureTypeDO.ENUM, null, null, "q2", null),
                         )
                     ), Slice.empty()
                 )

@@ -7,7 +7,7 @@ import com.booleworks.boolerules.computations.backbone.BACKBONE
 import com.booleworks.boolerules.computations.bomcheck.BOMCHECK
 import com.booleworks.boolerules.computations.computationManagementRoute
 import com.booleworks.boolerules.computations.consistency.CONSISTENCY
-import com.booleworks.boolerules.computations.consistency.coverageGraphRoute
+import com.booleworks.boolerules.computations.coverage.coverageGraphRoute
 import com.booleworks.boolerules.computations.coverage.COVERAGE
 import com.booleworks.boolerules.computations.details.detailsRoute
 import com.booleworks.boolerules.computations.generic.addComputationApi

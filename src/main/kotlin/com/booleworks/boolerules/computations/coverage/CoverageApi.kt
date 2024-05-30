@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright 2023 BooleWorks GmbH
+
 package com.booleworks.boolerules.computations.coverage
 
 import com.booleworks.boolerules.computations.generic.ComputationDetail
@@ -22,7 +25,11 @@ data class CoverageRequest(
     @field:Schema(description = "The set of constraints which must be covered")
     val constraintsToCover: List<String>,
 
-    @field:Schema(description = "By default every constraint most be covered (potentially together with a bunch of other constraints). Setting this value to true enforces, that all pairs of the given constraints must be covered. So for constraints A, B, and C, the combinations A+B, A+C, and B+C must be covered.")
+    @field:Schema(
+        description = "By default every constraint most be covered (potentially together with a bunch of " +
+                "other constraints). Setting this value to true enforces, that all pairs of the given constraints " +
+                "must be covered. So for constraints A, B, and C, the combinations A+B, A+C, and B+C must be covered."
+    )
     val pairwiseCover: Boolean = false
 ) : ComputationRequest
 
@@ -46,10 +53,16 @@ data class CoveringConfiguration(
 @Schema(description = "The main result of the coverage computation")
 data class CoverageMainResult(
 
-    @field:Schema(description = "The number of configurations required to cover all constraints (excluding the ones which cannot be covered at all)")
+    @field:Schema(
+        description = "The number of configurations required to cover all constraints (excluding the " +
+                "ones which cannot be covered at all)"
+    )
     val requiredConfigurations: Int,
 
-    @field:Schema(description = "The number of constraints that cannot be covered since the constraint is not buildable")
+    @field:Schema(
+        description = "The number of constraints that cannot be covered since the constraint " +
+                "is not buildable"
+    )
     val uncoverableConstraints: Int,
 )
 

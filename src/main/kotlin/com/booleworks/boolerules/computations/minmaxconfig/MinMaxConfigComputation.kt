@@ -19,7 +19,7 @@ import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.boolerules.computations.generic.computeRelevantVars
 import com.booleworks.boolerules.computations.generic.extractModel
 import com.booleworks.boolerules.computations.minmaxconfig.MinMaxConfigComputation.MinMaxInternalResult
-import com.booleworks.logicng.formulas.FormulaFactory
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.solvers.MaxSATSolver
 import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSAT.MaxSATResult.OPTIMUM
 import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSATConfig
@@ -70,11 +70,12 @@ internal object MinMaxConfigComputation :
         slice: Slice,
         info: TranslationInfo,
         model: PrlModel,
-        f: FormulaFactory,
+        cf: CspFactory,
         status: ComputationStatusBuilder,
     ): MinMaxInternalResult {
+        val f = cf.formulaFactory()
         val relevantVars = computeRelevantVars(f, info, request.features)
-        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::incWBO, request, f, model, info, status)
+        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, request, cf, model, info, status)
         relevantVars.forEach { solver.addSoftFormula(f.literal(it.name(), request.computationType == MAX), 1) }
         return if (solver.solve() == OPTIMUM) {
             val example = extractModel(solver.model().positiveVariables(), info)
@@ -95,7 +96,7 @@ internal object MinMaxConfigComputation :
         info: TranslationInfo,
         additionalConstraints: List<String>,
         splitProperties: Set<String>,
-        f: FormulaFactory
+        cf: CspFactory
     ) = error("details are always computed in main computation")
 
     data class MinMaxInternalResult(

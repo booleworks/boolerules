@@ -4,7 +4,6 @@
 package com.booleworks.boolerules.computations.generic
 
 import com.booleworks.logicng.formulas.Variable
-import com.booleworks.prl.model.Module
 import com.booleworks.prl.transpiler.TranslationInfo
 import com.fasterxml.jackson.annotation.JsonIgnore
 import io.swagger.v3.oas.annotations.media.Schema
@@ -44,13 +43,11 @@ internal fun extractModel(variables: Collection<Variable>, info: TranslationInfo
 
 internal fun extractFeature(variable: Variable, info: TranslationInfo) =
     if (info.booleanVariables.contains(variable)) {
-        FeatureDO.boolean(extractFeatureCode(variable.name()), variable.name(), true)
+        FeatureDO.boolean(variable.name(), true)
     } else if (info.enumVariables.contains(variable)) {
         val (feature, value) = info.getFeatureAndValue(variable)!!
-        FeatureDO.enum(extractFeatureCode(feature), feature, value)
+        FeatureDO.enum(feature, value)
     } else {
         error("Currently only boolean and enum features are supported.")
     }
 
-private fun extractFeatureCode(fullName: String) =
-    fullName.substring(fullName.lastIndexOf(Module.MODULE_SEPARATOR) + 1)

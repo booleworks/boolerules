@@ -4,6 +4,7 @@
 package com.booleworks.boolerules.computations.generic
 
 import com.booleworks.boolerules.config.ComputationConfig
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.formulas.FormulaFactoryConfig
 import com.booleworks.logicng.formulas.FormulaFactoryConfig.FormulaMergeStrategy.IMPORT
@@ -13,16 +14,15 @@ import com.booleworks.logicng.solvers.SATSolver
 import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSATConfig
 import com.booleworks.logicng.solvers.sat.SATSolverConfig
 import com.booleworks.prl.compiler.ConstraintCompiler
-import com.booleworks.prl.compiler.FeatureStore
-import com.booleworks.prl.model.AnyFeatureDef
 import com.booleworks.prl.model.FeatureDefinition
-import com.booleworks.prl.model.Module.Companion.MODULE_SEPARATOR
 import com.booleworks.prl.model.PrlModel
+import com.booleworks.prl.model.Theory
 import com.booleworks.prl.model.slices.AnySliceSelection
 import com.booleworks.prl.model.slices.Slice
 import com.booleworks.prl.parser.PrlConstraint
 import com.booleworks.prl.parser.PrlFeature
 import com.booleworks.prl.parser.parseConstraint
+import com.booleworks.prl.transpiler.IntegerEncodingStore
 import com.booleworks.prl.transpiler.ModelTranslation
 import com.booleworks.prl.transpiler.PrlProposition
 import com.booleworks.prl.transpiler.RuleInformation
@@ -97,7 +97,7 @@ sealed class Computation<
      * @param info the translation info including propositions, variables and
      *             variable mappings
      * @param model the compiled PRL model
-     * @param f the formula factory for the computation
+     * @param cf the CSP factory for the computation
      * @param status the status builder
      * @return the internal result for the computation
      */
@@ -106,7 +106,7 @@ sealed class Computation<
         slice: Slice,
         info: TranslationInfo,
         model: PrlModel,
-        f: FormulaFactory,
+        cf: CspFactory,
         status: ComputationStatusBuilder,
     ): INTRES
 
@@ -120,8 +120,9 @@ sealed class Computation<
         status: ComputationStatusBuilder
     ): Map<Slice, INTRES> {
         val factory: FormulaFactory = FormulaFactory.caching()
+        val cspFactory = CspFactory(factory)
         request.validateAndAugmentSliceSelection(model, allowedSliceTypes())
-        val modelTranslation = transpileModel(factory, model, request.modelSliceSelection())
+        val modelTranslation = transpileModel(cspFactory, model, request.modelSliceSelection())
         status.numberOfSlices = modelTranslation.allSlices.size
         status.sliceSets = computeProjectedSliceSets(modelTranslation.computations, request)
         val slice2Translation = modelTranslation.sliceMap()
@@ -136,7 +137,7 @@ sealed class Computation<
             splitComputations.forEach { splitSlice ->
                 execute(
                     request,
-                    factory,
+                    cspFactory,
                     model,
                     modelTranslation,
                     splitSlice,
@@ -155,7 +156,7 @@ sealed class Computation<
                         launch(dispatcher) {
                             execute(
                                 request,
-                                ffProvider(),
+                                CspFactory(cspFactory, ffProvider()),
                                 model,
                                 modelTranslation,
                                 splitSlice,
@@ -183,7 +184,7 @@ sealed class Computation<
 
     private fun execute(
         request: REQUEST,
-        f: FormulaFactory,
+        cf: CspFactory,
         model: PrlModel,
         modelTranslation: ModelTranslation,
         splitSlice: Slice,
@@ -199,7 +200,7 @@ sealed class Computation<
             if (sliceTranslations.size == 1) {
                 val sliceTranslation = sliceTranslations[0]
                 if (anySlice in slicesToCompute) {
-                    val result = computeForSlice(request, anySlice, sliceTranslation.info, model, f, status)
+                    val result = computeForSlice(request, anySlice, sliceTranslation.info, model, cf, status)
                     numExecs.incrementAndGet()
                     val newResult = mergeInternalResult(sliceResults[splitSlice], result)
                     sliceResults[splitSlice] = newResult
@@ -210,8 +211,8 @@ sealed class Computation<
 //                    }
                 }
             } else {
-                val merged = mergeSlices(f, sliceTranslations)
-                val result = computeForSlice(request, anySlice, merged.info, model, f, status)
+                val merged = mergeSlices(cf, sliceTranslations)
+                val result = computeForSlice(request, anySlice, merged.info, model, cf, status)
                 numExecs.incrementAndGet()
                 val newResult = mergeInternalResult(sliceResults[splitSlice], result)
                 sliceResults[splitSlice] = newResult
@@ -222,13 +223,13 @@ sealed class Computation<
     internal fun miniSat(
         config: SATSolverConfig,
         request: REQUEST,
-        f: FormulaFactory,
+        cf: CspFactory,
         model: PrlModel,
         info: TranslationInfo,
         slice: Slice,
         status: ComputationStatusBuilder
     ): SATSolver {
-        val solver = SATSolver.newSolver(f, config)
+        val solver = SATSolver.newSolver(cf.formulaFactory(), config)
         solver.addPropositions(info.propositions)
         if (!solver.sat()) {
             status.addWarning(
@@ -239,7 +240,7 @@ sealed class Computation<
         }
         val additionalFormulas = request.additionalConstraints.mapNotNull { constraint ->
             processConstraint(
-                f,
+                cf,
                 constraint,
                 model,
                 info,
@@ -262,16 +263,16 @@ sealed class Computation<
         config: MaxSATConfig,
         algo: (FormulaFactory, MaxSATConfig) -> MaxSATSolver,
         request: REQUEST,
-        f: FormulaFactory,
+        cf: CspFactory,
         model: PrlModel,
         info: TranslationInfo,
         status: ComputationStatusBuilder
     ): MaxSATSolver {
-        val solver = algo(f, config)
+        val solver = algo(cf.formulaFactory(), config)
         info.propositions.forEach { solver.addHardFormula(it.formula()) }
         val additionalFormulas = request.additionalConstraints.mapNotNull { constraint ->
             processConstraint(
-                f,
+                cf,
                 constraint,
                 model,
                 info,
@@ -283,41 +284,32 @@ sealed class Computation<
     }
 
     internal fun processConstraint(
-        f: FormulaFactory,
+        cf: CspFactory,
         constraint: String,
         model: PrlModel,
         info: TranslationInfo,
         status: ComputationStatusBuilder
     ): PrlProposition? {
         val parsed = parseConstraint<PrlConstraint>(constraint)
-        val featureMap = createFeatureMap(parsed, model.featureStore, status) ?: return null
-        val compiled = ConstraintCompiler().compileConstraint(parsed, featureMap)
-        val formula = transpileConstraint(f, compiled, info)
+        val theoryMap = model.featureStore.theoryMap
+        if (!checkTheoryMap(parsed, theoryMap, status)) return null
+        val compiled = ConstraintCompiler().compileConstraint(parsed, theoryMap)
+        val formula = transpileConstraint(cf, compiled, info, IntegerEncodingStore.empty()) // TODO: integer store
         return PrlProposition(RuleInformation.fromAdditionRestriction(compiled), formula)
     }
 
-    private fun createFeatureMap(
+    private fun checkTheoryMap(
         parsed: PrlConstraint,
-        featureStore: FeatureStore,
+        theoryMap: Map<PrlFeature, Theory>,
         status: ComputationStatusBuilder
-    ): Map<PrlFeature, FeatureDefinition<*, *>>? {
-        val featureMap: MutableMap<PrlFeature, AnyFeatureDef> = mutableMapOf()
-        val nonUniqueFeatures: Set<String> = featureStore.nonUniqueFeatures()
-        val allDefinitions = featureStore.allDefinitions()
+    ): Boolean {
         parsed.features().forEach { feature ->
-            val featureDefinition: AnyFeatureDef =
-                if (feature.featureCode.contains(MODULE_SEPARATOR)) {
-                    allDefinitions.find { featureDef -> featureDef.feature.fullName == feature.featureCode }
-                        ?: return errorResult(status, "Feature '${feature.featureCode}' is not defined in current rule files")
-                } else if (nonUniqueFeatures.contains(feature.featureCode)) {
-                    return errorResult(status, "Feature '${feature.featureCode}' is not unique and not full qualified")
-                } else {
-                    allDefinitions.find { featureDef -> featureDef.feature.featureCode == feature.featureCode }
-                        ?: return errorResult(status, "Feature '${feature.featureCode}' not defined in current rule files")
-                }
-            featureMap[feature] = featureDefinition
+            if (!theoryMap.contains(feature)) {
+                errorResult(status, "Feature '${feature.featureCode}' not defined in current rule files")
+                return false
+            }
         }
-        return featureMap
+        return true
     }
 
     private fun errorResult(
@@ -355,11 +347,12 @@ abstract class SingleComputation<
         splitProperties: Set<String>
     ): SplitComputationDetail<DETAIL> {
         val f = FormulaFactory.caching()
-        val modelTranslation = transpileModel(f, model, sliceSelection)
-        require(modelTranslation.computations.size == 1) { "Expected to get exactly one slice" }
+        val cf = CspFactory(f)
+        val modelTranslation = transpileModel(cf, model, sliceSelection)
+        assert(modelTranslation.computations.size == 1) { "Expected to get exactly one slice" }
         val slice = modelTranslation.allSlices.first()
         val translation = modelTranslation.computations.first().info
-        return computeDetailForSlice(slice, model, translation, additionalConstraints, splitProperties, f)
+        return computeDetailForSlice(slice, model, translation, additionalConstraints, splitProperties, cf)
     }
 
     abstract fun computeDetailForSlice(
@@ -368,7 +361,7 @@ abstract class SingleComputation<
         info: TranslationInfo,
         additionalConstraints: List<String>,
         splitProperties: Set<String>,
-        f: FormulaFactory
+        cf: CspFactory
     ): SplitComputationDetail<DETAIL>
 
 }

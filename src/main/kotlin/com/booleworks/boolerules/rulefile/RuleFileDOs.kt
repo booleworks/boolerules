@@ -34,9 +34,6 @@ data class UploadSummaryDO(
     @field:Schema(description = "The size in the storage in bytes for the uploaded rule file")
     val size: Int,
 
-    @field:Schema(description = "The number of modules of the uploaded rule file")
-    val numberOfModules: Int,
-
     @field:Schema(description = "The number of rules of the uploaded rule file")
     val numberOfRules: Int,
 
@@ -56,7 +53,7 @@ data class UploadSummaryDO(
     val slicingProperties: List<SlicingPropertyDO>,
 
     @field:Schema(description = "The list of all full feature names in the uploaded rule file")
-    val features: Set<FeatureNameDO>,
+    val features: Set<String>,
 
     @field:Schema(
         description = "A (potential empty) list of error messages during uploading and " +
@@ -83,12 +80,6 @@ data class UploadSummaryDO(
 data class SlicingPropertyDO(
     @field:Schema(description = "The name of this slicing property") val name: String,
     val type: PropertyTypeDO, val range: PropertyRangeDO
-)
-
-@Schema(description = "A feature with its unique and full name")
-data class FeatureNameDO(
-    @field:Schema(description = "The unique name of the feature in the uploaded rule file") val uniqueName: String,
-    @field:Schema(description = "The full qualified name of the feature") val fullName: String
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

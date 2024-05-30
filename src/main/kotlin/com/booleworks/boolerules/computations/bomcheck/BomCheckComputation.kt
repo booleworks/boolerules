@@ -15,8 +15,8 @@ import com.booleworks.boolerules.computations.generic.ListComputationRunner
 import com.booleworks.boolerules.computations.generic.NON_CACHING_USE_FF
 import com.booleworks.boolerules.computations.generic.NON_PT_CONFIG
 import com.booleworks.boolerules.computations.generic.computationDoc
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.datastructures.Tristate
-import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
 import com.booleworks.prl.transpiler.PrlProposition
@@ -73,16 +73,16 @@ internal object BomCheckComputation :
         slice: Slice,
         info: TranslationInfo,
         model: PrlModel,
-        f: FormulaFactory,
+        cf: CspFactory,
         status: ComputationStatusBuilder,
     ): BomCheckInternalResult {
-        val solver = miniSat(NON_PT_CONFIG, request, f, model, info, slice, status).also {
+        val solver = miniSat(NON_PT_CONFIG, request, cf, model, info, slice, status).also {
             if (!status.successful()) return BomCheckInternalResult(slice, mutableMapOf())
         }
         val positionElements: MutableList<PositionElementDO> = mutableListOf()
         // check if solver is sat with the rules from rule file
         request.positions.forEach { position ->
-            val positionConstraint = processConstraint(f, position.constraint, model, info, status)
+            val positionConstraint = processConstraint(cf, position.constraint, model, info, status)
             solver.add(positionConstraint)
             if (!solver.sat()) {
                 // TODO was tun?
@@ -93,7 +93,7 @@ internal object BomCheckComputation :
             var isComplete = true
 
             val pvConstraintMap =
-                position.positionVariants.associateWith { processConstraint(f, it.constraint, model, info, status) }
+                position.positionVariants.associateWith { processConstraint(cf, it.constraint, model, info, status) }
                     .filterValues { it != null } as Map<PositionVariant, PrlProposition>
             // Search dead pvs -> Detail: List of position variants that are dead
             pvConstraintMap.forEach { (pv, pvConstraint) ->
@@ -113,7 +113,7 @@ internal object BomCheckComputation :
             // Check if position is complete -> (Detail with example that does not hit a pv?)
             val initialState = solver.saveState()
             pvConstraintMap.values.forEach {
-                solver.add(f.not(it.formula()))
+                solver.add(cf.formulaFactory().not(it.formula()))
             }
             if (solver.sat()) {
                 // TODO generate model as example
@@ -142,7 +142,8 @@ internal object BomCheckComputation :
         TODO()
     }
 
-    override fun extractElements(internalResult: BomCheckInternalResult): Set<PositionElementDO> = internalResult.positions.keys
+    override fun extractElements(internalResult: BomCheckInternalResult): Set<PositionElementDO> =
+        internalResult.positions.keys
 
     override fun extractInternalResult(
         element: PositionElementDO,
@@ -150,9 +151,15 @@ internal object BomCheckComputation :
     ): PositionElementResult =
         internalResult.positions[element].let { slice ->
             if (slice == null) {
-                PositionElementResult(internalResult.slice, BomCheckAlgorithmsResult(element.isComplete, element.hasNonUniquePVs, element.hasDeadPvs))
+                PositionElementResult(
+                    internalResult.slice,
+                    BomCheckAlgorithmsResult(element.isComplete, element.hasNonUniquePVs, element.hasDeadPvs)
+                )
             } else {
-                PositionElementResult(slice, BomCheckAlgorithmsResult(element.isComplete, element.hasNonUniquePVs, element.hasDeadPvs))
+                PositionElementResult(
+                    slice,
+                    BomCheckAlgorithmsResult(element.isComplete, element.hasNonUniquePVs, element.hasDeadPvs)
+                )
             }
         }
 

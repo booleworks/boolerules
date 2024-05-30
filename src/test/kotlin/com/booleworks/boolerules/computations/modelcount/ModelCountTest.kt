@@ -3,6 +3,7 @@ package com.booleworks.boolerules.computations.modelcount
 import com.booleworks.boolerules.TestWithConfig
 import com.booleworks.boolerules.computations.generic.ComputationStatusBuilder
 import com.booleworks.boolerules.computations.generic.ComputationVariant.SINGLE
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.prl.compiler.PrlCompiler
 import com.booleworks.prl.model.slices.Slice
@@ -20,17 +21,46 @@ internal class ModelCountTest : TestWithConfig() {
     @Test
     fun testComputeForSlice() {
         val f = FormulaFactory.nonCaching()
-        val modelTranslation = transpileModel(f, model, listOf())
+        val cf = CspFactory(f)
+        val modelTranslation = transpileModel(cf, model, listOf())
 
         val request = ModelCountRequest("any", mutableListOf(), listOf())
         val info1 = modelTranslation[0].info
         val info2 = modelTranslation[1].info
         val info3 = modelTranslation[2].info
         val info4 = modelTranslation[3].info
-        val result1 = cut.computeForSlice(request, Slice.empty(), info1, model, f, ComputationStatusBuilder("fileId", "jobId", SINGLE))
-        val result2 = cut.computeForSlice(request, Slice.empty(), info2, model, f, ComputationStatusBuilder("fileId", "jobId", SINGLE))
-        val result3 = cut.computeForSlice(request, Slice.empty(), info3, model, f, ComputationStatusBuilder("fileId", "jobId", SINGLE))
-        val result4 = cut.computeForSlice(request, Slice.empty(), info4, model, f, ComputationStatusBuilder("fileId", "jobId", SINGLE))
+        val result1 = cut.computeForSlice(
+            request,
+            Slice.empty(),
+            info1,
+            model,
+            cf,
+            ComputationStatusBuilder("fileId", "jobId", SINGLE)
+        )
+        val result2 = cut.computeForSlice(
+            request,
+            Slice.empty(),
+            info2,
+            model,
+            cf,
+            ComputationStatusBuilder("fileId", "jobId", SINGLE)
+        )
+        val result3 = cut.computeForSlice(
+            request,
+            Slice.empty(),
+            info3,
+            model,
+            cf,
+            ComputationStatusBuilder("fileId", "jobId", SINGLE)
+        )
+        val result4 = cut.computeForSlice(
+            request,
+            Slice.empty(),
+            info4,
+            model,
+            cf,
+            ComputationStatusBuilder("fileId", "jobId", SINGLE)
+        )
 
         assertThat(result1.slice).isEqualTo(Slice.empty())
         assertThat(result1.count).isEqualTo(BigInteger.valueOf(2))
@@ -42,17 +72,46 @@ internal class ModelCountTest : TestWithConfig() {
     @Test
     fun testComputeForSliceWithAdditionalConstraints() {
         val f = FormulaFactory.nonCaching()
-        val modelTranslation = transpileModel(f, model, listOf())
+        val cf = CspFactory(f)
+        val modelTranslation = transpileModel(cf, model, listOf())
 
         val request = ModelCountRequest("any", mutableListOf(), listOf("[c = \"c1\"]"))
         val info1 = modelTranslation[0].info
         val info2 = modelTranslation[1].info
         val info3 = modelTranslation[2].info
         val info4 = modelTranslation[3].info
-        val result1 = cut.computeForSlice(request, Slice.empty(), info1, model, f, ComputationStatusBuilder("fileId", "jobId", SINGLE))
-        val result2 = cut.computeForSlice(request, Slice.empty(), info2, model, f, ComputationStatusBuilder("fileId", "jobId", SINGLE))
-        val result3 = cut.computeForSlice(request, Slice.empty(), info3, model, f, ComputationStatusBuilder("fileId", "jobId", SINGLE))
-        val result4 = cut.computeForSlice(request, Slice.empty(), info4, model, f, ComputationStatusBuilder("fileId", "jobId", SINGLE))
+        val result1 = cut.computeForSlice(
+            request,
+            Slice.empty(),
+            info1,
+            model,
+            cf,
+            ComputationStatusBuilder("fileId", "jobId", SINGLE)
+        )
+        val result2 = cut.computeForSlice(
+            request,
+            Slice.empty(),
+            info2,
+            model,
+            cf,
+            ComputationStatusBuilder("fileId", "jobId", SINGLE)
+        )
+        val result3 = cut.computeForSlice(
+            request,
+            Slice.empty(),
+            info3,
+            model,
+            cf,
+            ComputationStatusBuilder("fileId", "jobId", SINGLE)
+        )
+        val result4 = cut.computeForSlice(
+            request,
+            Slice.empty(),
+            info4,
+            model,
+            cf,
+            ComputationStatusBuilder("fileId", "jobId", SINGLE)
+        )
 
         assertThat(result1.slice).isEqualTo(Slice.empty())
         assertThat(result1.count).isEqualTo(BigInteger.valueOf(1))

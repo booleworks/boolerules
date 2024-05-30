@@ -1,7 +1,8 @@
-package com.booleworks.boolerules.computations.consistency
+// SPDX-License-Identifier: MIT
+// Copyright 2023 BooleWorks GmbH
 
-import com.booleworks.boolerules.computations.coverage.COVERAGE
-import com.booleworks.boolerules.computations.coverage.CoverageComputation
+package com.booleworks.boolerules.computations.coverage
+
 import com.booleworks.boolerules.computations.details.DetailRequest
 import com.booleworks.boolerules.computations.details.fetchModel
 import com.booleworks.boolerules.computations.generic.SliceDO
@@ -83,5 +84,10 @@ private fun computeCoverageGraphResponse(request: DetailRequest): CoverageGraphR
     val model = fetchModel(request.jobId)
     val sliceSelection = request.sliceSelection.map { it.toModelDS() }
     val mainRequest = Persistence.computation.fetchConstraints(request.jobId, COVERAGE).getOrThrow()
-    return CoverageComputation.computeCoverageGraph(model, sliceSelection, mainRequest, computationDetail.detail.configurations.size)
+    return CoverageComputation.computeCoverageGraph(
+        model,
+        sliceSelection,
+        mainRequest,
+        computationDetail.detail.configurations.size
+    )
 }

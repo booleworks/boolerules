@@ -19,7 +19,7 @@ import com.booleworks.boolerules.computations.generic.computeRelevantVars
 import com.booleworks.boolerules.computations.generic.extractModel
 import com.booleworks.boolerules.computations.modelenumeration.ModelEnumerationComputation.ModelEnumerationElementResult
 import com.booleworks.boolerules.computations.modelenumeration.ModelEnumerationComputation.ModelEnumerationInternalResult
-import com.booleworks.logicng.formulas.FormulaFactory
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.Variable
 import com.booleworks.logicng.solvers.SATSolver
 import com.booleworks.prl.model.PrlModel
@@ -79,12 +79,13 @@ internal object ModelEnumerationComputation : ListComputation<
         slice: Slice,
         info: TranslationInfo,
         model: PrlModel,
-        f: FormulaFactory,
+        cf: CspFactory,
         status: ComputationStatusBuilder,
     ): ModelEnumerationInternalResult {
+        val f = cf.formulaFactory()
         val relevantVars = computeRelevantVars(f, info, request.features)
 
-        val solver = miniSat(NON_PT_CONFIG, request, f, model, info, slice, status).also {
+        val solver = miniSat(NON_PT_CONFIG, request, cf, model, info, slice, status).also {
             if (!status.successful()) return ModelEnumerationInternalResult(slice, mutableMapOf())
         }
         addTautologyClauses(solver, relevantVars)

@@ -64,7 +64,6 @@ private fun generateUploadSummary(uuid: String, fileName: String, size: Int, mod
         fileName,
         LocalDateTime.now(),
         size,
-        model.moduleHierarchy.numberOfModules(),
         model.rules.size,
         model.features().size,
         model.booleanFeatures().isNotEmpty(),
@@ -84,7 +83,6 @@ private fun parseError(fileName: String, message: String) = UploadSummaryDO(
     0,
     0,
     0,
-    0,
     hasBooleanFeatures = false,
     hasEnumFeatures = false,
     hasIntFeatures = false,
@@ -97,7 +95,6 @@ private fun compilerError(fileName: String, compiler: PrlCompiler) = UploadSumma
     "",
     fileName,
     LocalDateTime.now(),
-    0,
     0,
     0,
     0,
@@ -120,11 +117,4 @@ private fun generateProperties(model: PrlModel) = model.propertyStore.allDefinit
     }
 }
 
-internal fun generateFeatures(model: PrlModel) = model.features().map {
-    val uniqueName = if (model.featureStore.nonUniqueFeatures().contains(it.featureCode)) {
-        it.fullName
-    } else {
-        it.featureCode
-    }
-    FeatureNameDO(uniqueName, it.fullName)
-}.toSortedSet(compareBy { it.uniqueName })
+internal fun generateFeatures(model: PrlModel) = model.features().map { it.featureCode }.toSortedSet()

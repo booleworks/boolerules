@@ -15,7 +15,7 @@ import com.booleworks.boolerules.computations.generic.SingleComputationRunner
 import com.booleworks.boolerules.computations.generic.SliceTypeDO
 import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.boolerules.computations.modelcount.ModelCountComputation.ModelCountInternalResult
-import com.booleworks.logicng.formulas.FormulaFactory
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.modelcounting.ModelCounter
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
@@ -60,15 +60,16 @@ internal object ModelCountComputation :
         slice: Slice,
         info: TranslationInfo,
         model: PrlModel,
-        f: FormulaFactory,
+        cf: CspFactory,
         status: ComputationStatusBuilder,
     ): ModelCountInternalResult {
         // currently no projected model counting
-//        val variables = computeRelevantVars(f, info, listOf())
+        // val variables = computeRelevantVars(f, info, listOf())
+        val f = cf.formulaFactory()
         val variables = info.knownVariables.toSortedSet()
         val formulas = info.propositions.map { it.formula() }
         val additionalConstraints =
-            request.additionalConstraints.map { constraint -> processConstraint(f, constraint, model, info, status) }
+            request.additionalConstraints.map { constraint -> processConstraint(cf, constraint, model, info, status) }
         if (!status.successful()) {
             return ModelCountInternalResult(slice, BigInteger.ZERO)
         }
@@ -84,7 +85,7 @@ internal object ModelCountComputation :
         info: TranslationInfo,
         additionalConstraints: List<String>,
         splitProperties: Set<String>,
-        f: FormulaFactory
+        cf: CspFactory
     ) = error("details are always computed in main computation")
 
     data class ModelCountInternalResult(override val slice: Slice, val count: BigInteger) :

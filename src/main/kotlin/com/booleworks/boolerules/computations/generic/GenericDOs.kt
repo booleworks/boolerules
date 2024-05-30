@@ -20,9 +20,6 @@ data class FeatureDO(
     @field:Schema(description = "The feature code")
     val code: String,
 
-    @field:Schema(description = "The full name of the feature including the module")
-    val fullName: String,
-
     @field:Schema(description = "The feature type (BOOLEAN, VERSIONED_BOOLEAN, ENUM, INT)")
     val type: FeatureTypeDO,
 
@@ -42,9 +39,9 @@ data class FeatureDO(
         if (it != 0) {
             it
         } else {
-            val fullNameComp = this.fullName.compareTo(other.fullName)
-            if (fullNameComp != 0) {
-                return fullNameComp
+            val featureComp = this.code.compareTo(other.code)
+            if (featureComp != 0) {
+                return featureComp
             } else {
                 when (type) {
                     BOOLEAN -> 0
@@ -64,17 +61,10 @@ data class FeatureDO(
     }
 
     companion object {
-        fun boolean(featureCode: String, fullName: String, value: Boolean) =
-            FeatureDO(featureCode, fullName, BOOLEAN, booleanValue = value)
-
-        fun boolean(featureCode: String, fullName: String, version: Int) =
-            FeatureDO(featureCode, fullName, VERSIONED_BOOLEAN, version = version)
-
-        fun enum(featureCode: String, fullName: String, value: String) =
-            FeatureDO(featureCode, fullName, ENUM, enumValue = value)
-
-        fun int(featureCode: String, fullName: String, value: Int) =
-            FeatureDO(featureCode, fullName, INT, intValue = value)
+        fun boolean(featureCode: String, value: Boolean) = FeatureDO(featureCode, BOOLEAN, booleanValue = value)
+        fun boolean(featureCode: String, version: Int) = FeatureDO(featureCode, VERSIONED_BOOLEAN, version = version)
+        fun enum(featureCode: String, value: String) = FeatureDO(featureCode, ENUM, enumValue = value)
+        fun int(featureCode: String, value: Int) = FeatureDO(featureCode, INT, intValue = value)
     }
 }
 
@@ -84,9 +74,6 @@ data class RuleDO(
 
     @field:Schema(description = "The rule body as text")
     val rule: String,
-
-    @field:Schema(description = "The module of the rule", required = false)
-    val module: String? = null,
 
     @field:Schema(description = "The rule ID", required = false)
     val id: String? = null,
@@ -102,8 +89,7 @@ data class RuleDO(
 ) {
     companion object {
         fun fromRulesetRule(rule: AnyRule, slicingProperties: Collection<String>) = RuleDO(
-            rule.headerLine(rule.module),
-            rule.module.fullName,
+            rule.headerLine(),
             rule.id,
             rule.description,
             rule.lineNumber,
@@ -112,7 +98,7 @@ data class RuleDO(
             }
         )
 
-        fun fromAdditionalConstraint(rule: ConstraintRule) = RuleDO(rule.headerLine(rule.module))
+        fun fromAdditionalConstraint(rule: ConstraintRule) = RuleDO(rule.headerLine())
 
         fun fromInternalRule(ruleType: RuleType) = RuleDO(ruleType.description)
     }

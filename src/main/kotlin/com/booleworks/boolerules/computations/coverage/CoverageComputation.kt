@@ -1,9 +1,10 @@
+// SPDX-License-Identifier: MIT
+// Copyright 2023 BooleWorks GmbH
+
 package com.booleworks.boolerules.computations.coverage
 
 import com.booleworks.boolerules.computations.ComputationType
 import com.booleworks.boolerules.computations.NoElement
-import com.booleworks.boolerules.computations.consistency.CoverableConstraints
-import com.booleworks.boolerules.computations.consistency.CoverageGraphResponse
 import com.booleworks.boolerules.computations.generic.ApiDocs
 import com.booleworks.boolerules.computations.generic.ComputationStatusBuilder
 import com.booleworks.boolerules.computations.generic.ComputationVariant
@@ -14,6 +15,7 @@ import com.booleworks.boolerules.computations.generic.SingleComputationRunner
 import com.booleworks.boolerules.computations.generic.SliceTypeDO
 import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.boolerules.computations.generic.extractModel
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.datastructures.Substitution
 import com.booleworks.logicng.datastructures.Tristate
 import com.booleworks.logicng.formulas.Formula
@@ -60,19 +62,24 @@ internal object CoverageComputation :
     override fun mergeInternalResult(
         existingResult: CoverageInternalResult?,
         newResult: CoverageInternalResult
-    ) = if (existingResult == null) newResult else error("Only split slices are allowed, so this method should never be called")
+    ) = if (existingResult == null) {
+        newResult
+    } else {
+        error("Only split slices are allowed, so this method should never be called")
+    }
 
     override fun computeForSlice(
         request: CoverageRequest,
         slice: Slice,
         info: TranslationInfo,
         model: PrlModel,
-        f: FormulaFactory,
+        cf: CspFactory,
         status: ComputationStatusBuilder,
     ): CoverageInternalResult {
-        val (baseFormula, constraintsToCover, invalidConstraints) = initialize(request, slice, info, model, f, status)
+        val (baseFormula, constraintsToCover, invalidConstraints) = initialize(request, slice, info, model, cf, status)
             ?: return CoverageInternalResult(slice, emptyList(), 0)
 
+        val f = cf.formulaFactory()
         val selectors = constraintsToCover.keys
         val initialCover = computeInitialCover(baseFormula, selectors, f)
         val fullModel = minimizeInitialCover(initialCover, baseFormula, selectors, f)
@@ -95,7 +102,7 @@ internal object CoverageComputation :
         info: TranslationInfo,
         additionalConstraints: List<String>,
         splitProperties: Set<String>,
-        f: FormulaFactory
+        cf: CspFactory
     ) = error("details are always computed in main computation")
 
     private fun initialize(
@@ -103,19 +110,29 @@ internal object CoverageComputation :
         slice: Slice,
         translation: TranslationInfo,
         model: PrlModel,
-        f: FormulaFactory,
+        cf: CspFactory,
         status: ComputationStatusBuilder
     ): CoverageInitialization? {
         val baseConstraints = translation.propositions.map { it.formula() }.toMutableList()
-        baseConstraints += request.additionalConstraints.mapNotNull { processConstraint(f, it, model, translation, status)?.formula() }
-        val (invalidConstraints, constraintsToCover) = computeConstraintsToCover(f, baseConstraints, request, model, translation, slice, status) ?: return null
+        baseConstraints += request.additionalConstraints.mapNotNull {
+            processConstraint(cf, it, model, translation, status)?.formula()
+        }
+        val (invalidConstraints, constraintsToCover) = computeConstraintsToCover(
+            cf,
+            baseConstraints,
+            request,
+            model,
+            translation,
+            slice,
+            status
+        ) ?: return null
         baseConstraints += constraintsToCover.values.map { it.first }
-        val baseFormula = f.and(baseConstraints)
+        val baseFormula = cf.formulaFactory().and(baseConstraints)
         return CoverageInitialization(baseFormula, constraintsToCover, invalidConstraints)
     }
 
     private fun computeConstraintsToCover(
-        f: FormulaFactory,
+        cf: CspFactory,
         baseConstraints: List<Formula>,
         request: CoverageRequest,
         model: PrlModel,
@@ -123,12 +140,13 @@ internal object CoverageComputation :
         slice: Slice,
         status: ComputationStatusBuilder,
     ): Pair<Int, Map<Variable, Pair<Formula, String>>>? {
+        val f = cf.formulaFactory()
         val baseSolver = SATSolver.newSolver(f)
         baseConstraints.forEach { baseSolver.add(it) }
         val validConstraints = mutableListOf<Pair<Formula, String>>()
         val invalidConstraints = mutableListOf<String>()
         for (constraint in request.constraintsToCover) {
-            val formula = processConstraint(f, constraint, model, info, status)?.formula() ?: return null
+            val formula = processConstraint(cf, constraint, model, info, status)?.formula() ?: return null
             if (baseSolver.satCall().addFormulas(formula).sat() == Tristate.FALSE) {
                 invalidConstraints.add(constraint)
             } else {
@@ -137,14 +155,18 @@ internal object CoverageComputation :
         }
 
         if (invalidConstraints.isNotEmpty()) {
-            status.addWarning("For slice $slice the following constraints were not buildable and are therefore not covered by the result: ${invalidConstraints.joinToString()}")
+            status.addWarning(
+                "For slice $slice the following constraints were not buildable and are " +
+                        "therefore not covered by the result: ${invalidConstraints.joinToString()}"
+            )
         }
 
         val constraintsToCover = mutableMapOf<Variable, Pair<Formula, String>>()
         // k nicht baubare Constraints = (n-1)+(n-2)+...+(n-k) nicht baubare Kombinationen = k*n-(k*(k+1)/2)
         var numInvalidCombinations: Int
         if (request.pairwiseCover) {
-            numInvalidCombinations = invalidConstraints.size * request.constraintsToCover.size - (invalidConstraints.size * (invalidConstraints.size + 1)) / 2
+            numInvalidCombinations =
+                invalidConstraints.size * request.constraintsToCover.size - invalidConstraints.size * (invalidConstraints.size + 1) / 2
             var index = 0
             val invalidCombinations = mutableListOf<String>()
             for (i in 0 until validConstraints.size) {
@@ -157,13 +179,17 @@ internal object CoverageComputation :
                         numInvalidCombinations++
                     } else {
                         val selector = f.variable("@COV_SELECTOR_$index")
-                        constraintsToCover[selector] = f.equivalence(selector, combination) to "[$constraintI, $constraintJ]"
+                        constraintsToCover[selector] =
+                            f.equivalence(selector, combination) to "[$constraintI, $constraintJ]"
                         index += 1
                     }
                 }
             }
             if (invalidCombinations.isNotEmpty()) {
-                status.addWarning("For slice $slice the following constraint-combinations were not buildable and are therefore not covered by the result: $invalidCombinations")
+                status.addWarning(
+                    "For slice $slice the following constraint-combinations were not buildable " +
+                            "and are therefore not covered by the result: $invalidCombinations"
+                )
             }
         } else {
             numInvalidCombinations = invalidConstraints.size
@@ -233,19 +259,31 @@ internal object CoverageComputation :
         request: CoverageRequest,
         maxConfigurations: Int
     ): CoverageGraphResponse {
-        val f = FormulaFactory.caching()
-        val modelTranslation = transpileModel(f, model, sliceSelection)
+        val cf = CspFactory(FormulaFactory.caching())
+        val modelTranslation = transpileModel(cf, model, sliceSelection)
         require(modelTranslation.computations.size == 1) { "Expected to get exactly one slice" }
         val slice = modelTranslation.allSlices.first()
         val translation = modelTranslation.computations.first().info
         val (baseFormula, constraintsToCover, _) =
-            initialize(request, slice, translation, model, f, ComputationStatusBuilder("", "", ComputationVariant.SINGLE))!!
+            initialize(
+                request,
+                slice,
+                translation,
+                model,
+                cf,
+                ComputationStatusBuilder("", "", ComputationVariant.SINGLE)
+            )!!
         return CoverageGraphResponse((1..maxConfigurations).map {
-            CoverableConstraints(it, computeMaxCover(baseFormula, it, constraintsToCover.keys, f))
+            CoverableConstraints(it, computeMaxCover(baseFormula, it, constraintsToCover.keys, cf.formulaFactory()))
         })
     }
 
-    private fun computeMaxCover(baseFormula: Formula, numCopies: Int, variablesToCover: Set<Variable>, f: FormulaFactory): Int {
+    private fun computeMaxCover(
+        baseFormula: Formula,
+        numCopies: Int,
+        variablesToCover: Set<Variable>,
+        f: FormulaFactory
+    ): Int {
         val baseFormulaCopies = mutableListOf<Formula>()
         for (i in 0 until numCopies) {
             val substitution = Substitution()
@@ -282,15 +320,9 @@ data class CoverageInternalResult(
 ) : InternalResult<CoverageMainResult, CoverageDetail>(slice) {
     override fun extractMainResult() = CoverageMainResult(result.size, uncoverableConstraints)
     override fun extractDetails() = CoverageDetail(result)
-    override fun toString(): String {
-        return "CoverageInternalResult(slice=$slice, result=[${result.joinToString { "[$it]" }}])"
-    }
+    override fun toString() = "CoverageInternalResult(slice=$slice, result=[${result.joinToString { "[$it]" }}])"
 }
 
-private fun baseFormulaSelector(i: Int, f: FormulaFactory): Variable {
-    return f.variable("BASE_COPY_USED_" + (i + 1))
-}
-
-private fun variableCopy(variable: Variable, i: Int, f: FormulaFactory): Variable {
-    return f.variable(variable.name() + "_copy_" + (i + 1))
-}
+private fun baseFormulaSelector(i: Int, f: FormulaFactory) = f.variable("BASE_COPY_USED_" + (i + 1))
+private fun variableCopy(variable: Variable, i: Int, f: FormulaFactory) =
+    f.variable(variable.name() + "_copy_" + (i + 1))

@@ -17,6 +17,7 @@ import com.booleworks.boolerules.computations.resForMain
 import com.booleworks.boolerules.rulefile.PropertyRangeDO
 import com.booleworks.boolerules.rulefile.PropertyTypeDO
 import com.booleworks.boolerules.rulefile.SlicingPropertyDO
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.prl.compiler.PrlCompiler
 import com.booleworks.prl.model.EnumProperty
@@ -46,32 +47,55 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
     @Test
     fun testComputeForSlice() {
         val f = FormulaFactory.nonCaching()
+        val cf = CspFactory(f)
         val request = BackboneRequest("any", mutableListOf(), listOf(), listOf())
-        val modelTranslation = transpileModel(f, model, listOf())
-        val res = cut.computeForSlice(request, Slice.empty(), modelTranslation[0].info, model, f, ComputationStatusBuilder("fileId", "jobId", LIST))
+        val modelTranslation = transpileModel(cf, model, listOf())
+        val res = cut.computeForSlice(
+            request,
+            Slice.empty(),
+            modelTranslation[0].info,
+            model,
+            cf,
+            ComputationStatusBuilder("fileId", "jobId", LIST)
+        )
 
         assertThat(res.slice).isEqualTo(Slice.empty())
         assertThat(res.backbone).hasSize(9)
-        assertThat(res.backbone[FeatureDO.enum("a", "test.a", "a1")]).isEqualTo(FORBIDDEN)
-        assertThat(res.backbone[FeatureDO.enum("a", "test.a", "a2")]).isEqualTo(MANDATORY)
-        assertThat(res.backbone[FeatureDO.enum("b", "test.b", "b1")]).isEqualTo(MANDATORY)
-        assertThat(res.backbone[FeatureDO.enum("b", "test.b", "b2")]).isEqualTo(FORBIDDEN)
-        assertThat(res.backbone[FeatureDO.enum("b", "test.b", "b3")]).isEqualTo(FORBIDDEN)
-        assertThat(res.backbone[FeatureDO.enum("c", "test.c", "c1")]).isEqualTo(OPTIONAL)
-        assertThat(res.backbone[FeatureDO.enum("c", "test.c", "c2")]).isEqualTo(OPTIONAL)
-        assertThat(res.backbone[FeatureDO.enum("p", "test.p", "px")]).isEqualTo(FORBIDDEN)
-        assertThat(res.backbone[FeatureDO.enum("p", "test.p", "p1")]).isEqualTo(MANDATORY)
+        assertThat(res.backbone[FeatureDO.enum("a", "a1")]).isEqualTo(FORBIDDEN)
+        assertThat(res.backbone[FeatureDO.enum("a", "a2")]).isEqualTo(MANDATORY)
+        assertThat(res.backbone[FeatureDO.enum("b", "b1")]).isEqualTo(MANDATORY)
+        assertThat(res.backbone[FeatureDO.enum("b", "b2")]).isEqualTo(FORBIDDEN)
+        assertThat(res.backbone[FeatureDO.enum("b", "b3")]).isEqualTo(FORBIDDEN)
+        assertThat(res.backbone[FeatureDO.enum("c", "c1")]).isEqualTo(OPTIONAL)
+        assertThat(res.backbone[FeatureDO.enum("c", "c2")]).isEqualTo(OPTIONAL)
+        assertThat(res.backbone[FeatureDO.enum("p", "px")]).isEqualTo(FORBIDDEN)
+        assertThat(res.backbone[FeatureDO.enum("p", "p1")]).isEqualTo(MANDATORY)
     }
 
     @ParameterizedTest
     @MethodSource("configs")
     fun testComputeSeriesSplitSlices(tc: TestConfig) {
         setUp(tc)
-        val slice1 = Slice.of(mapOf(Pair(IntProperty("version", 1), SliceType.SPLIT), Pair(EnumProperty("series", "S1"), SliceType.SPLIT)))
-        val slice2 = Slice.of(mapOf(Pair(IntProperty("version", 1), SliceType.SPLIT), Pair(EnumProperty("series", "S2"), SliceType.SPLIT)))
+        val slice1 = Slice.of(
+            mapOf(
+                Pair(IntProperty("version", 1), SliceType.SPLIT),
+                Pair(EnumProperty("series", "S1"), SliceType.SPLIT)
+            )
+        )
+        val slice2 = Slice.of(
+            mapOf(
+                Pair(IntProperty("version", 1), SliceType.SPLIT),
+                Pair(EnumProperty("series", "S2"), SliceType.SPLIT)
+            )
+        )
 
         val sliceSelection = mutableListOf(
-            PropertySelectionDO("series", PropertyTypeDO.ENUM, PropertyRangeDO(enumValues = setOf("S1", "S2")), SliceTypeDO.SPLIT),
+            PropertySelectionDO(
+                "series",
+                PropertyTypeDO.ENUM,
+                PropertyRangeDO(enumValues = setOf("S1", "S2")),
+                SliceTypeDO.SPLIT
+            ),
             PropertySelectionDO("version", PropertyTypeDO.INT, PropertyRangeDO(intValues = setOf(1)), SliceTypeDO.SPLIT)
         )
         val request = BackboneRequest("any", sliceSelection, listOf(), listOf())
@@ -92,16 +116,46 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
     @MethodSource("configs")
     fun testComputeSeriesAndVersionSplitSlicesWithRestrictedVars(tc: TestConfig) {
         setUp(tc)
-        val slice1 = Slice.of(mapOf(Pair(IntProperty("version", 1), SliceType.SPLIT), Pair(EnumProperty("series", "S1"), SliceType.SPLIT)))
-        val slice2 = Slice.of(mapOf(Pair(IntProperty("version", 1), SliceType.SPLIT), Pair(EnumProperty("series", "S2"), SliceType.SPLIT)))
-        val slice3 = Slice.of(mapOf(Pair(IntProperty("version", 2), SliceType.SPLIT), Pair(EnumProperty("series", "S1"), SliceType.SPLIT)))
-        val slice4 = Slice.of(mapOf(Pair(IntProperty("version", 2), SliceType.SPLIT), Pair(EnumProperty("series", "S2"), SliceType.SPLIT)))
+        val slice1 = Slice.of(
+            mapOf(
+                Pair(IntProperty("version", 1), SliceType.SPLIT),
+                Pair(EnumProperty("series", "S1"), SliceType.SPLIT)
+            )
+        )
+        val slice2 = Slice.of(
+            mapOf(
+                Pair(IntProperty("version", 1), SliceType.SPLIT),
+                Pair(EnumProperty("series", "S2"), SliceType.SPLIT)
+            )
+        )
+        val slice3 = Slice.of(
+            mapOf(
+                Pair(IntProperty("version", 2), SliceType.SPLIT),
+                Pair(EnumProperty("series", "S1"), SliceType.SPLIT)
+            )
+        )
+        val slice4 = Slice.of(
+            mapOf(
+                Pair(IntProperty("version", 2), SliceType.SPLIT),
+                Pair(EnumProperty("series", "S2"), SliceType.SPLIT)
+            )
+        )
 
         val sliceSelection = mutableListOf(
-            PropertySelectionDO("series", PropertyTypeDO.ENUM, PropertyRangeDO(enumValues = setOf("S1", "S2")), SliceTypeDO.SPLIT),
-            PropertySelectionDO("version", PropertyTypeDO.INT, PropertyRangeDO(intValues = setOf(1, 2)), SliceTypeDO.SPLIT)
+            PropertySelectionDO(
+                "series",
+                PropertyTypeDO.ENUM,
+                PropertyRangeDO(enumValues = setOf("S1", "S2")),
+                SliceTypeDO.SPLIT
+            ),
+            PropertySelectionDO(
+                "version",
+                PropertyTypeDO.INT,
+                PropertyRangeDO(intValues = setOf(1, 2)),
+                SliceTypeDO.SPLIT
+            )
         )
-        val request = BackboneRequest("any", sliceSelection, listOf(), listOf("test.a", "test.b", "test.c"))
+        val request = BackboneRequest("any", sliceSelection, listOf(), listOf("a", "b", "c"))
 
         val result = cut.computeForModel(request, model, ComputationStatusBuilder("fileId", "jobId", LIST))
         val sliceResult1 = result[slice1]!!
@@ -125,11 +179,26 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
     @MethodSource("configs")
     fun testComputeSeriesSplitSlicesWithAdditionalConstraints(tc: TestConfig) {
         setUp(tc)
-        val slice1 = Slice.of(mapOf(Pair(IntProperty("version", 1), SliceType.SPLIT), Pair(EnumProperty("series", "S1"), SliceType.SPLIT)))
-        val slice2 = Slice.of(mapOf(Pair(IntProperty("version", 1), SliceType.SPLIT), Pair(EnumProperty("series", "S2"), SliceType.SPLIT)))
+        val slice1 = Slice.of(
+            mapOf(
+                Pair(IntProperty("version", 1), SliceType.SPLIT),
+                Pair(EnumProperty("series", "S1"), SliceType.SPLIT)
+            )
+        )
+        val slice2 = Slice.of(
+            mapOf(
+                Pair(IntProperty("version", 1), SliceType.SPLIT),
+                Pair(EnumProperty("series", "S2"), SliceType.SPLIT)
+            )
+        )
 
         val sliceSelection = mutableListOf(
-            PropertySelectionDO("series", PropertyTypeDO.ENUM, PropertyRangeDO(enumValues = setOf("S1", "S2")), SliceTypeDO.SPLIT),
+            PropertySelectionDO(
+                "series",
+                PropertyTypeDO.ENUM,
+                PropertyRangeDO(enumValues = setOf("S1", "S2")),
+                SliceTypeDO.SPLIT
+            ),
             PropertySelectionDO("version", PropertyTypeDO.INT, PropertyRangeDO(intValues = setOf(1)), SliceTypeDO.SPLIT)
         )
         val request = BackboneRequest("any", sliceSelection, listOf("[c = \"c1\"]"), listOf())
@@ -143,15 +212,15 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
         assertThat(sliceResult1.slice).isEqualTo(slice1)
         assertThat(sliceResult1.backbone).hasSize(9)
         assertThat(sliceResult1.backbone.keys).containsExactly(
-            FeatureDO("a", "test.a", FeatureTypeDO.ENUM, null, null, "a2", null),
-            FeatureDO("b", "test.b", FeatureTypeDO.ENUM, null, null, "b1", null),
-            FeatureDO("c", "test.c", FeatureTypeDO.ENUM, null, null, "c1", null),
-            FeatureDO("p", "test.p", FeatureTypeDO.ENUM, null, null, "p1", null),
-            FeatureDO("a", "test.a", FeatureTypeDO.ENUM, null, null, "a1", null),
-            FeatureDO("b", "test.b", FeatureTypeDO.ENUM, null, null, "b2", null),
-            FeatureDO("b", "test.b", FeatureTypeDO.ENUM, null, null, "b3", null),
-            FeatureDO("c", "test.c", FeatureTypeDO.ENUM, null, null, "c2", null),
-            FeatureDO("p", "test.p", FeatureTypeDO.ENUM, null, null, "px", null)
+            FeatureDO("a", FeatureTypeDO.ENUM, null, null, "a2", null),
+            FeatureDO("b", FeatureTypeDO.ENUM, null, null, "b1", null),
+            FeatureDO("c", FeatureTypeDO.ENUM, null, null, "c1", null),
+            FeatureDO("p", FeatureTypeDO.ENUM, null, null, "p1", null),
+            FeatureDO("a", FeatureTypeDO.ENUM, null, null, "a1", null),
+            FeatureDO("b", FeatureTypeDO.ENUM, null, null, "b2", null),
+            FeatureDO("b", FeatureTypeDO.ENUM, null, null, "b3", null),
+            FeatureDO("c", FeatureTypeDO.ENUM, null, null, "c2", null),
+            FeatureDO("p", FeatureTypeDO.ENUM, null, null, "px", null)
         )
         assertThat(sliceResult1.backbone.values).containsExactly(
             MANDATORY,
@@ -167,17 +236,17 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
         assertThat(sliceResult2.slice).isEqualTo(slice2)
         assertThat(sliceResult2.backbone).hasSize(11)
         assertThat(sliceResult2.backbone.keys).containsExactly(
-            FeatureDO("a", "test.a", FeatureTypeDO.ENUM, null, null, "a2", null),
-            FeatureDO("b", "test.b", FeatureTypeDO.ENUM, null, null, "b1", null),
-            FeatureDO("c", "test.c", FeatureTypeDO.ENUM, null, null, "c1", null),
-            FeatureDO("p", "test.p", FeatureTypeDO.ENUM, null, null, "p2", null),
-            FeatureDO("a", "test.a", FeatureTypeDO.ENUM, null, null, "a1", null),
-            FeatureDO("b", "test.b", FeatureTypeDO.ENUM, null, null, "b2", null),
-            FeatureDO("b", "test.b", FeatureTypeDO.ENUM, null, null, "b3", null),
-            FeatureDO("c", "test.c", FeatureTypeDO.ENUM, null, null, "c2", null),
-            FeatureDO("p", "test.p", FeatureTypeDO.ENUM, null, null, "px", null),
-            FeatureDO("q", "test.q", FeatureTypeDO.ENUM, null, null, "q1", null),
-            FeatureDO("q", "test.q", FeatureTypeDO.ENUM, null, null, "q2", null)
+            FeatureDO("a", FeatureTypeDO.ENUM, null, null, "a2", null),
+            FeatureDO("b", FeatureTypeDO.ENUM, null, null, "b1", null),
+            FeatureDO("c", FeatureTypeDO.ENUM, null, null, "c1", null),
+            FeatureDO("p", FeatureTypeDO.ENUM, null, null, "p2", null),
+            FeatureDO("a", FeatureTypeDO.ENUM, null, null, "a1", null),
+            FeatureDO("b", FeatureTypeDO.ENUM, null, null, "b2", null),
+            FeatureDO("b", FeatureTypeDO.ENUM, null, null, "b3", null),
+            FeatureDO("c", FeatureTypeDO.ENUM, null, null, "c2", null),
+            FeatureDO("p", FeatureTypeDO.ENUM, null, null, "px", null),
+            FeatureDO("q", FeatureTypeDO.ENUM, null, null, "q1", null),
+            FeatureDO("q", FeatureTypeDO.ENUM, null, null, "q2", null)
         )
         assertThat(sliceResult2.backbone.values).containsExactly(
             MANDATORY,
@@ -198,14 +267,30 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
     @MethodSource("configs")
     fun testComputeSeriesSplitSlicesWithRestrictedVarsWithAdditionalConstraints(tc: TestConfig) {
         setUp(tc)
-        val slice1 = Slice.of(mapOf(Pair(IntProperty("version", 1), SliceType.SPLIT), Pair(EnumProperty("series", "S1"), SliceType.SPLIT)))
-        val slice2 = Slice.of(mapOf(Pair(IntProperty("version", 1), SliceType.SPLIT), Pair(EnumProperty("series", "S2"), SliceType.SPLIT)))
+        val slice1 = Slice.of(
+            mapOf(
+                Pair(IntProperty("version", 1), SliceType.SPLIT),
+                Pair(EnumProperty("series", "S1"), SliceType.SPLIT)
+            )
+        )
+        val slice2 = Slice.of(
+            mapOf(
+                Pair(IntProperty("version", 1), SliceType.SPLIT),
+                Pair(EnumProperty("series", "S2"), SliceType.SPLIT)
+            )
+        )
 
         val sliceSelection = mutableListOf(
-            PropertySelectionDO("series", PropertyTypeDO.ENUM, PropertyRangeDO(enumValues = setOf("S1", "S2")), SliceTypeDO.SPLIT),
+            PropertySelectionDO(
+                "series",
+                PropertyTypeDO.ENUM,
+                PropertyRangeDO(enumValues = setOf("S1", "S2")),
+                SliceTypeDO.SPLIT
+            ),
             PropertySelectionDO("version", PropertyTypeDO.INT, PropertyRangeDO(intValues = setOf(1)), SliceTypeDO.SPLIT)
         )
-        val request = BackboneRequest("any", sliceSelection, listOf("[c = \"c1\"]"), listOf("test.a", "test.b", "test.c"))
+        val request =
+            BackboneRequest("any", sliceSelection, listOf("[c = \"c1\"]"), listOf("a", "b", "c"))
 
         val result = cut.computeForModel(request, model, ComputationStatusBuilder("fileId", "jobId", LIST))
 
@@ -216,13 +301,13 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
         assertThat(sliceResult1.slice).isEqualTo(slice1)
         assertThat(sliceResult1.backbone).hasSize(7)
         assertThat(sliceResult1.backbone.keys).containsExactly(
-            FeatureDO("a", "test.a", FeatureTypeDO.ENUM, null, null, "a2", null),
-            FeatureDO("b", "test.b", FeatureTypeDO.ENUM, null, null, "b1", null),
-            FeatureDO("c", "test.c", FeatureTypeDO.ENUM, null, null, "c1", null),
-            FeatureDO("a", "test.a", FeatureTypeDO.ENUM, null, null, "a1", null),
-            FeatureDO("b", "test.b", FeatureTypeDO.ENUM, null, null, "b2", null),
-            FeatureDO("b", "test.b", FeatureTypeDO.ENUM, null, null, "b3", null),
-            FeatureDO("c", "test.c", FeatureTypeDO.ENUM, null, null, "c2", null)
+            FeatureDO("a", FeatureTypeDO.ENUM, null, null, "a2", null),
+            FeatureDO("b", FeatureTypeDO.ENUM, null, null, "b1", null),
+            FeatureDO("c", FeatureTypeDO.ENUM, null, null, "c1", null),
+            FeatureDO("a", FeatureTypeDO.ENUM, null, null, "a1", null),
+            FeatureDO("b", FeatureTypeDO.ENUM, null, null, "b2", null),
+            FeatureDO("b", FeatureTypeDO.ENUM, null, null, "b3", null),
+            FeatureDO("c", FeatureTypeDO.ENUM, null, null, "c2", null)
         )
         assertThat(sliceResult1.backbone.values).containsExactly(
             MANDATORY,
@@ -236,13 +321,13 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
         assertThat(sliceResult2.slice).isEqualTo(slice2)
         assertThat(sliceResult2.backbone).hasSize(7)
         assertThat(sliceResult2.backbone.keys).containsExactly(
-            FeatureDO("a", "test.a", FeatureTypeDO.ENUM, null, null, "a2", null),
-            FeatureDO("b", "test.b", FeatureTypeDO.ENUM, null, null, "b1", null),
-            FeatureDO("c", "test.c", FeatureTypeDO.ENUM, null, null, "c1", null),
-            FeatureDO("a", "test.a", FeatureTypeDO.ENUM, null, null, "a1", null),
-            FeatureDO("b", "test.b", FeatureTypeDO.ENUM, null, null, "b2", null),
-            FeatureDO("b", "test.b", FeatureTypeDO.ENUM, null, null, "b3", null),
-            FeatureDO("c", "test.c", FeatureTypeDO.ENUM, null, null, "c2", null)
+            FeatureDO("a", FeatureTypeDO.ENUM, null, null, "a2", null),
+            FeatureDO("b", FeatureTypeDO.ENUM, null, null, "b1", null),
+            FeatureDO("c", FeatureTypeDO.ENUM, null, null, "c1", null),
+            FeatureDO("a", FeatureTypeDO.ENUM, null, null, "a1", null),
+            FeatureDO("b", FeatureTypeDO.ENUM, null, null, "b2", null),
+            FeatureDO("b", FeatureTypeDO.ENUM, null, null, "b3", null),
+            FeatureDO("c", FeatureTypeDO.ENUM, null, null, "c2", null)
         )
         assertThat(sliceResult2.backbone.values).containsExactly(
             MANDATORY,
@@ -263,7 +348,12 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
         val slice2 = Slice.of(mapOf(Pair(EnumProperty("series", "S2"), SliceType.SPLIT)))
 
         val sliceSelection = mutableListOf(
-            PropertySelectionDO("series", PropertyTypeDO.ENUM, PropertyRangeDO(enumValues = setOf("S1", "S2")), SliceTypeDO.SPLIT),
+            PropertySelectionDO(
+                "series",
+                PropertyTypeDO.ENUM,
+                PropertyRangeDO(enumValues = setOf("S1", "S2")),
+                SliceTypeDO.SPLIT
+            ),
             PropertySelectionDO("version", PropertyTypeDO.INT, PropertyRangeDO(intMin = 1, intMax = 2), SliceTypeDO.ALL)
         )
         val request = BackboneRequest("any", sliceSelection, listOf(), listOf())
@@ -322,8 +412,18 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
         )
 
         val sliceSelection = mutableListOf(
-            PropertySelectionDO("series", PropertyTypeDO.ENUM, PropertyRangeDO(enumValues = setOf("S1", "S2")), SliceTypeDO.SPLIT),
-            PropertySelectionDO("version", PropertyTypeDO.INT, PropertyRangeDO(intMin = 1, intMax = 2), SliceTypeDO.SPLIT)
+            PropertySelectionDO(
+                "series",
+                PropertyTypeDO.ENUM,
+                PropertyRangeDO(enumValues = setOf("S1", "S2")),
+                SliceTypeDO.SPLIT
+            ),
+            PropertySelectionDO(
+                "version",
+                PropertyTypeDO.INT,
+                PropertyRangeDO(intMin = 1, intMax = 2),
+                SliceTypeDO.SPLIT
+            )
         )
         val request = BackboneRequest("any", sliceSelection, listOf(), listOf())
 
@@ -342,19 +442,19 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
 
         assertThat(respone).hasSize(13)
 
-        var r = respone[ComputationElement(1, FeatureDO.enum("a", "test.a", "a1"))]!!
+        var r = respone[ComputationElement(1, FeatureDO.enum("a", "a1"))]!!
         assertThat(r.merge).hasSize(1)
         assertThat(r.merge[0].result).isEqualTo(FORBIDDEN)
         assertThat(r.merge[0].slices).hasSize(1)
         assertThat(r.merge[0].slices[0]).isEqualTo(sliceAll)
 
-        r = respone[ComputationElement(2, FeatureDO.enum("a", "test.a", "a2"))]!!
+        r = respone[ComputationElement(2, FeatureDO.enum("a", "a2"))]!!
         assertThat(r.merge).hasSize(1)
         assertThat(r.merge[0].result).isEqualTo(MANDATORY)
         assertThat(r.merge[0].slices).hasSize(1)
         assertThat(r.merge[0].slices[0]).isEqualTo(sliceAll)
 
-        r = respone[ComputationElement(3, FeatureDO.enum("b", "test.b", "b1"))]!!
+        r = respone[ComputationElement(3, FeatureDO.enum("b", "b1"))]!!
         assertThat(r.merge).hasSize(2)
 
         var res = resForMain(MANDATORY, r.merge)
@@ -367,7 +467,7 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
         assertThat(res.slices).hasSize(1)
         assertThat(res.slices[0]).isEqualTo(sliceOnlyV2)
 
-        r = respone[ComputationElement(4, FeatureDO.enum("b", "test.b", "b2"))]!!
+        r = respone[ComputationElement(4, FeatureDO.enum("b", "b2"))]!!
         assertThat(r.merge).hasSize(2)
 
         res = resForMain(FORBIDDEN, r.merge)
@@ -380,25 +480,25 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
         assertThat(res.slices).hasSize(1)
         assertThat(res.slices[0]).isEqualTo(sliceOnlyV2)
 
-        r = respone[ComputationElement(5, FeatureDO.enum("b", "test.b", "b3"))]!!
+        r = respone[ComputationElement(5, FeatureDO.enum("b", "b3"))]!!
         assertThat(r.merge).hasSize(1)
         assertThat(r.merge[0].result).isEqualTo(FORBIDDEN)
         assertThat(r.merge[0].slices).hasSize(1)
         assertThat(r.merge[0].slices[0]).isEqualTo(sliceAll)
 
-        r = respone[ComputationElement(6, FeatureDO.enum("c", "test.c", "c1"))]!!
+        r = respone[ComputationElement(6, FeatureDO.enum("c", "c1"))]!!
         assertThat(r.merge).hasSize(1)
         assertThat(r.merge[0].result).isEqualTo(OPTIONAL)
         assertThat(r.merge[0].slices).hasSize(1)
         assertThat(r.merge[0].slices[0]).isEqualTo(sliceAll)
 
-        r = respone[ComputationElement(7, FeatureDO.enum("c", "test.c", "c2"))]!!
+        r = respone[ComputationElement(7, FeatureDO.enum("c", "c2"))]!!
         assertThat(r.merge).hasSize(1)
         assertThat(r.merge[0].result).isEqualTo(OPTIONAL)
         assertThat(r.merge[0].slices).hasSize(1)
         assertThat(r.merge[0].slices[0]).isEqualTo(sliceAll)
 
-        r = respone[ComputationElement(8, FeatureDO.enum("c", "test.c", "c3"))]!!
+        r = respone[ComputationElement(8, FeatureDO.enum("c", "c3"))]!!
         assertThat(r.merge).hasSize(2)
 
         res = resForMain(FORBIDDEN, r.merge)
@@ -411,7 +511,7 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
         assertThat(res.slices).hasSize(1)
         assertThat(res.slices[0]).isEqualTo(sliceOnlyV2)
 
-        r = respone[ComputationElement(9, FeatureDO.enum("p", "test.p", "p1"))]!!
+        r = respone[ComputationElement(9, FeatureDO.enum("p", "p1"))]!!
         assertThat(r.merge).hasSize(2)
 
         res = resForMain(MANDATORY, r.merge)
@@ -424,7 +524,7 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
         assertThat(res.slices).hasSize(1)
         assertThat(res.slices[0]).isEqualTo(sliceOnlyS2)
 
-        r = respone[ComputationElement(10, FeatureDO.enum("p", "test.p", "p2"))]!!
+        r = respone[ComputationElement(10, FeatureDO.enum("p", "p2"))]!!
         assertThat(r.merge).hasSize(2)
 
         res = resForMain(FORBIDDEN, r.merge)
@@ -437,13 +537,13 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
         assertThat(res.slices).hasSize(1)
         assertThat(res.slices[0]).isEqualTo(sliceOnlyS2)
 
-        r = respone[ComputationElement(11, FeatureDO.enum("p", "test.p", "px"))]!!
+        r = respone[ComputationElement(11, FeatureDO.enum("p", "px"))]!!
         assertThat(r.merge).hasSize(1)
         assertThat(r.merge[0].result).isEqualTo(FORBIDDEN)
         assertThat(r.merge[0].slices).hasSize(1)
         assertThat(r.merge[0].slices[0]).isEqualTo(sliceAll)
 
-        r = respone[ComputationElement(12, FeatureDO.enum("q", "test.q", "q1"))]!!
+        r = respone[ComputationElement(12, FeatureDO.enum("q", "q1"))]!!
         assertThat(r.merge).hasSize(2)
 
         res = resForMain(FORBIDDEN, r.merge)
@@ -456,7 +556,7 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
         assertThat(res.slices).hasSize(1)
         assertThat(res.slices[0]).isEqualTo(sliceOnlyS2)
 
-        r = respone[ComputationElement(13, FeatureDO.enum("q", "test.q", "q2"))]!!
+        r = respone[ComputationElement(13, FeatureDO.enum("q", "q2"))]!!
         assertThat(r.merge).hasSize(2)
 
         res = resForMain(FORBIDDEN, r.merge)
@@ -475,8 +575,18 @@ internal class BackboneOnlyEnumWithSlicesTest : TestWithConfig() {
     fun testComputeResponseWithAnySlice(tc: TestConfig) {
         setUp(tc)
         val sliceSelection = mutableListOf(
-            PropertySelectionDO("series", PropertyTypeDO.ENUM, PropertyRangeDO(enumValues = setOf("S1", "S2")), SliceTypeDO.ANY),
-            PropertySelectionDO("version", PropertyTypeDO.INT, PropertyRangeDO(intMin = 1, intMax = 2), SliceTypeDO.SPLIT)
+            PropertySelectionDO(
+                "series",
+                PropertyTypeDO.ENUM,
+                PropertyRangeDO(enumValues = setOf("S1", "S2")),
+                SliceTypeDO.ANY
+            ),
+            PropertySelectionDO(
+                "version",
+                PropertyTypeDO.INT,
+                PropertyRangeDO(intMin = 1, intMax = 2),
+                SliceTypeDO.SPLIT
+            )
         )
         val request = BackboneRequest("any", sliceSelection, listOf(), listOf())
 

@@ -29,15 +29,60 @@ internal class ConsistencyComputationOnlyBooleanWithSlicesTest : TestWithConfig(
     private val compiler = PrlCompiler()
     private val model = compiler.compile(parseRuleFile("test-files/prl/transpiler/merge2.prl"))
 
-    private val s11 = Slice.of(mapOf(Pair(IntProperty("version", 1), SliceType.SPLIT), Pair(EnumProperty("series", "S1"), SliceType.SPLIT)))
-    private val s21 = Slice.of(mapOf(Pair(IntProperty("version", 1), SliceType.SPLIT), Pair(EnumProperty("series", "S2"), SliceType.SPLIT)))
-    private val s31 = Slice.of(mapOf(Pair(IntProperty("version", 1), SliceType.SPLIT), Pair(EnumProperty("series", "S3"), SliceType.SPLIT)))
-    private val s12 = Slice.of(mapOf(Pair(IntProperty("version", 2), SliceType.SPLIT), Pair(EnumProperty("series", "S1"), SliceType.SPLIT)))
-    private val s22 = Slice.of(mapOf(Pair(IntProperty("version", 2), SliceType.SPLIT), Pair(EnumProperty("series", "S2"), SliceType.SPLIT)))
-    private val s32 = Slice.of(mapOf(Pair(IntProperty("version", 2), SliceType.SPLIT), Pair(EnumProperty("series", "S3"), SliceType.SPLIT)))
-    private val s13 = Slice.of(mapOf(Pair(IntProperty("version", 3), SliceType.SPLIT), Pair(EnumProperty("series", "S1"), SliceType.SPLIT)))
-    private val s23 = Slice.of(mapOf(Pair(IntProperty("version", 3), SliceType.SPLIT), Pair(EnumProperty("series", "S2"), SliceType.SPLIT)))
-    private val s33 = Slice.of(mapOf(Pair(IntProperty("version", 3), SliceType.SPLIT), Pair(EnumProperty("series", "S3"), SliceType.SPLIT)))
+    private val s11 = Slice.of(
+        mapOf(
+            Pair(IntProperty("version", 1), SliceType.SPLIT),
+            Pair(EnumProperty("series", "S1"), SliceType.SPLIT)
+        )
+    )
+    private val s21 = Slice.of(
+        mapOf(
+            Pair(IntProperty("version", 1), SliceType.SPLIT),
+            Pair(EnumProperty("series", "S2"), SliceType.SPLIT)
+        )
+    )
+    private val s31 = Slice.of(
+        mapOf(
+            Pair(IntProperty("version", 1), SliceType.SPLIT),
+            Pair(EnumProperty("series", "S3"), SliceType.SPLIT)
+        )
+    )
+    private val s12 = Slice.of(
+        mapOf(
+            Pair(IntProperty("version", 2), SliceType.SPLIT),
+            Pair(EnumProperty("series", "S1"), SliceType.SPLIT)
+        )
+    )
+    private val s22 = Slice.of(
+        mapOf(
+            Pair(IntProperty("version", 2), SliceType.SPLIT),
+            Pair(EnumProperty("series", "S2"), SliceType.SPLIT)
+        )
+    )
+    private val s32 = Slice.of(
+        mapOf(
+            Pair(IntProperty("version", 2), SliceType.SPLIT),
+            Pair(EnumProperty("series", "S3"), SliceType.SPLIT)
+        )
+    )
+    private val s13 = Slice.of(
+        mapOf(
+            Pair(IntProperty("version", 3), SliceType.SPLIT),
+            Pair(EnumProperty("series", "S1"), SliceType.SPLIT)
+        )
+    )
+    private val s23 = Slice.of(
+        mapOf(
+            Pair(IntProperty("version", 3), SliceType.SPLIT),
+            Pair(EnumProperty("series", "S2"), SliceType.SPLIT)
+        )
+    )
+    private val s33 = Slice.of(
+        mapOf(
+            Pair(IntProperty("version", 3), SliceType.SPLIT),
+            Pair(EnumProperty("series", "S3"), SliceType.SPLIT)
+        )
+    )
 
     @Test
     fun testModel() {
@@ -50,8 +95,18 @@ internal class ConsistencyComputationOnlyBooleanWithSlicesTest : TestWithConfig(
     fun testComputeWithExplanation(tc: TestConfig) {
         setUp(tc)
         val sliceSelection = mutableListOf(
-            PropertySelectionDO("series", PropertyTypeDO.ENUM, PropertyRangeDO(enumValues = setOf("S1", "S2", "S3")), SliceTypeDO.SPLIT),
-            PropertySelectionDO("version", PropertyTypeDO.INT, PropertyRangeDO(intMin = 1, intMax = 3), SliceTypeDO.SPLIT)
+            PropertySelectionDO(
+                "series",
+                PropertyTypeDO.ENUM,
+                PropertyRangeDO(enumValues = setOf("S1", "S2", "S3")),
+                SliceTypeDO.SPLIT
+            ),
+            PropertySelectionDO(
+                "version",
+                PropertyTypeDO.INT,
+                PropertyRangeDO(intMin = 1, intMax = 3),
+                SliceTypeDO.SPLIT
+            )
         )
         val request = ConsistencyRequest("any", sliceSelection, listOf())
 
@@ -73,8 +128,18 @@ internal class ConsistencyComputationOnlyBooleanWithSlicesTest : TestWithConfig(
     fun testComputeWithAdditionalConstraints(tc: TestConfig) {
         setUp(tc)
         val sliceSelection = mutableListOf(
-            PropertySelectionDO("series", PropertyTypeDO.ENUM, PropertyRangeDO(enumValues = setOf("S1", "S2")), SliceTypeDO.SPLIT),
-            PropertySelectionDO("version", PropertyTypeDO.INT, PropertyRangeDO(intMin = 1, intMax = 2), SliceTypeDO.SPLIT)
+            PropertySelectionDO(
+                "series",
+                PropertyTypeDO.ENUM,
+                PropertyRangeDO(enumValues = setOf("S1", "S2")),
+                SliceTypeDO.SPLIT
+            ),
+            PropertySelectionDO(
+                "version",
+                PropertyTypeDO.INT,
+                PropertyRangeDO(intMin = 1, intMax = 2),
+                SliceTypeDO.SPLIT
+            )
         )
         val request = ConsistencyRequest("any", sliceSelection, listOf("-b"))
 
@@ -91,7 +156,12 @@ internal class ConsistencyComputationOnlyBooleanWithSlicesTest : TestWithConfig(
     fun testComputeWithExplanationWithAdditionalConstraints(tc: TestConfig) {
         setUp(tc)
         val sliceSelection = mutableListOf(
-            PropertySelectionDO("series", PropertyTypeDO.ENUM, PropertyRangeDO(enumValues = setOf("S1", "S2")), SliceTypeDO.SPLIT),
+            PropertySelectionDO(
+                "series",
+                PropertyTypeDO.ENUM,
+                PropertyRangeDO(enumValues = setOf("S1", "S2")),
+                SliceTypeDO.SPLIT
+            ),
             PropertySelectionDO("version", PropertyTypeDO.INT, PropertyRangeDO(intValues = setOf(1)), SliceTypeDO.SPLIT)
         )
         val request = ConsistencyRequest("any", sliceSelection, listOf("-b", "-c"), true)
@@ -102,18 +172,18 @@ internal class ConsistencyComputationOnlyBooleanWithSlicesTest : TestWithConfig(
         assertThat(sliceResult1.consistent).isFalse
 
         assertThat(sliceResult1.explanation).containsExactlyInAnyOrder(
-            RuleDO("if a then b / c", "test", "", "", 44, listOf(PropertyDO("version", "1", true))),
-            RuleDO("a / b", "test", "", "", 43, listOf()),
-            RuleDO("-test.c"),
-            RuleDO("-test.b")
+            RuleDO("if a then b / c", "", "", 43, listOf(PropertyDO("version", "1", true))),
+            RuleDO("a / b", "", "", 42, listOf()),
+            RuleDO("-c"),
+            RuleDO("-b")
         )
         val sliceResult2 = result[s21]!!
         assertThat(sliceResult2.consistent).isFalse
         assertThat(sliceResult2.explanation).containsExactlyInAnyOrder(
-            RuleDO("if a then b / c", "test", "", "", 44, listOf(PropertyDO("version", "1", true))),
-            RuleDO("a / b", "test", "", "", 43, listOf()),
-            RuleDO("-test.c"),
-            RuleDO("-test.b")
+            RuleDO("if a then b / c", "", "", 43, listOf(PropertyDO("version", "1", true))),
+            RuleDO("a / b", "", "", 42, listOf()),
+            RuleDO("-c"),
+            RuleDO("-b")
         )
     }
 
@@ -122,7 +192,12 @@ internal class ConsistencyComputationOnlyBooleanWithSlicesTest : TestWithConfig(
     fun testComputeWithoutExplanationWithAdditionalConstraints(tc: TestConfig) {
         setUp(tc)
         val sliceSelection = mutableListOf(
-            PropertySelectionDO("series", PropertyTypeDO.ENUM, PropertyRangeDO(enumValues = setOf("S1", "S2")), SliceTypeDO.SPLIT),
+            PropertySelectionDO(
+                "series",
+                PropertyTypeDO.ENUM,
+                PropertyRangeDO(enumValues = setOf("S1", "S2")),
+                SliceTypeDO.SPLIT
+            ),
             PropertySelectionDO("version", PropertyTypeDO.INT, PropertyRangeDO(intValues = setOf(1)), SliceTypeDO.SPLIT)
         )
         val request = ConsistencyRequest("any", sliceSelection, listOf("-b", "-c"))
@@ -142,8 +217,18 @@ internal class ConsistencyComputationOnlyBooleanWithSlicesTest : TestWithConfig(
     fun testComputeResponse(tc: TestConfig) {
         setUp(tc)
         val sliceSelection = mutableListOf(
-            PropertySelectionDO("series", PropertyTypeDO.ENUM, PropertyRangeDO(enumValues = setOf("S1", "S2", "S3")), SliceTypeDO.SPLIT),
-            PropertySelectionDO("version", PropertyTypeDO.INT, PropertyRangeDO(intMin = 1, intMax = 3), SliceTypeDO.SPLIT)
+            PropertySelectionDO(
+                "series",
+                PropertyTypeDO.ENUM,
+                PropertyRangeDO(enumValues = setOf("S1", "S2", "S3")),
+                SliceTypeDO.SPLIT
+            ),
+            PropertySelectionDO(
+                "version",
+                PropertyTypeDO.INT,
+                PropertyRangeDO(intMin = 1, intMax = 3),
+                SliceTypeDO.SPLIT
+            )
         )
         val request = ConsistencyRequest("any", sliceSelection, listOf())
 
@@ -167,7 +252,11 @@ internal class ConsistencyComputationOnlyBooleanWithSlicesTest : TestWithConfig(
         assertThat(respone.merge[0].slices[0]).isEqualTo(
             SliceDO(
                 listOf(
-                    SlicingPropertyDO("series", PropertyTypeDO.ENUM, PropertyRangeDO(enumValues = setOf("S1", "S2", "S3"))),
+                    SlicingPropertyDO(
+                        "series",
+                        PropertyTypeDO.ENUM,
+                        PropertyRangeDO(enumValues = setOf("S1", "S2", "S3"))
+                    ),
                     SlicingPropertyDO("version", PropertyTypeDO.INT, PropertyRangeDO(intMin = 1, intMax = 3))
                 )
             )
@@ -182,7 +271,12 @@ internal class ConsistencyComputationOnlyBooleanWithSlicesTest : TestWithConfig(
     fun testComputeResponseVersionAny(tc: TestConfig) {
         setUp(tc)
         val sliceSelection = mutableListOf(
-            PropertySelectionDO("series", PropertyTypeDO.ENUM, PropertyRangeDO(enumValues = setOf("S1", "S2", "S3")), SliceTypeDO.SPLIT),
+            PropertySelectionDO(
+                "series",
+                PropertyTypeDO.ENUM,
+                PropertyRangeDO(enumValues = setOf("S1", "S2", "S3")),
+                SliceTypeDO.SPLIT
+            ),
             PropertySelectionDO("version", PropertyTypeDO.INT, PropertyRangeDO(intMin = 1, intMax = 3), SliceTypeDO.ANY)
         )
         val request = ConsistencyRequest("any", sliceSelection, listOf())
@@ -207,7 +301,11 @@ internal class ConsistencyComputationOnlyBooleanWithSlicesTest : TestWithConfig(
         assertThat(respone.merge[0].slices[0]).isEqualTo(
             SliceDO(
                 listOf(
-                    SlicingPropertyDO("series", PropertyTypeDO.ENUM, PropertyRangeDO(enumValues = setOf("S1", "S2", "S3")))
+                    SlicingPropertyDO(
+                        "series",
+                        PropertyTypeDO.ENUM,
+                        PropertyRangeDO(enumValues = setOf("S1", "S2", "S3"))
+                    )
                 )
             )
         )

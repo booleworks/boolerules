@@ -12,6 +12,7 @@ import com.booleworks.boolerules.computations.generic.toDO
 import com.booleworks.boolerules.rulefile.PropertyRangeDO
 import com.booleworks.boolerules.rulefile.PropertyTypeDO
 import com.booleworks.boolerules.rulefile.SlicingPropertyDO
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.prl.compiler.PrlCompiler
 import com.booleworks.prl.model.EnumProperty
@@ -41,17 +42,18 @@ internal class ConsistencyComputationOnlyEnumWithSlicesTest : TestWithConfig() {
     @Test
     fun testComputeForSliceWithoutExplanation() {
         val f = FormulaFactory.nonCaching()
-        val modelTranslation = transpileModel(f, model, listOf())
+        val cf = CspFactory(f)
+        val modelTranslation = transpileModel(cf, model, listOf())
 
         val request = ConsistencyRequest("any", mutableListOf(), listOf())
         val info = modelTranslation[0].info
-        val mergedInfo = mergeSlices(f, modelTranslation.computations).info
+        val mergedInfo = mergeSlices(cf, modelTranslation.computations).info
         val resultTrue = cut.computeForSlice(
             request,
             Slice.empty(),
             info,
             model,
-            f,
+            cf,
             ComputationStatusBuilder("fileId", "jobId", SINGLE)
         )
         val resultFalse = cut.computeForSlice(
@@ -59,7 +61,7 @@ internal class ConsistencyComputationOnlyEnumWithSlicesTest : TestWithConfig() {
             Slice.empty(),
             mergedInfo,
             model,
-            f,
+            cf,
             ComputationStatusBuilder("fileId", "jobId", SINGLE)
         )
 
@@ -77,17 +79,18 @@ internal class ConsistencyComputationOnlyEnumWithSlicesTest : TestWithConfig() {
     @Test
     fun testComputeForSliceWithExplanation() {
         val f = FormulaFactory.nonCaching()
-        val modelTranslation = transpileModel(f, model, listOf())
+        val cf = CspFactory(f)
+        val modelTranslation = transpileModel(cf, model, listOf())
 
         val request = ConsistencyRequest("any", mutableListOf(), listOf(), true)
         val info = modelTranslation[0].info
-        val mergedInfo = mergeSlices(f, modelTranslation.computations).info
+        val mergedInfo = mergeSlices(cf, modelTranslation.computations).info
         val resultTrue = cut.computeForSlice(
             request,
             Slice.empty(),
             info,
             model,
-            f,
+            cf,
             ComputationStatusBuilder("fileId", "jobId", SINGLE)
         )
         val resultFalse = cut.computeForSlice(
@@ -95,7 +98,7 @@ internal class ConsistencyComputationOnlyEnumWithSlicesTest : TestWithConfig() {
             Slice.empty(),
             mergedInfo,
             model,
-            f,
+            cf,
             ComputationStatusBuilder("fileId", "jobId", SINGLE)
         )
 

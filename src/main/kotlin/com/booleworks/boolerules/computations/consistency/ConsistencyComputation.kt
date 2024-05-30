@@ -20,8 +20,8 @@ import com.booleworks.boolerules.computations.generic.SplitComputationDetail
 import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.boolerules.computations.generic.computeExplanation
 import com.booleworks.boolerules.computations.generic.extractModel
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.datastructures.Tristate
-import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.solvers.SATSolver
 import com.booleworks.logicng.solvers.sat.SATSolverConfig
 import com.booleworks.prl.model.PrlModel
@@ -70,10 +70,10 @@ internal object ConsistencyComputation :
         slice: Slice,
         info: TranslationInfo,
         model: PrlModel,
-        f: FormulaFactory,
+        cf: CspFactory,
         status: ComputationStatusBuilder,
     ): ConsistencyInternalResult {
-        val solver = prepareSolver(f, request.computeAllDetails, info, request.additionalConstraints, model, status)
+        val solver = prepareSolver(cf, request.computeAllDetails, info, request.additionalConstraints, model, status)
         if (!status.successful()) return ConsistencyInternalResult(slice, false, null, null)
         return solver.satCall().solve().use { satCall ->
             if (satCall.satResult == Tristate.TRUE) {
@@ -85,11 +85,11 @@ internal object ConsistencyComputation :
                     slice,
                     false,
                     null,
-                    if (request.computeAllDetails) computeExplanation(
-                        satCall,
-                        model.propertyStore.allDefinitions(),
-                        f
-                    ) else null
+                    if (request.computeAllDetails) {
+                        computeExplanation(satCall, model.propertyStore.allDefinitions(), cf)
+                    } else {
+                        null
+                    }
                 )
             }
         }
@@ -101,32 +101,33 @@ internal object ConsistencyComputation :
         info: TranslationInfo,
         additionalConstraints: List<String>,
         splitProperties: Set<String>,
-        f: FormulaFactory
+        cf: CspFactory
     ): SplitComputationDetail<ConsistencyDetail> {
-        val solver = prepareSolver(f, true, info, additionalConstraints, model, ComputationStatus("", "", SINGLE))
+        val solver = prepareSolver(cf, true, info, additionalConstraints, model, ComputationStatus("", "", SINGLE))
         return solver.satCall().solve().use { satCall ->
             assert(satCall.satResult == Tristate.FALSE) { "Detail computation should only be called for inconsistent slices" }
-            val explanation = computeExplanation(satCall, model.propertyStore.allDefinitions(), f)
+            val explanation = computeExplanation(satCall, model.propertyStore.allDefinitions(), cf)
             val result = ConsistencyInternalResult(slice, false, null, explanation)
             SplitComputationDetail(result, splitProperties)
         }
     }
 
     private fun prepareSolver(
-        f: FormulaFactory,
+        cf: CspFactory,
         proofTracing: Boolean,
         info: TranslationInfo,
         additionalConstraints: List<String>,
         model: PrlModel,
         status: ComputationStatusBuilder
     ): SATSolver {
+        val f = cf.formulaFactory()
         val solver = SATSolver.newSolver(f, SATSolverConfig.builder().proofGeneration(proofTracing).build()).apply {
             addPropositions(info.propositions)
         }
         if (solver.sat()) {
             val additionalFormulas =
                 additionalConstraints.mapNotNull { constraint ->
-                    processConstraint(f, constraint, model, info, status)
+                    processConstraint(cf, constraint, model, info, status)
                 }
             if (!status.successful()) return solver
             solver.addPropositions(additionalFormulas)

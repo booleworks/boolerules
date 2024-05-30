@@ -1,5 +1,6 @@
 package com.booleworks.boolerules.computations.generic
 
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.prl.compiler.PrlCompiler
 import com.booleworks.prl.parser.parseRuleFile
@@ -13,13 +14,14 @@ class ModelExtractionTest {
     fun testEnumExtraction() {
         val model = PrlCompiler().compile(parseRuleFile("test-files/prl/transpiler/merge3.prl"))
         val f = FormulaFactory.caching();
-        val modelTranslation = transpileModel(f, model, listOf())
+        val cf = CspFactory(f)
+        val modelTranslation = transpileModel(cf, model, listOf())
         val info = modelTranslation[0].info
-        val extracted = extractModel(f.variables("@ENUM_test#a_a2", "@ENUM_test#c_c1"), info)
+        val extracted = extractModel(f.variables("@ENUM_a_a2", "@ENUM_c_c1"), info)
 
         assertThat(extracted.features).containsExactlyInAnyOrder(
-            FeatureDO.enum("a", "test.a", "a2"),
-            FeatureDO.enum("c", "test.c", "c1")
+            FeatureDO.enum("a", "a2"),
+            FeatureDO.enum("c", "c1")
         )
     }
 
@@ -27,13 +29,14 @@ class ModelExtractionTest {
     fun testBooleanExtraction() {
         val model = PrlCompiler().compile(parseRuleFile("test-files/prl/transpiler/merge1.prl"))
         val f = FormulaFactory.caching();
-        val modelTranslation = transpileModel(f, model, listOf())
+        val cf = CspFactory(f)
+        val modelTranslation = transpileModel(cf, model, listOf())
         val info = modelTranslation[0].info
-        val extracted = extractModel(f.variables("test.a", "test.x"), info)
+        val extracted = extractModel(f.variables("a", "x"), info)
 
         assertThat(extracted.features).containsExactlyInAnyOrder(
-            FeatureDO.boolean("a", "test.a", true),
-            FeatureDO.boolean("x", "test.x", true)
+            FeatureDO.boolean("a", true),
+            FeatureDO.boolean("x", true)
         )
     }
 }
