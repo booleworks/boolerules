@@ -1,0 +1,42 @@
+header {
+  prl_version 1.0
+}
+
+slicing properties {
+  int version
+  enum series
+}
+
+# valid in every slice
+enum feature a ["a1", "a2"]
+enum feature b ["b1", "b2", "b3"]
+enum feature c ["c1", "c2"] {
+  version 1
+}
+enum feature c ["c1", "c2", "c3"] {
+  version 2
+}
+
+# valid depending on series
+enum feature p ["px", "p1"] {
+  series "S1"
+}
+enum feature p ["px", "p2"] {
+  series "S2"
+}
+enum feature q ["q1", "q2"] {
+  series "S2"
+}
+
+rule [a = "a2"]
+rule if [a = "a2"]  then [b = "b1"] {
+  version 1
+}
+rule if [a = "a2"]  then [b = "b2"] {
+  version 2
+}
+
+rule [p in ["p1", "p2", "p3"]]
+rule if [q in ["q1", "q2"]] then [p = "p2"] {
+  version 2
+}

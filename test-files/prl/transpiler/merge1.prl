@@ -1,0 +1,26 @@
+header {
+  prl_version 1.0
+  creator "booleworks"
+  creation_date 2023-05-18
+}
+
+slicing properties {
+  int version
+}
+
+feature a
+feature b
+feature c
+feature x {
+  version [1, 2]
+}
+
+rule if a then b/c {
+  version 1
+}
+rule if a then b {
+  version 2
+}
+rule a/x {
+  version 3
+}

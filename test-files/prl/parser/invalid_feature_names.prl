@@ -1,0 +1,11 @@
+header {
+  prl_version 1.0
+}
+
+feature f1
+int feature i1 [1,2,3]
+feature com.x1
+enum feature s1 ["a"]
+
+optional group valid_name contains [f1, i1]
+optional group invalid.name contains [f1, i1]

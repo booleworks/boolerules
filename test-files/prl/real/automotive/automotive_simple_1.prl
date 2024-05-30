@@ -1,0 +1,746 @@
+header {
+  prl_version 1.0
+}
+
+feature ham
+feature qxz
+feature cic
+feature obu
+feature fls
+feature cub
+feature hcj
+feature esy
+feature nqm
+feature pni
+feature xdb
+feature ume
+feature wwy
+feature cai
+feature uio
+feature hfg
+feature erj
+feature zrr
+feature aoh
+feature mdm
+feature mhe
+feature gxh
+feature wjc
+feature iaz
+feature rye
+feature vby
+feature ypp
+feature hha
+feature uxy
+feature mry
+feature pze
+feature ecz
+feature mxh
+feature brt
+feature bci
+feature ihh
+feature tgk
+feature ysj
+feature mye
+feature kzr
+feature dbj
+feature kwr
+feature wnk
+feature xhn
+feature xca
+feature zzt
+feature rwe
+feature qbp
+feature bds
+feature xgo
+feature ajn
+feature tss
+feature mvp
+feature dzp
+feature gzg
+feature agl
+feature mrd
+feature uue
+feature khs
+feature kks
+feature vsm
+feature bop
+feature mhw
+feature oot
+feature jiq
+feature pba
+feature mha
+feature qrd
+feature euf
+feature dgy
+feature myv
+feature yzs
+feature yly
+feature zke
+feature enz
+feature nur
+feature ccv
+feature nen
+feature dql
+feature tjg
+feature ggz
+feature uhu
+feature kjp
+feature btp
+feature cce
+feature hbm
+feature axv
+feature qtm
+feature mrk
+feature uep
+feature usz
+feature ixu
+feature mzv
+feature pis
+feature ewq
+feature twb
+feature kmw
+feature efh
+feature sfa
+feature jhf
+feature okc
+feature ece
+feature vai
+feature cgc
+feature wan
+feature yry
+feature duq
+feature dca
+feature wfj
+feature gtl
+feature mwx
+feature ayb
+feature gsc
+feature gci
+feature mrp
+feature tjx
+feature wjh
+feature vlu
+feature fcq
+feature sre
+feature hau
+feature mje
+feature jok
+feature joy
+feature knz
+feature clq
+feature twv
+feature iif
+feature klh
+feature jzu
+feature nuo
+feature rgm
+feature mdb
+feature zmu
+feature azm
+feature dkm
+feature mkw
+feature lhv
+feature dth
+feature gxv
+feature xjg
+feature hbe
+feature cck
+feature nar
+feature lar
+feature sal
+feature lac
+feature uri
+feature ebj
+feature lbx
+feature taz
+feature vnz
+feature ckz
+feature ypd
+feature bay
+feature ndv
+feature qhm
+feature lof
+feature lbu
+feature ayg
+feature epn
+feature cou
+feature zua
+feature aju
+feature log
+feature ppm
+feature let
+feature coe
+feature cnt
+feature cnz
+feature mrb
+feature uit
+feature fsi
+feature jqc
+feature rff
+feature qod
+feature wnt
+feature abq
+feature kxs
+feature jfy
+feature uxd
+feature maj
+feature pif
+feature xhc
+feature hgn
+feature xiq
+feature zbj
+feature xwq
+feature bsa
+feature ekc
+feature xcg
+feature bqv
+feature eox
+feature jqp
+feature uki
+feature dpb
+feature msi
+feature vuw
+feature jbn
+feature fql
+feature ukp
+feature dic
+feature leh
+feature moe
+feature cmo
+feature aub
+feature phk
+feature tlk
+feature big
+feature ppo
+feature yht
+feature blw
+feature pzg
+feature bqp
+feature bdy
+feature epf
+feature fvy
+feature uei
+feature mid
+feature cgy
+feature eyq
+feature rfr
+feature cot
+feature irw
+feature ocy
+feature bkg
+feature gct
+feature bwi
+feature vwr
+feature gyd
+feature jqd
+feature guy
+feature vao
+feature wmx
+feature mhl
+feature hab
+feature wzd
+feature mxi
+feature lzm
+feature ehj
+feature fof
+feature seq
+feature row
+feature qic
+feature shq
+feature fcf
+feature ngc
+feature egp
+feature ndi
+feature cpu
+feature icm
+feature ugy
+feature vim
+feature wvo
+feature cnj
+feature mfo
+feature tii
+feature sdz
+feature tlq
+feature lda
+feature bit
+feature eku
+feature dqt
+feature ixt
+feature xqa
+feature itr
+feature god
+feature vqc
+feature jqm
+feature psv
+feature pxg
+feature otu
+feature lev
+feature qev
+feature cpx
+feature nuv
+feature mdt
+feature yyc
+feature wss
+feature fqd
+feature tvk
+feature hmk
+feature uow
+feature hit
+feature kjf
+feature wnm
+feature scy
+feature kdn
+feature bad
+feature mmf
+feature qyq
+feature bet
+feature zjk
+feature wyi
+feature cpf
+feature qgq
+feature gqe
+feature aji
+feature lxh
+feature obm
+feature tpq
+feature qaz
+feature edc
+feature wik
+feature rly
+feature drz
+feature dpq
+feature wcn
+feature kku
+feature brr
+feature zef
+feature xei
+feature ozv
+feature hna
+feature okd
+feature tmp
+feature oom
+feature ljb
+feature cvf
+feature eej
+feature lsx
+feature fcl
+feature oqk
+feature llq
+feature gnv
+feature emp
+feature muk
+feature vff
+feature rzz
+feature qze
+feature ngj
+feature duw
+feature mmt
+feature fgf
+feature kjc
+feature qfn
+feature zzh
+feature vqr
+feature yjs
+feature rqa
+feature ywd
+feature ndm
+feature ypn
+feature wpu
+feature wjb
+feature jjp
+feature ioh
+feature orf
+feature hds
+feature mng
+feature mxj
+feature nqy
+feature wsy
+feature osn
+feature fnf
+feature six
+feature wmw
+feature vbx
+feature lkd
+feature pff
+feature exg
+feature zrx
+feature wcr
+feature ywo
+feature qzb
+feature zhd
+feature pow
+feature lmp
+feature xvo
+feature wyl
+feature zqm
+feature atu
+feature vpf
+feature vti
+feature suz
+feature gao
+feature csq
+feature emc
+feature eop
+feature jlt
+feature dxg
+feature xpx
+feature bhy
+feature fdj
+feature oda
+feature aai
+feature zgg
+feature dez
+feature wat
+feature joh
+feature gqk
+feature peq
+feature jlu
+feature lvn
+feature ftd
+feature kte
+feature erv
+feature boz
+feature dzg
+feature oax
+feature pdm
+feature uoh
+
+mandatory group tbl contains [vby, ypp, hha, uxy, mry, pze, ecz, mxh, brt, bci, ihh, tgk, ysj, mye]
+mandatory group bwj contains [xdb, ume, wwy, cai, uio, hfg, erj, zrr, aoh, mdm, mhe, gxh, wjc, iaz, rye]
+mandatory group pxr contains [ham, qxz, cic, obu, fls, cub, hcj, esy, nqm, pni]
+optional group cnp contains [cgc]
+optional group zre contains [wnt]
+optional group wmv contains [mdt, yyc, wss, fqd, tvk, hmk, uow, kjf, wnm, scy, kdn, aji, lxh, obm, tpq, edc, wik, rly, drz, dpq, wcn, kku, brr, zef]
+optional group iuc contains [qrd, euf]
+optional group cho contains [fdj]
+optional group opf contains [jqc]
+optional group mrz contains [ozv, hna, okd, tmp, oom, ljb, cvf, eej, lsx]
+optional group xwl contains [dkm]
+optional group ztc contains [clq, klh, azm]
+optional group mnd contains [zrx, wcr]
+optional group pih contains [okc, ece, fvy]
+optional group pvp contains [gsc, zmu]
+optional group eva contains [tjg, ggz, uhu, kjp, btp, cce, hbm, axv, qtm, mrk, uep, usz, ixu, mzv, pis, ewq, twb, kmw, efh, sfa, wan, dca, mwx, ayb, zhd]
+optional group eha contains [hau]
+optional group oeq contains [jhf, mrp]
+optional group ryz contains [csq, emc, eop]
+optional group rwp contains [eox, jqp]
+optional group paq contains [eyq]
+optional group ega contains [nen]
+optional group mir contains [zqm, vti]
+optional group eex contains [cnz, mrb]
+optional group alw contains [fls, uio, hfg]
+optional group fjz contains [kzr, fcl, oqk, llq, emp, muk, vff, rzz, qze, ngj]
+optional group ask contains [hcj, aoh, esy, mdm, mhe, gxh, wjc]
+optional group msv contains [ckz, ndv, qhm, lbu, ayg, epn, log]
+optional group zqv contains [wfj, uei]
+optional group msf contains [rff, jfy]
+optional group iux contains [wnk, xhn]
+optional group eye contains [vby, ecz, mxh, brt, bci, ihh, tgk, ysj, mye]
+optional group crn contains [atu, suz, bhy]
+optional group qez contains [dbj]
+optional group kbz contains [xca, zzt, rwe, qbp]
+optional group tgh contains [bqp, bdy]
+optional group koj contains [let, coe]
+optional group wmi contains [nar]
+optional group vki contains [phk, tlk, big, ppo, yht, blw, vqc, jqm, psv, pxg, otu, qev, cpx, bad, mmf, qyq, bet, zjk, wyi, cpf, qgq, gqe]
+optional group pgz contains [mdb, cgy]
+optional group eyh contains [ebj]
+optional group pes contains [lar, sal]
+optional group nxh contains [fnf, six, wmw, vbx, lkd, pff]
+optional group qwq contains [xvo]
+optional group xyz contains [nuo]
+optional group ndp contains [ppm]
+optional group lpn contains [vlu]
+optional group fhi contains [ham, xdb, qxz, ume, cic, wwy, cai, cub, erj, zrr]
+optional group ser contains [mid]
+optional group pao contains [cmo, aub]
+optional group giz contains [uit, zbj]
+optional group wjt contains [hha, uxy]
+optional group acx contains [rfr, cot, irw, mxi, wvo]
+optional group hda contains [ocy, bkg, gct, bwi, vwr, gyd, jqd, guy, vao, wmx, mhl, hab, lzm, ehj, fof, seq, row, qic, shq, fcf, ngc, egp, ndi, cpu, icm, ugy, vim, cnj, mfo, tii, sdz, tlq, lda, bit]
+rule if xdb then xhn
+rule if wwy then ebj
+rule if cai then dbj
+rule if erj then wnk
+rule if zrr then ebj
+rule if kzr then cou
+rule if dez & bqp then qev
+rule if ask then wfj / uei
+rule if zzt then wnk
+rule if rwe then dbj
+rule if qbp then xhn
+rule if mdm then dbj / wnk / xhn
+rule if mhe then dbj
+rule if gxh then dbj / wnk / xhn
+rule if wjc then dbj / wnk / xhn
+rule if dgy then gqk / yzs / yly / zke
+rule if myv then ume / aoh
+rule if myv then yzs
+rule if myv then ndv
+rule if yzs then yly / zke
+rule if yzs then joy
+rule if yzs then clq / klh
+rule if yzs then taz
+rule if yzs then qod
+rule if yzs then abq
+rule if yzs & zhd then gtl
+rule if nen then dql
+rule if dql then nen
+rule if tjg then dbj
+rule if ggz / btp / cce / jlu / axv / uep / ixu / pis / kmw / efh / sfa then gtl
+rule if ggz / qtm / mrk / uep then dbj
+rule if uhu then dbj
+rule if kjp then dbj
+rule if btp then dbj
+rule if usz then xhn
+rule if ixu then xhn
+rule if ece then dbj
+rule if yry then wfj / uei
+rule if yry then uit / pif / zbj
+rule if gtl then ggz / btp / cce / jlu / axv / uep / ixu / pis / kmw / efh / sfa
+rule if gsc / zmu then dbj / rwe
+rule if gsc / zmu then tjg / ggz / uhu / qtm / mrk / uep / zhd
+rule if gci then eva
+rule if mrp then duq
+rule if mrp then wfj / uei
+rule if sre then xiq
+rule if twv then let / coe
+rule if nuo then wnk
+rule if rgm then dbj
+rule if dth & ebj then sal
+rule if hbe then mje
+rule if hbe then cck
+rule if ebj then alw / ask / xdb / wwy / cai / erj / zrr
+rule if ckz then dbj / wnk / xhn
+rule if qhm then xhn
+rule if lof then dbj / rwe
+rule if log then dbj
+rule if coe then xwq
+rule if maj then duq
+rule if maj then wfj / uei
+rule if pif then duq
+rule if pif then wfj / uei
+rule if pif then zbj
+rule if xhc then duq
+rule if xiq then sre
+rule if zbj then duq
+rule if zbj then pif
+rule if xwq then coe
+rule if bsa then uri
+rule if bsa then kte / bqp / bdy
+rule if bsa then vuw
+rule if bsa then cmo
+rule if ekc & -aai & -zgg then bdy
+rule if uki then dpb
+rule if dpb then uki / msi / vuw
+rule if vuw then dpb
+rule if jbn then kte / bqp / bdy
+rule if jbn then vuw
+rule if fql then vuw
+rule if ukp then vuw
+rule if dic then kte / bqp / bdy
+rule if dic then vuw / moe
+rule if cmo then uri
+rule if aub then uri
+rule if pzg then kte / bqp / bdy
+rule if bqp & qev then dez / emp / ngj
+rule if bqp & emp then qev
+rule if bqp & ngj then qev
+rule if bdy then uri
+rule if bdy then ekc
+rule if uei then duq
+rule if mid then dbj
+rule if wzd then dbj / rwe
+rule if wzd then cgy
+rule if nuv then hau
+rule if xei then fnf / six / wmw / lkd / pff / zrx / wcr / vpf
+rule if zzh then hau
+rule if ywd then zrx / wcr / vpf
+rule if jjp then maj / pif / xhc
+rule if nqy then zrx / wcr / vpf
+rule if wsy then zrx / wcr / vpf
+rule if osn then zrx / wcr / vpf
+rule if exg then gnv / zrx / wcr / vpf
+rule if vpf & -fnf & -six & -wmw & -lkd & -pff then exg
+rule if xpx then zrx / wcr / vpf
+rule if ihh then dbj
+rule if -wmv & -zgg & -hit then wmv
+rule if -mrz then mrz
+rule if ume thenNot ebj
+rule if kzr thenNot jzu
+rule if zgg thenNot enz / boz
+rule if zgg / wat thenNot nen
+rule if aoh thenNot wnk / xhn
+rule if dbj thenNot wnk / xhn
+rule if xca thenNot dbj / wnk / xhn / joh
+rule if xca thenNot zzt / rwe / qbp
+rule if zzt thenNot xca / rwe / qbp
+rule if rwe thenNot xca / zzt / qbp
+rule if qbp thenNot xca / zzt / rwe
+rule if yzs thenNot sre
+rule if yzs thenNot iif
+rule if yzs thenNot dkm
+rule if yzs thenNot zua
+rule if yzs thenNot xiq
+rule if yzs thenNot jqp / eox
+rule if enz thenNot erv
+rule if enz / boz thenNot nen / emp / ngj
+rule if nen thenNot dqt
+rule if qtm / mrk / uep thenNot sre / xiq
+rule if gtl & -yzs thenNot zhd
+rule if gsc / zmu thenNot kjp / btp
+rule if gsc / zmu thenNot sre
+rule if wjh thenNot sre
+rule if wjh & -oax thenNot gtl
+rule if joy thenNot six / wmw
+rule if iif thenNot cgc
+rule if bay thenNot sal / ebj
+rule if maj thenNot pif
+rule if pif thenNot uit
+rule if xhc thenNot pif / maj
+rule if hgn thenNot lac / bay
+rule if bsa thenNot aai / zgg
+rule if bsa thenNot aub
+rule if xcg thenNot ixt
+rule if msi thenNot uki
+rule if moe thenNot vuw
+rule if bqp thenNot aai / zgg
+rule if bdy thenNot aai / zgg
+rule if epf thenNot bqp / bdy
+rule if eku thenNot nen
+rule if dqt thenNot peq
+rule if erv thenNot qze
+rule if qev thenNot kte
+rule if qev & -dez & -emp & -ngj thenNot bqp
+rule if dzg thenNot bqp
+rule if mmt thenNot fgf / kjc / qfn
+rule if mmt thenNot zhd
+rule if fgf thenNot kjc / qfn
+rule if fgf thenNot zhd
+rule if kjc thenNot qfn
+rule if kjc thenNot zhd
+rule if qfn thenNot zhd
+rule if ywd thenNot pdm / jlt
+rule if wpu thenNot emp
+rule if zhd & -yzs thenNot gtl
+rule -pdm
+rule -uoh
+rule if dbj then exo[vby, hha, mxh, brt, ihh, mye] & exo[cai, hfg, mdm, mhe, gxh, wjc] & exo[tjg, ggz, uhu, kjp, btp, qtm, mrk, uep, zhd] & exo[klh, azm] & ebj & exo[ckz, lbu, ayg, epn, log] & kxs & exo[okc, ece, fvy] & uei & mid & exo[mdb, cgy] & eyq
+rule if kwr then mrp & mje & exo[clq, klh, azm] & twv & nar & uri & coe & kxs & exo[rff, jfy] & xwq & exo[bqp, bdy, epf]
+rule if wnk then exo[uio, hfg, erj, zrr, mdm, gxh, wjc] & exo[cce, hbm, axv, mzv, pis, ewq, twb, kmw, efh, sfa, dca, mwx, ayb, zhd] & exo[wfj, uei] & ebj & exo[ckz, lbu, ayg, epn] & kxs
+rule if xhn then exo[xdb, uio, hfg, mdm, gxh, wjc] & exo[cce, hbm, axv, usz, ixu, mzv, pis, ewq, twb, kmw, efh, sfa, dca, mwx, ayb, zhd] & exo[wfj, uei] & exo[ckz, qhm, lbu, ayg, epn]
+rule if xca then jok & exo[let, coe] & mrb & exo[uit, zbj]
+rule if zzt then jok & exo[let, coe] & mrb & exo[uit, zbj] & qod & exo[rff, jfy]
+rule if rwe then vlu & jok & exo[let, coe] & mrb & exo[uit, zbj] & qod & exo[rff, jfy]
+rule if qbp then jok & exo[clq, klh, azm] & exo[mdb, cgy] & exo[let, coe] & mrb & exo[uit, zbj] & qod & kxs & exo[rff, jfy]
+rule if bds then vuw & jbn & fql & ukp
+rule if xgo then gci & mrp & exo[clq, klh, azm] & nuo & exo[mdb, cgy] & lac & exo[let, coe] & mrb & exo[uit, zbj] & qod & abq & exo[rff, jfy]
+rule if ajn then gtl & gci & mrp & jok & twv & gxv & uri & exo[let, coe] & mrb & qod & exo[rff, jfy]
+rule if tss then gci & mje & twv & gxv & lac & uri & coe & mrb & exo[uit, zbj] & qod & abq & exo[rff, jfy] & xwq & ekc & dic & moe & bdy & wzd
+rule if mvp then ekc & dic & moe & bdy
+rule if dzp then gci & mje & twv & exo[clq, klh, azm] & exo[mdb, cgy] & gxv & hbe & lac & coe & mrb & exo[uit, zbj] & qod & abq & kxs & exo[rff, jfy] & xwq
+rule if gzg then tjx & exo[wjh, sre] & mje & twv & dkm & lhv & gxv & xjg & nar & sal & lac & uri & vnz & coe & mrb & qod & kxs & exo[rff, jfy] & exo[maj, pif] & moe & exo[bqp, bdy, epf]
+rule if agl then cck & lbx & vnz & jbn & exo[bqp, bdy]
+rule if mrd then gtl & gci & mrp & jok & knz & twv & dkm & gxv & uri & exo[let, coe] & mrb & qod & exo[rff, jfy]
+rule if uue then exo[uio, hfg, aoh] & exo[cce, axv, pis, kmw, efh, sfa] & exo[wfj, uei] & exo[clq, klh, azm] & exo[lbu, ayg, epn]
+rule if khs then dic & moe & bqp
+rule if kks then ekc & dic & moe & bdy
+rule if vsm then exo[uio, hfg, aoh] & exo[cce, axv, pis, kmw, efh, sfa] & gtl & gci & exo[clq, klh, azm] & twv & gxv & uri & coe & xwq
+rule if bop then jok & exo[let, coe] & mrb & exo[uit, pif] & exo[rff, jfy]
+rule if mhw then yry & knz & mkw & lac & exo[eox, jqp] & exo[bqp, bdy]
+rule if oot then yry & knz & mkw & lac & ekc & exo[eox, jqp] & aub & bdy
+rule if jiq then twv & hbe & xwq
+rule if pba then yry & gci & tjx & sre & twv & gxv & hbe & lac & uri & vnz & coe & mrb & uit & qod & abq & exo[rff, jfy] & xiq & xwq & dic & moe & blw & exo[bqp, bdy] & scy
+rule if mha then exo[eox, jqp] & dic & aub
+rule if uio then amo[wnk, xhn, uue, vsm]
+rule if hfg then amo[dbj, wnk, xhn, uue, vsm]
+rule if aoh then amo[uue, vsm]
+rule if mdm then amo[dbj, wnk, xhn]
+rule if gxh then amo[dbj, wnk, xhn]
+rule if wjc then amo[dbj, wnk, xhn]
+rule if cce then amo[wnk, xhn, uue, vsm]
+rule if hbm then amo[wnk, xhn]
+rule if axv then amo[wnk, xhn, uue, vsm]
+rule if mzv then amo[wnk, xhn]
+rule if pis then amo[wnk, xhn, uue, vsm]
+rule if ewq then amo[wnk, xhn]
+rule if twb then amo[wnk, xhn]
+rule if kmw then amo[wnk, xhn, uue, vsm]
+rule if efh then amo[wnk, xhn, uue, vsm]
+rule if sfa then amo[wnk, xhn, uue, vsm]
+rule if yry then amo[mhw, oot, pba]
+rule if dca then amo[wnk, xhn]
+rule if wfj then amo[wnk, xhn, uue]
+rule if gtl then amo[ajn, mrd, vsm]
+rule if mwx then amo[wnk, xhn]
+rule if ayb then amo[wnk, xhn]
+rule if gci then amo[xgo, ajn, tss, dzp, mrd, vsm, pba]
+rule if mrp then amo[kwr, xgo, ajn, mrd]
+rule if tjx then amo[gzg, pba]
+rule if sre then amo[gzg, pba]
+rule if mje then amo[kwr, tss, dzp, gzg]
+rule if jok then amo[xca, zzt, rwe, qbp, ajn, mrd, bop]
+rule if knz then amo[mrd, mhw, oot]
+rule if clq then amo[kwr, qbp, xgo, dzp, uue, vsm]
+rule if twv then amo[kwr, ajn, tss, dzp, gzg, mrd, vsm, jiq, pba]
+rule if klh then amo[dbj, kwr, qbp, xgo, dzp, uue, vsm]
+rule if mdb then amo[dbj, qbp, xgo, dzp]
+rule if azm then amo[dbj, kwr, qbp, xgo, dzp, uue, vsm]
+rule if dkm then amo[gzg, mrd]
+rule if mkw then amo[mhw, oot]
+rule if gxv then amo[ajn, tss, dzp, gzg, mrd, vsm, pba]
+rule if hbe then amo[dzp, jiq, pba]
+rule if nar then amo[kwr, gzg]
+rule if lac then amo[xgo, tss, dzp, gzg, mhw, oot, pba]
+rule if uri then amo[kwr, ajn, tss, gzg, mrd, vsm, pba]
+rule if ebj then amo[dbj, wnk]
+rule if vnz then amo[gzg, agl, pba]
+rule if ckz then amo[dbj, wnk, xhn]
+rule if lbu then amo[dbj, wnk, xhn, uue]
+rule if ayg then amo[dbj, wnk, xhn, uue]
+rule if epn then amo[dbj, wnk, xhn, uue]
+rule if let then amo[xca, zzt, rwe, qbp, xgo, ajn, mrd, bop]
+rule if coe then amo[kwr, xca, zzt, rwe, qbp, xgo, ajn, tss, dzp, gzg, mrd, vsm, bop, pba]
+rule if mrb then amo[xca, zzt, rwe, qbp, xgo, ajn, tss, dzp, gzg, mrd, bop, pba]
+rule if uit then amo[xca, zzt, rwe, qbp, xgo, tss, dzp, bop, pba]
+rule if rff then amo[kwr, zzt, rwe, qbp, xgo, ajn, tss, dzp, gzg, mrd, bop, pba]
+rule if qod then amo[zzt, rwe, qbp, xgo, ajn, tss, dzp, gzg, mrd, pba]
+rule if abq then amo[xgo, tss, dzp, pba]
+rule if kxs then amo[dbj, kwr, wnk, qbp, dzp, gzg]
+rule if jfy then amo[kwr, zzt, rwe, qbp, xgo, ajn, tss, dzp, gzg, mrd, bop, pba]
+rule if pif then amo[gzg, bop]
+rule if zbj then amo[xca, zzt, rwe, qbp, xgo, tss, dzp]
+rule if xwq then amo[kwr, tss, dzp, vsm, jiq, pba]
+rule if ekc then amo[tss, mvp, kks, oot]
+rule if eox then amo[mhw, oot, mha]
+rule if jqp then amo[mhw, oot, mha]
+rule if jbn then amo[bds, agl]
+rule if dic then amo[tss, mvp, khs, kks, pba, mha]
+rule if moe then amo[tss, mvp, gzg, khs, kks, pba]
+rule if aub then amo[oot, mha]
+rule if bqp then amo[kwr, gzg, agl, khs, mhw, pba]
+rule if bdy then amo[kwr, tss, mvp, gzg, agl, kks, mhw, oot, pba]
+rule if epf then amo[kwr, gzg]
+rule if uei then amo[dbj, wnk, xhn, uue]
+rule if cgy then amo[dbj, qbp, xgo, dzp]
+rule if zhd then amo[dbj, wnk, xhn]
+rule (xdb => ham) & (ume => qxz) & (wwy => cic) & (cai => obu) & (uio => fls) & (hfg => fls) & (erj => cub) & (zrr => cub) & (aoh => hcj) & (mdm => esy) & (mhe => esy) & (gxh => esy) & (wjc => esy) & (iaz => nqm) & (rye => pni)
+rule forbidden feature oda
+rule forbidden feature aai
+rule forbidden feature zgg
+rule forbidden feature dez
+rule forbidden feature wat
+rule forbidden feature joh
+rule forbidden feature gqk
+rule forbidden feature peq
+rule forbidden feature jlu
+rule forbidden feature lvn
+rule forbidden feature ftd
+rule forbidden feature kte
+rule forbidden feature erv
+rule forbidden feature boz
+rule forbidden feature dzg
+rule forbidden feature oax
+rule forbidden feature pdm
+rule forbidden feature uoh

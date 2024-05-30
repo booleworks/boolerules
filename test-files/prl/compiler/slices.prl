@@ -1,0 +1,44 @@
+header {
+  prl_version 1.0
+  creator "booleworks"
+  creation_date 2023-05-18
+}
+
+slicing properties {
+  bool active
+  int version
+  enum model
+  date validity
+  enum release
+}
+
+feature f1 {
+  active true
+  version 1
+  model "M1"
+  validity [2022-01-01 - 2025-12-31]
+  release "R1"
+}
+
+feature f2 {
+  active false
+  version 3
+  model "M2"
+  validity [2024-01-01 - 2024-12-31]
+  release ["R1", "R2"]
+}
+
+feature f3 {
+  active true
+  version 1
+  model ["M1", "M3"]
+  validity 2023-01-12
+}
+
+feature f4 {
+  active true
+  version [1-5]
+  model "M10"
+  validity [2024-01-12, 2025-01-12, 2026-01-12]
+  release["R1", "R3"]
+}

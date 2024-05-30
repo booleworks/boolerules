@@ -1,0 +1,56 @@
+header {
+  prl_version 1.0
+}
+
+# boolean features
+feature ft1
+bool feature ft2
+bool feature ft3
+
+versioned feature ft4
+versioned bool feature ft5
+versioned bool feature ft6
+versioned bool feature ft7
+
+feature ft8 {
+  description "description of ft8"
+}
+
+# enum features
+enum feature sft1 ["a", "b", "c"]
+enum feature sft2 ["a"]
+enum feature sft3 ["bla"] {
+  description "description of sft3"
+}
+
+enum feature `2022-10-10` ["a", "b"]
+
+enum feature foo ["a", "b"] {
+  v1 [1, 2, 3]
+  v2 [1 - 6]
+  validity [2020-01-01 - 2022-12-31]
+  soc 2018-07-31
+}
+
+# int features
+int feature ift1 [1, 2, 3]
+int feature ift2 [1]
+int feature ift3 [0] {
+  description "description of ift3"
+}
+int feature ift4 [1 - 7]
+int feature ift5 [1-142]
+
+int feature ift6 [1-5] {
+  description "description of ift6"
+  `important version` 4
+  validFrom 2010-01-01
+  validTo   2022-12-31
+  text "text text text"
+  releases ["R1", "R2", "R3"]
+  active false
+  cool true
+}
+
+int feature `123` [1, 2, 3]
+

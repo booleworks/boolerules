@@ -1,0 +1,41 @@
+# LogicNG Bike Shop Example (https://logicng.org/tutorial/chapter1)
+header {
+  prl_version 1.0
+}
+
+# Mandatory features for a bike (modelled as enum features)
+enum feature Frame ["Carbon", "Aluminium", "Steel"]
+enum feature Handlebar ["Cruise", "Drop", "Touring", "Flat", "Aero"]
+enum feature Saddle ["Touring", "Comfort", "Triathlon", "Pro"]
+enum feature FrontWheel ["24 inch", "26 inch", "27.5 inch", "29 inch", "32 inch"]
+enum feature BackWheel ["24 inch", "26 inch", "27.5 inch", "29 inch", "32 inch"]
+enum feature Color ["blue", "red", "white", "silver"]
+
+# Optional features (modelled as Boolean features)
+# Bells
+feature ClassicBell
+feature MetalStripBell
+feature LadyBugBell
+optional group Bell contains [ClassicBell, MetalStripBell, LadyBugBell]
+
+# Luggage Rack
+feature AluminiumRack
+feature TitaniumRack
+feature SteelRack
+feature MinimalisticRack
+optional group Rack contains [AluminiumRack, TitaniumRack, SteelRack, MinimalisticRack]
+
+
+# The rules
+rule if [Frame = "Carbon"] then [Saddle != "Touring"] & [Handlebar != "Touring"]
+rule if [Frame = "Carbon"] then -Bell / MinimalisticRack
+rule if [Frame = "Steel"] thenNot [Handlebar = "Aero"]
+rule if [Handlebar = "Aero"] thenNot Bell
+rule if MinimalisticRack then -MetalStripBell / [Frame in ["Aluminium", "Steel"]]
+rule [FrontWheel = "24 inch"] <=> [BackWheel = "24 inch"]
+rule [FrontWheel = "26 inch"] <=> [BackWheel = "26 inch"]
+rule [FrontWheel = "27.5 inch"] <=> [BackWheel = "27.5 inch"]
+rule [FrontWheel = "29 inch"] <=> [BackWheel = "29 inch"]
+rule [FrontWheel = "32 inch"] <=> [BackWheel = "32 inch"]
+rule if [Frame in ["Carbon", "Aluminium", "Steel"]] then [FrontWheel in ["26 inch", "27.5 inch", "29 inch", "32 inch"]]
+rule if [FrontWheel = "32 inch"] then [Frame = "Steel"]

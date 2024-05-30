@@ -1,0 +1,38 @@
+header {
+  prl_version 1.0
+}
+
+slicing properties {
+  int i1
+}
+
+feature f1 {
+  i1 [1-22]
+}
+
+feature f2
+feature f3
+feature f4
+feature f5 {
+  i1 [3]
+}
+
+rule f1 => f2 {
+  i1 [1-10]
+}
+
+rule f2 => f3 {
+  i1 [1, 14, 22]
+}
+
+rule f3 => f4 {
+  i1 [1, 14, 22]
+}
+
+rule f4 => f5 {
+  i1 [3-12]
+}
+
+rule f5 => f1 {
+  i1 [3-12]
+}

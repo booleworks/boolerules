@@ -1,0 +1,20 @@
+header {
+  prl_version 1.0
+}
+
+int feature i1 [0 - 10]
+int feature i2 [0 - 20]
+int feature i3 [-20 - 20]
+int feature i4 [-20 - 0]
+int feature sum [-20 - -10]
+
+rule [i1 <= sum]
+rule [i1 <= 48]
+rule [i1 + 17 <= sum]
+rule [i1 + 17 <= 48]
+rule [i1 + 2*i2 + -4*i3 + -i4 + 17 <= sum]
+rule [i1 + 2*i2 + -4*i3 + -i4 + 17 <= 48]
+rule [i1 + 2*i2 + -4*i3 + -i4 + 17 = sum]
+rule [i1 + 2*i2 + -4*i3 + -i4 + 17 = 48]
+rule [i1 + 2*i2 + -4*i3 + -i4 + 17 in [-10 - 20]]
+rule [i1 + 2*i2 + -4*i3 + -i4 + 17 in [-10, -5, 0, 1, 5, 10]]

@@ -1,0 +1,15 @@
+header {
+  prl_version 1.0
+}
+
+bool feature b1
+versioned bool feature i1
+versioned bool feature i2
+versioned bool feature i3
+
+rule i1[ < 5]
+rule if i1[ = 1] then i2[ = 3]
+rule if i1[ = 2] then i2[ = 2]
+rule if i1[ = 3] then i2[ = 1]
+rule b1 is i1[ >= 2] & i3[ > 2]
+rule forbidden feature i1 = 2

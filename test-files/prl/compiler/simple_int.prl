@@ -1,0 +1,23 @@
+header {
+  prl_version 1.0
+}
+
+bool feature b1
+bool feature b2
+int feature i1 [0 - 100]
+int feature i2 [0 - 20]
+int feature i3 [-20 - 20]
+int feature i4 [-100 - 100]
+
+rule [i1 < 50]
+rule if [i1 = 20] then [i2 = 0]
+rule if [i1 = 10] then [i2 = 10]
+rule if [i2 = 10] then [i2 = 30]
+
+rule b1 is [i3 >= 0] & [i4 >= 0]
+rule b2 is [i3 < 0] / [i4 < 0]
+rule if b1 thenNot [i3 in [0, 10, 20]]
+rule if b2 then [i4 in [20, 40]] else [i4 in [-40 - -20]]
+rule [i3 > i4] => b1
+
+rule forbidden feature i1 = 20

@@ -1,0 +1,61 @@
+header {
+  prl_version 1.0
+  creator "booleworks"
+  creation_date 2023-05-18
+}
+
+slicing properties {
+  int version
+  enum series
+}
+
+# valid in every slice
+feature a
+feature b
+feature c {
+  version [1-3]
+  series ["S1", "S2", "S3"]
+}
+
+# valid depending on series
+feature p {
+  series "S1"
+}
+feature q {
+  series "S2"
+}
+feature r {
+  series "S3"
+}
+
+# valid depending on version
+feature x {
+  version [1, 2]
+}
+feature y {
+  version 2
+}
+feature z {
+  version [2, 3]
+}
+
+rule a/b
+rule if a then b/c {
+  version 1
+}
+rule if a then b {
+  version 2
+}
+rule a/x {
+  version 3
+}
+
+rule if q then y {
+  series "S2"
+  version 2
+}
+
+rule if y thenNot z
+rule if p/q then a
+rule if q/r then b
+rule if x then c
