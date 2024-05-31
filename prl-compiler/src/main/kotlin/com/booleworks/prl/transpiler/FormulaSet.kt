@@ -61,8 +61,8 @@ data class SliceTranslation(val sliceSet: SliceSet, val info: TranslationInfo) {
     val booleanVariables = info.booleanVariables
     val enumVariables = info.enumVariables
     val integerVariables = info.integerVariables
-
-    //TODO version variables
+    val versionVariables = info.versionVariables
+    val versionMapping = info.versionMapping
     val enumMapping = info.enumMapping
     val unknownFeatures = info.unknownFeatures
 }
@@ -125,6 +125,7 @@ interface TranspilerCoreInfo {
     val unknownFeatures: Set<Feature>
     val booleanVariables: Set<Variable>
     val integerVariables: Set<LngIntVariable>
+    val versionVariables: Set<Variable>
     val enumMapping: Map<String, Map<String, Variable>>
     val intPredicateMapping: Map<IntPredicate, Variable>
     val encodingContext: CspEncodingContext
@@ -138,6 +139,7 @@ data class TranslationInfo(
     override val featureInstantiations: FeatureInstantiation,
     override val booleanVariables: Set<Variable>,
     override val integerVariables: Set<LngIntVariable>,
+    override val versionVariables: Set<Variable>,
     override val enumMapping: Map<String, Map<String, Variable>>,
     override val unknownFeatures: Set<Feature>,
     override val intPredicateMapping: Map<IntPredicate, Variable>,

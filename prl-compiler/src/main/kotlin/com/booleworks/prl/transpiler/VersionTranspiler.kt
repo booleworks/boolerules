@@ -94,7 +94,7 @@ fun translateVersionComparison(cf: CspFactory, constraint: VersionPredicate): Fo
         LT -> installedLT(f, fea, ver)
         LE -> installedLE(f, fea, ver)
         GT -> installedGT(f, fea, ver)
-        GE -> installedGT(f, fea, ver)
+        GE -> installedGE(f, fea, ver)
     }
 }
 

@@ -226,6 +226,7 @@ fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTran
             instantiation,
             booleanVariables,
             integerVariables,
+            setOf(),  //TODO merged version features
             enumMapping,
             unknownFeatures,
             intPredicateMapping,
@@ -319,6 +320,7 @@ private fun initState(
     )
     versionStore?.usedValues?.forEach { (fea, maxVer) ->
         versionMapping[fea.featureCode] = (1..maxVer).associateWith { installed(cf.formulaFactory(), fea, it) }
+        versionVariables.addAll(versionMapping.flatMap { it.value.values })
     }
 }
 
@@ -389,6 +391,7 @@ data class TranspilerState(
     override val unknownFeatures: MutableSet<Feature> = mutableSetOf(),
     override val booleanVariables: MutableSet<Variable> = mutableSetOf(),
     override val integerVariables: MutableSet<LngIntVariable> = mutableSetOf(),
+    override val versionVariables: MutableSet<Variable> = mutableSetOf(),
     override val enumMapping: MutableMap<String, Map<String, Variable>> = mutableMapOf(),
     override val intPredicateMapping: MutableMap<IntPredicate, Variable> = mutableMapOf(),
     override val encodingContext: CspEncodingContext,
@@ -403,6 +406,7 @@ data class TranspilerState(
             featureInstantiations,
             booleanVariables,
             integerVariables,
+            versionVariables,
             enumMapping,
             unknownFeatures,
             intPredicateMapping,

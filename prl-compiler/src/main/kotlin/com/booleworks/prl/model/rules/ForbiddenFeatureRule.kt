@@ -13,7 +13,7 @@ import com.booleworks.prl.model.constraints.enumNe
 import com.booleworks.prl.model.constraints.enumVal
 import com.booleworks.prl.model.constraints.intNe
 import com.booleworks.prl.model.constraints.not
-import com.booleworks.prl.model.constraints.versionNe
+import com.booleworks.prl.model.constraints.versionEq
 import com.booleworks.prl.model.datastructures.FeatureRenaming
 import java.util.Objects
 
@@ -106,7 +106,7 @@ class ForbiddenFeatureRule internal constructor(
                 intValueOrVersion == other.intValueOrVersion
 
     override fun generateConstraint(feature: Feature, enumValue: String?, intValueOrVersion: Int?) = when (feature) {
-        is VersionedBooleanFeature -> versionNe(feature, intValueOrVersion!!)
+        is VersionedBooleanFeature -> not(versionEq(feature, intValueOrVersion!!))
         is BooleanFeature -> not(feature)
         is EnumFeature -> enumNe(feature, enumVal(enumValue!!))
         is IntFeature -> intNe(feature, intValueOrVersion!!)
