@@ -39,11 +39,11 @@ enum class ReconfigurationAlgorithm { MAX_COV, MIN_DIFF, }
 @Schema(description = "The reconfiguration")
 data class ReconfigurationResult(
 
-    @field:Schema(description = "The codes to remove s.t. the configuration is valid")
-    val codesToRemove: List<String>,
+    @field:Schema(description = "The features to remove s.t. the configuration is valid")
+    val featuresToRemove: List<String>,
 
-    @field:Schema(description = "The codes to add s.t. the configuration is valid")
-    val codesToAdd: List<String>
+    @field:Schema(description = "The features to add s.t. the configuration is valid")
+    val featuresToAdd: List<String>
 )
 
 typealias ReconfigurationResponse = SingleComputationResponse<ReconfigurationResult>

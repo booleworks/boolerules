@@ -75,18 +75,18 @@ object ReconfigurationComputation :
         status: ComputationStatusBuilder
     ): ReconfigurationInternalResult {
         val f = cf.formulaFactory()
-        val (validCodes, invalidCodes) = request.configuration.map { f.variable(it) }
+        val (validFeatures, invalidFeatures) = request.configuration.map { f.variable(it) }
             .partition { it in translation.knownVariables }
-        if (invalidCodes.isNotEmpty()) {
+        if (invalidFeatures.isNotEmpty()) {
             status.addWarning(
-                "The order contains invalid codes which must always be removed: ${
-                    invalidCodes.joinToString(
+                "The order contains invalid features which must always be removed: ${
+                    invalidFeatures.joinToString(
                         ", "
                     )
                 }"
             )
         }
-        val configuration = validCodes.toSet()
+        val configuration = validFeatures.toSet()
         val notInConfiguration = translation.knownVariables - configuration
 
         val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, cf, translation).also {
@@ -104,7 +104,7 @@ object ReconfigurationComputation :
             val added = notInConfiguration.intersect(reconfiguration)
             ReconfigurationInternalResult(
                 slice,
-                (invalidCodes + removed).map { it.name() }.toList(),
+                (invalidFeatures + removed).map { it.name() }.toList(),
                 added.map { it.name() }.toList()
             )
         } else {
@@ -120,9 +120,9 @@ object ReconfigurationComputation :
 
 data class ReconfigurationInternalResult(
     override val slice: Slice,
-    val codesToRemove: List<String>,
-    val codesToAdd: List<String>,
+    val featuresToRemove: List<String>,
+    val featuresToAdd: List<String>,
 ) : InternalResult<ReconfigurationResult, NoComputationDetail>(slice) {
-    override fun extractMainResult() = ReconfigurationResult(codesToRemove, codesToAdd)
+    override fun extractMainResult() = ReconfigurationResult(featuresToRemove, featuresToAdd)
     override fun extractDetails() = NoComputationDetail
 }
