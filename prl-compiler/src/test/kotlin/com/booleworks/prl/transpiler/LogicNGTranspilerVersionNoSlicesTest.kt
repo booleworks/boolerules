@@ -28,28 +28,28 @@ class LogicNGTranspilerVersionNoSlicesTest {
         assertThat(trans.versionMapping.keys).containsExactlyInAnyOrder("i1", "i2", "i3")
 
         assertThat(trans.versionMapping["i1"]).containsExactly(
-            entry(1, f.variable("@VER_i_i1_1")),
-            entry(2, f.variable("@VER_i_i1_2")),
-            entry(3, f.variable("@VER_i_i1_3")),
-            entry(4, f.variable("@VER_i_i1_4")),
+            entry(1, f.variable("@VER_i1_1")),
+            entry(2, f.variable("@VER_i1_2")),
+            entry(3, f.variable("@VER_i1_3")),
+            entry(4, f.variable("@VER_i1_4")),
         )
 
         assertThat(trans.versionMapping["i2"]).containsExactly(
-            entry(1, f.variable("@VER_i_i2_1")),
-            entry(2, f.variable("@VER_i_i2_2")),
-            entry(3, f.variable("@VER_i_i2_3")),
+            entry(1, f.variable("@VER_i2_1")),
+            entry(2, f.variable("@VER_i2_2")),
+            entry(3, f.variable("@VER_i2_3")),
         )
         assertThat(trans.versionMapping["i3"]).containsExactly(
-            entry(1, f.variable("@VER_i_i3_1")),
-            entry(2, f.variable("@VER_i_i3_2")),
-            entry(3, f.variable("@VER_i_i3_3")),
+            entry(1, f.variable("@VER_i3_1")),
+            entry(2, f.variable("@VER_i3_2")),
+            entry(3, f.variable("@VER_i3_3")),
         )
 
         assertThat(trans.versionVariables).containsExactlyInAnyOrderElementsOf(
             f.variables(
-                "@VER_i_i1_1", "@VER_i_i1_2", "@VER_i_i1_3", "@VER_i_i1_4",
-                "@VER_i_i2_1", "@VER_i_i2_2", "@VER_i_i2_3",
-                "@VER_i_i3_1", "@VER_i_i3_2", "@VER_i_i3_3",
+                "@VER_i1_1", "@VER_i1_2", "@VER_i1_3", "@VER_i1_4",
+                "@VER_i2_1", "@VER_i2_2", "@VER_i2_3",
+                "@VER_i3_1", "@VER_i3_2", "@VER_i3_3",
             )
         )
     }
@@ -58,7 +58,7 @@ class LogicNGTranspilerVersionNoSlicesTest {
     fun testVersionConstraints() {
         val trans = modelTranslation[0]
         val props = trans.propositions
-        assertThat(props).hasSize(7 + 3 + 3 + 10)
+        assertThat(props).hasSize(7 + 3 + 3)
     }
 
     @Test
@@ -75,28 +75,28 @@ class LogicNGTranspilerVersionNoSlicesTest {
         assertThat(original).contains(
             PrlProposition(
                 RuleInformation(rules[0], sliceSet),
-                f.parse("@VER_il_i1_4")
+                f.parse("@VER_i1_1 | @VER_i1_2 | @VER_i1_3 | @VER_i1_4")
             )
         )
         // rule if i1[ = 1] then i2[ = 3]
         assertThat(original).contains(
             PrlProposition(
                 RuleInformation(rules[1], sliceSet),
-                f.parse("@VER_i_i1_1 => @VER_i_i2_3")
+                f.parse("@VER_i1_1 => @VER_i2_3")
             )
         )
         // rule if i1[ = 2] then i2[ > 1]
         assertThat(original).contains(
             PrlProposition(
                 RuleInformation(rules[2], sliceSet),
-                f.parse("@VER_i_i1_2 => @VER_ig_i2_2")
+                f.parse("@VER_i1_2 => (@VER_i2_2 | @VER_i2_3)")
             )
         )
         // rule if i1[ = 3] then i2
         assertThat(original).contains(
             PrlProposition(
                 RuleInformation(rules[3], sliceSet),
-                f.parse("@VER_i_i1_3 => i2")
+                f.parse("@VER_i1_3 => i2")
             )
         )
         // rule if i2 then -i3
@@ -110,14 +110,14 @@ class LogicNGTranspilerVersionNoSlicesTest {
         assertThat(original).contains(
             PrlProposition(
                 RuleInformation(rules[5], sliceSet),
-                f.parse("b1 <=> @VER_ig_i1_2 & @VER_ig_i3_3")
+                f.parse("b1 <=> (@VER_i1_2 | @VER_i1_3 | @VER_i1_4) & @VER_i3_3")
             )
         )
         // rule forbidden feature i1 = 2
         assertThat(original).contains(
             PrlProposition(
                 RuleInformation(rules[6], sliceSet),
-                f.parse("~@VER_i_i1_2")
+                f.parse("~@VER_i1_2")
             )
         )
     }
@@ -134,19 +134,19 @@ class LogicNGTranspilerVersionNoSlicesTest {
         assertThat(amo).contains(
             PrlProposition(
                 RuleInformation(RuleType.VERSION_AMO_CONSTRAINT, sliceSet),
-                f.parse("@VER_i_i1_1 + @VER_i_i1_2 + @VER_i_i1_3 + @VER_i_i1_4 <= 1")
+                f.parse("@VER_i1_1 + @VER_i1_2 + @VER_i1_3 + @VER_i1_4 <= 1")
             )
         )
         assertThat(amo).contains(
             PrlProposition(
                 RuleInformation(RuleType.VERSION_AMO_CONSTRAINT, sliceSet),
-                f.parse("@VER_i_i2_1 + @VER_i_i2_2 + @VER_i_i2_3 <= 1")
+                f.parse("@VER_i2_1 + @VER_i2_2 + @VER_i2_3 <= 1")
             )
         )
         assertThat(amo).contains(
             PrlProposition(
                 RuleInformation(RuleType.VERSION_AMO_CONSTRAINT, sliceSet),
-                f.parse("@VER_i_i3_1 + @VER_i_i3_2 + @VER_i_i3_3 <= 1")
+                f.parse("@VER_i3_1 + @VER_i3_2 + @VER_i3_3 <= 1")
             )
         )
     }
@@ -163,170 +163,19 @@ class LogicNGTranspilerVersionNoSlicesTest {
         assertThat(equiv).contains(
             PrlProposition(
                 RuleInformation(RuleType.VERSION_EQUIVALENCE, sliceSet),
-                f.parse("i1 <=> @VER_i_i1_1 | @VER_i_i1_2 | @VER_i_i1_3 | @VER_i_i1_4")
+                f.parse("i1 <=> @VER_i1_1 | @VER_i1_2 | @VER_i1_3 | @VER_i1_4")
             )
         )
         assertThat(equiv).contains(
             PrlProposition(
                 RuleInformation(RuleType.VERSION_EQUIVALENCE, sliceSet),
-                f.parse("i2 <=> @VER_i_i2_1 | @VER_i_i2_2 | @VER_i_i2_3")
+                f.parse("i2 <=> @VER_i2_1 | @VER_i2_2 | @VER_i2_3")
             )
         )
         assertThat(equiv).contains(
             PrlProposition(
                 RuleInformation(RuleType.VERSION_EQUIVALENCE, sliceSet),
-                f.parse("i3 <=> @VER_i_i3_1 | @VER_i_i3_2 | @VER_i_i3_3")
-            )
-        )
-    }
-
-    @Test
-    fun testVersionIntervalConstraints() {
-        val trans = modelTranslation[0]
-        val sliceSet = trans.sliceSet
-        val props = trans.propositions
-
-        val intervals = props.filter { it.backpack().ruleType == RuleType.VERSION_INTERVAL_VARIABLE }
-        assertThat(intervals).hasSize(10)
-
-        // i1 = 1
-        assertThat(intervals).contains(
-            PrlProposition(
-                RuleInformation(RuleType.VERSION_INTERVAL_VARIABLE, sliceSet),
-                f.parse(
-                    "(~@VER_ig_i1_1 | @VER_i_i1_1 | @VER_ig_i1_2) & " +
-                            "(~@VER_ug_i1_1 | ~@VER_i_i1_1) & " +
-                            "(~@VER_ug_i1_1 | @VER_ug_i1_2) & " +
-                            "(~@VER_il_i1_1 | @VER_i_i1_1) & " +
-                            "(~@VER_ul_i1_1 | ~@VER_i_i1_1) & " +
-                            "(~@VER_ul_i1_1 | @VER_ul_i1_0)"
-                )
-            )
-        )
-        // i2 = 1
-        assertThat(intervals).contains(
-            PrlProposition(
-                RuleInformation(RuleType.VERSION_INTERVAL_VARIABLE, sliceSet),
-                f.parse(
-                    "(~@VER_ig_i2_1 | @VER_i_i2_1 | @VER_ig_i2_2) & " +
-                            "(~@VER_ug_i2_1 | ~@VER_i_i2_1) & " +
-                            "(~@VER_ug_i2_1 | @VER_ug_i2_2) & " +
-                            "(~@VER_il_i2_1 | @VER_i_i2_1) & " +
-                            "(~@VER_ul_i2_1 | ~@VER_i_i2_1) & " +
-                            "(~@VER_ul_i2_1 | @VER_ul_i2_0)"
-                )
-            )
-        )
-        // i3 = 1
-        assertThat(intervals).contains(
-            PrlProposition(
-                RuleInformation(RuleType.VERSION_INTERVAL_VARIABLE, sliceSet),
-                f.parse(
-                    "(~@VER_ig_i3_1 | @VER_i_i3_1 | @VER_ig_i3_2) & " +
-                            "(~@VER_ug_i3_1 | ~@VER_i_i3_1) & " +
-                            "(~@VER_ug_i3_1 | @VER_ug_i3_2) & " +
-                            "(~@VER_il_i3_1 | @VER_i_i3_1) & " +
-                            "(~@VER_ul_i3_1 | ~@VER_i_i3_1) & " +
-                            "(~@VER_ul_i3_1 | @VER_ul_i3_0)"
-                )
-            )
-        )
-        // i1 = 2
-        assertThat(intervals).contains(
-            PrlProposition(
-                RuleInformation(RuleType.VERSION_INTERVAL_VARIABLE, sliceSet),
-                f.parse(
-                    "(~@VER_ig_i1_2 | @VER_i_i1_2 | @VER_ig_i1_3) & " +
-                            "(~@VER_ug_i1_2 | ~@VER_i_i1_2) & " +
-                            "(~@VER_ug_i1_2 | @VER_ug_i1_3) & " +
-                            "(~@VER_il_i1_2 | @VER_i_i1_2 | @VER_il_i1_1) & " +
-                            "(~@VER_ul_i1_2 | ~@VER_i_i1_2) & " +
-                            "(~@VER_ul_i1_2 | @VER_ul_i1_1)"
-                )
-            )
-        )
-        // i2 = 2
-        assertThat(intervals).contains(
-            PrlProposition(
-                RuleInformation(RuleType.VERSION_INTERVAL_VARIABLE, sliceSet),
-                f.parse(
-                    "(~@VER_ig_i2_2 | @VER_i_i2_2 | @VER_ig_i2_3) & " +
-                            "(~@VER_ug_i2_2 | ~@VER_i_i2_2) & " +
-                            "(~@VER_ug_i2_2 | @VER_ug_i2_3) & " +
-                            "(~@VER_il_i2_2 | @VER_i_i2_2 | @VER_il_i2_1) & " +
-                            "(~@VER_ul_i2_2 | ~@VER_i_i2_2) & " +
-                            "(~@VER_ul_i2_2 | @VER_ul_i2_1)"
-                )
-            )
-        )
-        // i3 = 2
-        assertThat(intervals).contains(
-            PrlProposition(
-                RuleInformation(RuleType.VERSION_INTERVAL_VARIABLE, sliceSet),
-                f.parse(
-                    "(~@VER_ig_i3_2 | @VER_i_i3_2 | @VER_ig_i3_3) & " +
-                            "(~@VER_ug_i3_2 | ~@VER_i_i3_2) & " +
-                            "(~@VER_ug_i3_2 | @VER_ug_i3_3) & " +
-                            "(~@VER_il_i3_2 | @VER_i_i3_2 | @VER_il_i3_1) & " +
-                            "(~@VER_ul_i3_2 | ~@VER_i_i3_2) & " +
-                            "(~@VER_ul_i3_2 | @VER_ul_i3_1)"
-                )
-            )
-        )
-        // i1 = 3
-        assertThat(intervals).contains(
-            PrlProposition(
-                RuleInformation(RuleType.VERSION_INTERVAL_VARIABLE, sliceSet),
-                f.parse(
-                    "(~@VER_ig_i1_3 | @VER_i_i1_3 | @VER_ig_i1_4) & " +
-                            "(~@VER_ug_i1_3 | ~@VER_i_i1_3) & " +
-                            "(~@VER_ug_i1_3 | @VER_ug_i1_4) & " +
-                            "(~@VER_il_i1_3 | @VER_i_i1_3 | @VER_il_i1_2) & " +
-                            "(~@VER_ul_i1_3 | ~@VER_i_i1_3) & " +
-                            "(~@VER_ul_i1_3 | @VER_ul_i1_2)"
-                )
-            )
-        )
-        // i2 = 3
-        assertThat(intervals).contains(
-            PrlProposition(
-                RuleInformation(RuleType.VERSION_INTERVAL_VARIABLE, sliceSet),
-                f.parse(
-                    "(~@VER_ig_i2_3 | @VER_i_i2_3) & " +
-                            "(~@VER_ug_i2_3 | ~@VER_i_i2_3) & " +
-                            "(~@VER_ug_i2_3 | @VER_ug_i2_4) & " +
-                            "(~@VER_il_i2_3 | @VER_i_i2_3 | @VER_il_i2_2) & " +
-                            "(~@VER_ul_i2_3 | ~@VER_i_i2_3) & " +
-                            "(~@VER_ul_i2_3 | @VER_ul_i2_2)"
-                )
-            )
-        )
-        // i3 = 3
-        assertThat(intervals).contains(
-            PrlProposition(
-                RuleInformation(RuleType.VERSION_INTERVAL_VARIABLE, sliceSet),
-                f.parse(
-                    "(~@VER_ig_i3_3 | @VER_i_i3_3) & " +
-                            "(~@VER_ug_i3_3 | ~@VER_i_i3_3) & " +
-                            "(~@VER_ug_i3_3 | @VER_ug_i3_4) & " +
-                            "(~@VER_il_i3_3 | @VER_i_i3_3 | @VER_il_i3_2) & " +
-                            "(~@VER_ul_i3_3 | ~@VER_i_i3_3) & " +
-                            "(~@VER_ul_i3_3 | @VER_ul_i3_2)"
-                )
-            )
-        )
-        // i1 = 4
-        assertThat(intervals).contains(
-            PrlProposition(
-                RuleInformation(RuleType.VERSION_INTERVAL_VARIABLE, sliceSet),
-                f.parse(
-                    "(~@VER_ig_i1_4 | @VER_i_i1_4) & " +
-                            "(~@VER_ug_i1_4 | ~@VER_i_i1_4) & " +
-                            "(~@VER_ug_i1_4 | @VER_ug_i1_5) & " +
-                            "(~@VER_il_i1_4 | @VER_i_i1_4 | @VER_il_i1_3) & " +
-                            "(~@VER_ul_i1_4 | ~@VER_i_i1_4) & " +
-                            "(~@VER_ul_i1_4 | @VER_ul_i1_3)"
-                )
+                f.parse("i3 <=> @VER_i3_1 | @VER_i3_2 | @VER_i3_3")
             )
         )
     }
@@ -355,17 +204,17 @@ class LogicNGTranspilerVersionNoSlicesTest {
         val models = solver.enumerateAllModels(trans.versionVariables)
         assertThat(models).hasSize(11)
         assertThat(models.map { it.positiveVariables() }).containsExactlyInAnyOrder(
-            TreeSet(f.variables("@VER_i_i1_1", "@VER_i_i2_3")),
-            TreeSet(f.variables("@VER_i_i1_3", "@VER_i_i2_1")),
-            TreeSet(f.variables("@VER_i_i1_3", "@VER_i_i2_2")),
-            TreeSet(f.variables("@VER_i_i1_3", "@VER_i_i2_3")),
-            TreeSet(f.variables("@VER_i_i1_4", "@VER_i_i2_1")),
-            TreeSet(f.variables("@VER_i_i1_4", "@VER_i_i2_2")),
-            TreeSet(f.variables("@VER_i_i1_4", "@VER_i_i2_3")),
-            TreeSet(f.variables("@VER_i_i1_4", "@VER_i_i3_1")),
-            TreeSet(f.variables("@VER_i_i1_4", "@VER_i_i3_2")),
-            TreeSet(f.variables("@VER_i_i1_4", "@VER_i_i3_3")),
-            TreeSet(f.variables("@VER_i_i1_4")),
+            TreeSet(f.variables("@VER_i1_1", "@VER_i2_3")),
+            TreeSet(f.variables("@VER_i1_3", "@VER_i2_1")),
+            TreeSet(f.variables("@VER_i1_3", "@VER_i2_2")),
+            TreeSet(f.variables("@VER_i1_3", "@VER_i2_3")),
+            TreeSet(f.variables("@VER_i1_4", "@VER_i2_1")),
+            TreeSet(f.variables("@VER_i1_4", "@VER_i2_2")),
+            TreeSet(f.variables("@VER_i1_4", "@VER_i2_3")),
+            TreeSet(f.variables("@VER_i1_4", "@VER_i3_1")),
+            TreeSet(f.variables("@VER_i1_4", "@VER_i3_2")),
+            TreeSet(f.variables("@VER_i1_4", "@VER_i3_3")),
+            TreeSet(f.variables("@VER_i1_4")),
         )
     }
 
@@ -376,20 +225,19 @@ class LogicNGTranspilerVersionNoSlicesTest {
         solver.addPropositions(trans.propositions)
         assertThat(solver.sat()).isTrue()
         val models = solver.enumerateAllModels(trans.versionVariables + f.variables("b1"))
-        assertThat(models).hasSize(12)
-        assertThat(models.map { it.positiveVariables() }).containsExactlyInAnyOrder(
-            TreeSet(f.variables("@VER_i_i1_1", "@VER_i_i2_3")),
-            TreeSet(f.variables("@VER_i_i1_3", "@VER_i_i2_1")),
-            TreeSet(f.variables("@VER_i_i1_3", "@VER_i_i2_2")),
-            TreeSet(f.variables("@VER_i_i1_3", "@VER_i_i2_3")),
-            TreeSet(f.variables("@VER_i_i1_4", "@VER_i_i2_1")),
-            TreeSet(f.variables("@VER_i_i1_4", "@VER_i_i2_2")),
-            TreeSet(f.variables("@VER_i_i1_4", "@VER_i_i2_3")),
-            TreeSet(f.variables("@VER_i_i1_4", "@VER_i_i3_1")),
-            TreeSet(f.variables("@VER_i_i1_4", "@VER_i_i3_2")),
-            TreeSet(f.variables("@VER_i_i1_4", "@VER_i_i3_3")),
-            TreeSet(f.variables("@VER_i_i1_4")),
-            TreeSet(f.variables("b1", "@VER_i_i1_4", "@VER_i_i3_3")),
+        assertThat(models).hasSize(11)
+        assertThat(models.map { it.positiveVariables() }).contains(
+            TreeSet(f.variables("@VER_i1_1", "@VER_i2_3")),
+            TreeSet(f.variables("@VER_i1_3", "@VER_i2_1")),
+            TreeSet(f.variables("@VER_i1_3", "@VER_i2_2")),
+            TreeSet(f.variables("@VER_i1_3", "@VER_i2_3")),
+            TreeSet(f.variables("@VER_i1_4", "@VER_i2_1")),
+            TreeSet(f.variables("@VER_i1_4", "@VER_i2_2")),
+            TreeSet(f.variables("@VER_i1_4", "@VER_i2_3")),
+            TreeSet(f.variables("@VER_i1_4", "@VER_i3_1")),
+            TreeSet(f.variables("@VER_i1_4", "@VER_i3_2")),
+            TreeSet(f.variables("@VER_i1_4")),
+            TreeSet(f.variables("b1", "@VER_i1_4", "@VER_i3_3")),
         )
     }
 }

@@ -1,0 +1,21 @@
+header {
+  prl_version 1.0
+}
+
+versioned feature SoundHelper
+versioned feature Tidal
+versioned feature Spotify
+versioned feature SoundModuleAdvanced
+versioned feature MusicPlus
+versioned feature SoundModule
+
+rule if Spotify[=2] then SoundModuleAdvanced[>=1]
+rule if Spotify[=1] then SoundModule[>=1] / SoundModuleAdvanced[>=1]
+rule if SoundModuleAdvanced[=2] thenNot SoundModule[>=1]
+rule if Tidal[=1] then SoundModule[=2] / SoundModuleAdvanced[=2]
+rule if SoundModule[=1] thenNot SoundModuleAdvanced[>=1]
+rule if SoundModuleAdvanced[=1] thenNot SoundModule[>=1]
+rule if SoundModule[=2] then SoundHelper[>=1]
+rule if SoundModule[=2] thenNot SoundModuleAdvanced[>=1]
+rule if MusicPlus[=2] then Spotify[>=2] / Tidal[>=1]
+
