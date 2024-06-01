@@ -1,0 +1,18 @@
+# IntelliJ IDEA files
+.idea/
+.idea_modules/
+*.iml
+
+# vim swap files
+*.swp
+
+# compiled files
+target/
+
+# temporary test files
+src/test/resources/excel_exports
+
+# LSP
+.settings
+.classpath
+.project
