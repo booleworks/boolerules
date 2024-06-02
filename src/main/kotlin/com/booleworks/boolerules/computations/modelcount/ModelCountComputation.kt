@@ -19,7 +19,7 @@ import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.modelcounting.ModelCounter
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
-import com.booleworks.prl.transpiler.TranslationInfo
+import com.booleworks.prl.transpiler.TranspilationInfo
 import java.math.BigInteger
 
 val MODELCOUNT = object : ComputationType<
@@ -58,26 +58,25 @@ internal object ModelCountComputation :
     override fun computeForSlice(
         request: ModelCountRequest,
         slice: Slice,
-        info: TranslationInfo,
+        info: TranspilationInfo,
         model: PrlModel,
         cf: CspFactory,
         status: ComputationStatusBuilder,
     ): ModelCountInternalResult {
         // currently no projected model counting
         // val variables = computeRelevantVars(f, info, listOf())
-        val f = cf.formulaFactory()
         val variables = info.knownVariables.toSortedSet()
         val formulas = info.propositions.map { it.formula() }
         if (!status.successful()) {
             return ModelCountInternalResult(slice, BigInteger.ZERO)
         }
-        return ModelCountInternalResult(slice, ModelCounter.count(f, formulas, variables))
+        return ModelCountInternalResult(slice, ModelCounter.count(cf.formulaFactory(), formulas, variables))
     }
 
     override fun computeDetailForSlice(
         slice: Slice,
         model: PrlModel,
-        info: TranslationInfo,
+        info: TranspilationInfo,
         additionalConstraints: List<String>,
         splitProperties: Set<String>,
         cf: CspFactory

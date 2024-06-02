@@ -4,7 +4,7 @@
 package com.booleworks.boolerules.computations.generic
 
 import com.booleworks.logicng.formulas.Variable
-import com.booleworks.prl.transpiler.TranslationInfo
+import com.booleworks.prl.transpiler.TranspilationInfo
 import com.fasterxml.jackson.annotation.JsonIgnore
 import io.swagger.v3.oas.annotations.media.Schema
 
@@ -37,11 +37,11 @@ data class FeatureModelDO(
  * Extracts a model of a given set of variables (which are the positive
  * variables of the model) and returns a list of typed features.
  */
-internal fun extractModel(variables: Collection<Variable>, info: TranslationInfo): FeatureModelDO =
+internal fun extractModel(variables: Collection<Variable>, info: TranspilationInfo): FeatureModelDO =
     FeatureModelDO(variables.filter { info.knownVariables.contains(it) }
         .map { variable -> extractFeature(variable, info) }.sorted())
 
-internal fun extractFeature(variable: Variable, info: TranslationInfo) =
+internal fun extractFeature(variable: Variable, info: TranspilationInfo) =
     if (info.booleanVariables.contains(variable)) {
         FeatureDO.boolean(variable.name(), true)
     } else if (info.enumVariables.contains(variable)) {

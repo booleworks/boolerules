@@ -24,7 +24,7 @@ import com.booleworks.logicng.solvers.SATSolver
 import com.booleworks.logicng.solvers.sat.SATSolverConfig
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
-import com.booleworks.prl.transpiler.TranslationInfo
+import com.booleworks.prl.transpiler.TranspilationInfo
 
 val CONSISTENCY = object : ComputationType<
         ConsistencyRequest,
@@ -66,7 +66,7 @@ internal object ConsistencyComputation :
     override fun computeForSlice(
         request: ConsistencyRequest,
         slice: Slice,
-        info: TranslationInfo,
+        info: TranspilationInfo,
         model: PrlModel,
         cf: CspFactory,
         status: ComputationStatusBuilder,
@@ -96,7 +96,7 @@ internal object ConsistencyComputation :
     override fun computeDetailForSlice(
         slice: Slice,
         model: PrlModel,
-        info: TranslationInfo,
+        info: TranspilationInfo,
         additionalConstraints: List<String>,
         splitProperties: Set<String>,
         cf: CspFactory
@@ -104,7 +104,7 @@ internal object ConsistencyComputation :
         val solver = prepareSolver(cf, true, info)
         return solver.satCall().solve().use { satCall ->
             assert(satCall.satResult == Tristate.FALSE) { "Detail computation should only be called for inconsistent slices" }
-            val explanation = computeExplanation(satCall, model.propertyStore.allDefinitions(), cf)
+            val explanation = computeExplanation(satCall, model.propertyStore.allDefinitions(), info.cf)
             val result = ConsistencyInternalResult(slice, false, null, explanation)
             SplitComputationDetail(result, splitProperties)
         }
@@ -113,7 +113,7 @@ internal object ConsistencyComputation :
     private fun prepareSolver(
         cf: CspFactory,
         proofTracing: Boolean,
-        info: TranslationInfo,
+        info: TranspilationInfo,
     ): SATSolver {
         val f = cf.formulaFactory()
         val solver = SATSolver.newSolver(f, SATSolverConfig.builder().proofGeneration(proofTracing).build()).apply {

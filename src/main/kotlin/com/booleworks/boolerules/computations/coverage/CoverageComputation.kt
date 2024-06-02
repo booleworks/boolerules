@@ -27,7 +27,7 @@ import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSAT
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
 import com.booleworks.prl.model.slices.SliceSelection
-import com.booleworks.prl.transpiler.TranslationInfo
+import com.booleworks.prl.transpiler.TranspilationInfo
 import com.booleworks.prl.transpiler.transpileModel
 import java.util.SortedSet
 
@@ -70,12 +70,12 @@ internal object CoverageComputation :
     override fun computeForSlice(
         request: CoverageRequest,
         slice: Slice,
-        info: TranslationInfo,
+        info: TranspilationInfo,
         model: PrlModel,
         cf: CspFactory,
         status: ComputationStatusBuilder,
     ): CoverageInternalResult {
-        val (baseFormula, constraintsToCover, invalidConstraints) = initialize(request, slice, info, model, cf, status)
+        val (baseFormula, constraintsToCover, invalidConstraints) = initialize(request, slice, info, cf, status)
             ?: return CoverageInternalResult(slice, emptyList(), 0)
 
         val f = cf.formulaFactory()
@@ -98,7 +98,7 @@ internal object CoverageComputation :
     override fun computeDetailForSlice(
         slice: Slice,
         model: PrlModel,
-        info: TranslationInfo,
+        info: TranspilationInfo,
         additionalConstraints: List<String>,
         splitProperties: Set<String>,
         cf: CspFactory
@@ -107,21 +107,16 @@ internal object CoverageComputation :
     private fun initialize(
         request: CoverageRequest,
         slice: Slice,
-        translation: TranslationInfo,
-        model: PrlModel,
+        info: TranspilationInfo,
         cf: CspFactory,
         status: ComputationStatusBuilder
     ): CoverageInitialization? {
-        val baseConstraints = translation.propositions.map { it.formula() }.toMutableList()
-        baseConstraints += request.additionalConstraints.mapNotNull {
-            processConstraint(cf, it, model, translation, status)
-        }
+        val baseConstraints = info.propositions.map { it.formula() }.toMutableList()
         val (invalidConstraints, constraintsToCover) = computeConstraintsToCover(
             cf,
             baseConstraints,
             request,
-            model,
-            translation,
+            info,
             slice,
             status
         ) ?: return null
@@ -134,8 +129,7 @@ internal object CoverageComputation :
         cf: CspFactory,
         baseConstraints: List<Formula>,
         request: CoverageRequest,
-        model: PrlModel,
-        info: TranslationInfo,
+        info: TranspilationInfo,
         slice: Slice,
         status: ComputationStatusBuilder,
     ): Pair<Int, Map<Variable, Pair<Formula, String>>>? {
@@ -145,7 +139,8 @@ internal object CoverageComputation :
         val validConstraints = mutableListOf<Pair<Formula, String>>()
         val invalidConstraints = mutableListOf<String>()
         for (constraint in request.constraintsToCover) {
-            val formula = processConstraint(cf, constraint, model, info, status) ?: return null
+            val cPair = info.translateConstraint(f, constraint) ?: return null
+            val formula = cPair.second
             if (baseSolver.satCall().addFormulas(formula).sat() == Tristate.FALSE) {
                 invalidConstraints.add(constraint)
             } else {
@@ -262,7 +257,13 @@ internal object CoverageComputation :
         maxConfigurations: Int
     ): CoverageGraphResponse {
         val cf = CspFactory(FormulaFactory.caching())
-        val modelTranslation = transpileModel(cf, model, sliceSelection)
+        val modelTranslation = transpileModel(
+            cf,
+            model,
+            sliceSelection,
+            additionalConstraints = request.additionalConstraints,
+            considerConstraints = request.considerConstraints()
+        )
         require(modelTranslation.computations.size == 1) { "Expected to get exactly one slice" }
         val slice = modelTranslation.allSlices.first()
         val translation = modelTranslation.computations.first().info
@@ -271,7 +272,6 @@ internal object CoverageComputation :
                 request,
                 slice,
                 translation,
-                model,
                 cf,
                 ComputationStatusBuilder("", "", ComputationVariant.SINGLE)
             )!!

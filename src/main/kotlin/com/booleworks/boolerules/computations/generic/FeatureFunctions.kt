@@ -5,15 +5,11 @@ package com.booleworks.boolerules.computations.generic
 
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.formulas.Variable
-import com.booleworks.prl.transpiler.TranslationInfo
+import com.booleworks.prl.transpiler.TranspilationInfo
 import java.util.SortedSet
 import java.util.TreeSet
 
-fun computeRelevantVars(
-    f: FormulaFactory,
-    info: TranslationInfo,
-    features: List<String>,
-): SortedSet<Variable> =
+fun computeRelevantVars(f: FormulaFactory, info: TranspilationInfo, features: List<String>): SortedSet<Variable> =
     if (features.isEmpty()) {
         val intSatVariables =
             info.integerVariables.flatMap { info.encodingContext.variableMap[it.variable]?.values ?: emptySet() }

@@ -30,7 +30,9 @@ data class OptimizationRequest(
 
     @field:Schema(description = "A list of weightings for constraints")
     val weightings: List<WeightPair>
-) : ComputationRequest
+) : ComputationRequest {
+    override fun considerConstraints() = weightings.map { it.constraint }
+}
 
 @Schema(description = "A pair of constraint and it's weighting")
 data class WeightPair(

@@ -19,7 +19,7 @@ import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSAT.MaxSATResult.OPTI
 import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSATConfig
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
-import com.booleworks.prl.transpiler.TranslationInfo
+import com.booleworks.prl.transpiler.TranspilationInfo
 
 val RECONFIGURATION = object : ComputationType<
         ReconfigurationRequest,
@@ -60,7 +60,7 @@ object ReconfigurationComputation :
     override fun computeDetailForSlice(
         slice: Slice,
         model: PrlModel,
-        info: TranslationInfo,
+        info: TranspilationInfo,
         additionalConstraints: List<String>,
         splitProperties: Set<String>,
         cf: CspFactory
@@ -69,14 +69,14 @@ object ReconfigurationComputation :
     override fun computeForSlice(
         request: ReconfigurationRequest,
         slice: Slice,
-        translation: TranslationInfo,
+        info: TranspilationInfo,
         model: PrlModel,
         cf: CspFactory,
         status: ComputationStatusBuilder
     ): ReconfigurationInternalResult {
         val f = cf.formulaFactory()
         val (validFeatures, invalidFeatures) = request.configuration.map { f.variable(it) }
-            .partition { it in translation.knownVariables }
+            .partition { it in info.knownVariables }
         if (invalidFeatures.isNotEmpty()) {
             status.addWarning(
                 "The order contains invalid features which must always be removed: ${
@@ -87,13 +87,13 @@ object ReconfigurationComputation :
             )
         }
         val configuration = validFeatures.toSet()
-        val notInConfiguration = translation.knownVariables - configuration
+        val notInConfiguration = info.knownVariables - configuration
 
-        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, cf, translation).also {
+        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, f, info).also {
             if (!status.successful()) return ReconfigurationInternalResult(slice, emptyList(), emptyList())
         }
         val weightForRemoval = when (request.algorithm) {
-            ReconfigurationAlgorithm.MAX_COV -> translation.knownVariables.size
+            ReconfigurationAlgorithm.MAX_COV -> info.knownVariables.size
             ReconfigurationAlgorithm.MIN_DIFF -> 1
         }
         configuration.forEach { solver.addSoftFormula(it, weightForRemoval) }
