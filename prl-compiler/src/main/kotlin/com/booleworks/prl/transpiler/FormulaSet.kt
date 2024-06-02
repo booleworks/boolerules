@@ -139,13 +139,13 @@ interface TranspilerCoreInfo {
     fun translateConstraint(cf: CspFactory, input: String): Pair<Constraint, Formula>? {
         val processed = processConstraint(input, theoryMap) ?: return null
         val constraint = processed.constraint
-        val formula = transpileConstraint(cf, constraint, this, integerStore, versionStore)
+        val formula = transpileConstraint(cf, constraint, this)
         return Pair(constraint, formula)
     }
 }
 
 data class TranslationInfo(
-    val propositions: List<PrlProposition>,
+    val propositions: List<PrlProposition> = mutableListOf(),
     val knownVariables: Set<Variable>,
     override val integerStore: IntegerEncodingStore,
     override val theoryMap: Map<String, Theory>,

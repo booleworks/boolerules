@@ -62,7 +62,7 @@ fun encodeIntFeatures(
     cf: CspFactory,
     store: FeatureStore
 ): IntegerEncodingStore = IntegerEncodingStore(store.intFeatures.values.associate { defs ->
-    val reference = defs.first().code
+    val feature = defs.first().code
     val map1 = defs.mapIndexed { index, d ->
         val def = d as IntFeatureDefinition
         Pair(
@@ -80,7 +80,7 @@ fun encodeIntFeatures(
         val clauses = cf.encodeVariable(v.variable, context)
         cf.formulaFactory().and(clauses)
     }.toMutableMap()
-    Pair(reference, IntFeatureEncodingInfo(map1, map2))
+    Pair(feature, IntFeatureEncodingInfo(map1, map2))
 })
 
 fun createIntVariableEquivalence(

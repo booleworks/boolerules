@@ -72,15 +72,52 @@ fun transpileModel(
     val allSlices = computeAllSlices(selectors, model.propertyStore.allDefinitions(), maxNumberOfSlices)
     val sliceSets = computeSliceSets(allSlices, model)
     val context = CspEncodingContext()
-    val intVarDefinitions = encodeIntFeatures(context, cf, model.featureStore)
+    val intStore = encodeIntFeatures(context, cf, model.featureStore)
     val skippedConstraints = mutableListOf<String>()
     val theoryMap = model.featureStore.theoryMap
     val globalContraints = additionalConstraints.mapNotNull { processConstraint(it, theoryMap, skippedConstraints) }
     val consider = considerConstraints.mapNotNull { processConstraint(it, theoryMap, skippedConstraints) }
     return ModelTranslation(sliceSets.map {
-        transpileSliceSet(theoryMap, context, cf, intVarDefinitions, globalContraints, consider, it)
+        transpileSliceSet(theoryMap, context, cf, intStore, globalContraints, consider, it)
     }, skippedConstraints)
 }
+
+fun transpileSliceSet(
+    theoryMap: Map<String, Theory>,
+    context: CspEncodingContext,
+    cf: CspFactory,
+    ie: IntegerEncodingStore,
+    constraints: List<ConstraintRule>,
+    consider: List<ConstraintRule>,
+    sliceSet: SliceSet
+): SliceTranslation {
+    val f = cf.formulaFactory()
+    sliceSet.rules.addAll(constraints)
+    sliceSet.additionalConstraints.addAll(constraints)
+    val state = initState(theoryMap, context, cf, sliceSet, ie)
+    val propositions = sliceSet.rules.map { transpileRule(cf, it, sliceSet, state) }.toMutableList()
+    propositions += state.enumMapping.values.map {
+        PrlProposition(
+            RuleInformation(ENUM_FEATURE_CONSTRAINT, sliceSet),
+            f.exo(it.values)
+        )
+    }
+    propositions += state.intPredicateMapping.entries.map {
+        val lngPredicate = transpileIntPredicate(cf, ie, state.featureInstantiations, it.key)
+        val clauses = cf.encodeConstraint(lngPredicate, context)
+        val formula = f.equivalence(it.value, f.and(clauses))
+        PrlProposition(RuleInformation(INTEGER_PREDICATE_DEFINITION, sliceSet), formula)
+    }
+    propositions += state.integerVariables.map {
+        PrlProposition(
+            RuleInformation(INTEGER_VARIABLE),
+            ie.getEncoding(it)!!
+        )
+    }
+    propositions += versionPropositions(f, sliceSet, state.versionStore)
+    return SliceTranslation(sliceSet, state.toTranslationInfo(propositions, ie))
+}
+
 
 fun processConstraint(
     constraint: String,
@@ -101,55 +138,52 @@ fun transpileConstraint(
     cf: CspFactory,
     constraint: Constraint,
     info: TranspilerCoreInfo,
-    ie: IntegerEncodingStore,
-    vs: VersionStore?
-): Formula =
-    when (constraint) {
-        is Constant -> cf.formulaFactory().constant(constraint.value)
-        is VersionedBooleanFeature ->
-            if (info.booleanVariables.contains(cf.formulaFactory().variable(constraint.featureCode))) {
-                cf.formulaFactory().variable(constraint.featureCode)
-            } else {
-                cf.formulaFactory().falsum()
-            }
-        is BooleanFeature ->
-            if (info.booleanVariables.contains(cf.formulaFactory().variable(constraint.featureCode))) {
-                cf.formulaFactory().variable(constraint.featureCode)
-            } else {
-                cf.formulaFactory().falsum()
-            }
-        is Not -> cf.formulaFactory().not(transpileConstraint(cf, constraint.operand, info, ie, vs))
-        is Implication -> cf.formulaFactory().implication(
-            transpileConstraint(cf, constraint.left, info, ie, vs),
-            transpileConstraint(cf, constraint.right, info, ie, vs)
-        )
-        is Equivalence -> cf.formulaFactory().equivalence(
-            transpileConstraint(cf, constraint.left, info, ie, vs),
-            transpileConstraint(cf, constraint.right, info, ie, vs)
-        )
-        is And -> cf.formulaFactory()
-            .and(constraint.operands.map { transpileConstraint(cf, it, info, ie, vs) })
-        is Or -> cf.formulaFactory().or(constraint.operands.map { transpileConstraint(cf, it, info, ie, vs) })
-        is Amo -> cf.formulaFactory().amo(filterFeatures(cf.formulaFactory(), constraint.features, info))
-        is Exo -> cf.formulaFactory().exo(filterFeatures(cf.formulaFactory(), constraint.features, info))
-        is EnumComparisonPredicate -> translateEnumComparison(cf.formulaFactory(), info.enumMapping, constraint)
-        is EnumInPredicate -> translateEnumIn(cf.formulaFactory(), info.enumMapping, constraint)
-        is IntComparisonPredicate -> info.intPredicateMapping[constraint]
-            ?: cf.formulaFactory().and( // TODO still necessary at the end?
-                cf.encodeConstraint(
-                    transpileIntComparisonPredicate(cf, ie, info.featureInstantiations, constraint),
-                    info.encodingContext
-                )
+): Formula = when (constraint) {
+    is Constant -> cf.formulaFactory().constant(constraint.value)
+    is VersionedBooleanFeature ->
+        if (info.booleanVariables.contains(cf.formulaFactory().variable(constraint.featureCode))) {
+            cf.formulaFactory().variable(constraint.featureCode)
+        } else {
+            cf.formulaFactory().falsum()
+        }
+    is BooleanFeature ->
+        if (info.booleanVariables.contains(cf.formulaFactory().variable(constraint.featureCode))) {
+            cf.formulaFactory().variable(constraint.featureCode)
+        } else {
+            cf.formulaFactory().falsum()
+        }
+    is Not -> cf.formulaFactory().not(transpileConstraint(cf, constraint.operand, info))
+    is Implication -> cf.formulaFactory().implication(
+        transpileConstraint(cf, constraint.left, info),
+        transpileConstraint(cf, constraint.right, info)
+    )
+    is Equivalence -> cf.formulaFactory().equivalence(
+        transpileConstraint(cf, constraint.left, info),
+        transpileConstraint(cf, constraint.right, info)
+    )
+    is And -> cf.formulaFactory()
+        .and(constraint.operands.map { transpileConstraint(cf, it, info) })
+    is Or -> cf.formulaFactory().or(constraint.operands.map { transpileConstraint(cf, it, info) })
+    is Amo -> cf.formulaFactory().amo(filterFeatures(cf.formulaFactory(), constraint.features, info))
+    is Exo -> cf.formulaFactory().exo(filterFeatures(cf.formulaFactory(), constraint.features, info))
+    is EnumComparisonPredicate -> translateEnumComparison(cf.formulaFactory(), info.enumMapping, constraint)
+    is EnumInPredicate -> translateEnumIn(cf.formulaFactory(), info.enumMapping, constraint)
+    is IntComparisonPredicate -> info.intPredicateMapping[constraint]
+        ?: cf.formulaFactory().and( // TODO still necessary at the end?
+            cf.encodeConstraint(
+                transpileIntComparisonPredicate(cf, info.integerStore, info.featureInstantiations, constraint),
+                info.encodingContext
             )
-        is IntInPredicate -> info.intPredicateMapping[constraint]
-            ?: cf.formulaFactory().and( // TODO still necessary at the end?
-                cf.encodeConstraint(
-                    transpileIntInPredicate(cf, ie, info.featureInstantiations, constraint),
-                    info.encodingContext,
-                )
+        )
+    is IntInPredicate -> info.intPredicateMapping[constraint]
+        ?: cf.formulaFactory().and( // TODO still necessary at the end?
+            cf.encodeConstraint(
+                transpileIntInPredicate(cf, info.integerStore, info.featureInstantiations, constraint),
+                info.encodingContext,
             )
-        is VersionPredicate -> translateVersionComparison(cf, constraint, vs!!)
-    }
+        )
+    is VersionPredicate -> translateVersionComparison(cf, constraint, info.versionStore)
+}
 
 fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTranslation {
     val f = cf.formulaFactory()
@@ -263,82 +297,50 @@ fun mergeFeatureInstantiations(slices: List<SliceTranslation>): FeatureInstantia
     return FeatureInstantiation(booleanFeatureInstantiations, enumFeatureInstantiations, intFeatureInstantiations)
 }
 
-fun transpileSliceSet(
-    theoryMap: Map<String, Theory>,
-    context: CspEncodingContext,
-    cf: CspFactory,
-    ie: IntegerEncodingStore,
-    constraints: List<ConstraintRule>,
-    consider: List<ConstraintRule>,
-    sliceSet: SliceSet
-): SliceTranslation {
-    val f = cf.formulaFactory()
-    sliceSet.rules.addAll(constraints)
-    sliceSet.additionalConstraints.addAll(constraints)
-    val versionStore = if (sliceSet.hasVersionFeatures()) initVersionStore(sliceSet.rules) else VersionStore()
-    val state = initState(theoryMap, context, cf, sliceSet, ie, versionStore)
-    val propositions = sliceSet.rules.map { transpileRule(cf, it, sliceSet, state, ie, versionStore) }.toMutableList()
-    propositions += state.enumMapping.values.map {
-        PrlProposition(
-            RuleInformation(ENUM_FEATURE_CONSTRAINT, sliceSet),
-            f.exo(it.values)
-        )
-    }
-    propositions += state.intPredicateMapping.entries.map {
-        val lngPredicate = transpileIntPredicate(cf, ie, state.featureInstantiations, it.key)
-        val clauses = cf.encodeConstraint(lngPredicate, context)
-        val formula = f.equivalence(it.value, f.and(clauses))
-        PrlProposition(RuleInformation(INTEGER_PREDICATE_DEFINITION, sliceSet), formula)
-    }
-    propositions += state.integerVariables.map {
-        PrlProposition(
-            RuleInformation(INTEGER_VARIABLE),
-            ie.getEncoding(it)!!
-        )
-    }
-    if (versionStore != null) {
-        propositions += versionPropositions(f, sliceSet, versionStore)
-    }
-    return SliceTranslation(sliceSet, state.toTranslationInfo(propositions, ie))
-}
-
 private fun initState(
     theoryMap: Map<String, Theory>,
     context: CspEncodingContext,
     cf: CspFactory,
     sliceSet: SliceSet,
     integerEncodings: IntegerEncodingStore,
-    versionStore: VersionStore
-) = TranspilerState(
-    integerEncodings,
-    theoryMap = theoryMap,
-    featureInstantiations = getFeatureInstantiations(sliceSet),
-    intPredicateMapping = getAllIntPredicates(cf.formulaFactory(), sliceSet),
-    encodingContext = context,
-    versionStore = versionStore
-).apply {
-    sliceSet.rules.flatMap { it.features() }.filter { featureInstantiations[it] == null }
-        .forEach { unknownFeatures.add(it) }
-    booleanVariables.addAll(
-        featureInstantiations.booleanFeatures.values.map { cf.formulaFactory().variable(it.feature.featureCode) })
-    featureInstantiations.enumFeatures.values
-        .forEach { def ->
-            enumMapping[def.feature.featureCode] =
-                def.values.associateWith { enumFeature(cf.formulaFactory(), def.feature.featureCode, it) }
-        }
-    integerVariables.addAll(
-        featureInstantiations.integerFeatures.values
-            .map { integerEncodings.getVariable(featureInstantiations[it.feature]!!)!! }
+): TranspilerState {
+    val state = TranspilerState(
+        integerEncodings,
+        theoryMap = theoryMap,
+        featureInstantiations = getFeatureInstantiations(sliceSet),
+        intPredicateMapping = getAllIntPredicates(cf.formulaFactory(), sliceSet),
+        encodingContext = context,
+        versionStore = if (sliceSet.hasVersionFeatures()) initVersionStore(sliceSet.rules) else VersionStore()
     )
 
-    versionStore.usedValues.forEach { (fea, maxVer) ->
-        versionMapping[fea.featureCode] = mutableMapOf()
+    sliceSet.rules
+        .flatMap { it.features() }
+        .filter { state.featureInstantiations[it] == null }
+        .forEach { state.unknownFeatures.add(it) }
+
+    state.booleanVariables.addAll(
+        state.featureInstantiations.booleanFeatures.values.map { cf.formulaFactory().variable(it.feature.featureCode) })
+
+    state.featureInstantiations.enumFeatures.values
+        .forEach { def ->
+            state.enumMapping[def.feature.featureCode] =
+                def.values.associateWith { enumFeature(cf.formulaFactory(), def.feature.featureCode, it) }
+        }
+
+    state.integerVariables.addAll(
+        state.featureInstantiations.integerFeatures.values
+            .map { integerEncodings.getVariable(state.featureInstantiations[it.feature]!!)!! }
+    )
+
+    state.versionStore.usedValues.forEach { (fea, maxVer) ->
+        state.versionMapping[fea.featureCode] = mutableMapOf()
         for (ver in 1..maxVer) {
             val i = versionVar(cf.formulaFactory(), fea, ver)
-            versionMapping[fea.featureCode]!![ver] = i
-            versionVariables.add(i)
+            state.versionMapping[fea.featureCode]!![ver] = i
+            state.versionVariables.add(i)
         }
     }
+    return state
 }
 
 fun getFeatureInstantiations(sliceSet: SliceSet): FeatureInstantiation {
@@ -353,32 +355,30 @@ private fun transpileRule(
     r: AnyRule,
     sliceSet: SliceSet,
     state: TranspilerState,
-    ie: IntegerEncodingStore,
-    vs: VersionStore?
 ): PrlProposition =
     when (r) {
-        is ConstraintRule -> transpileConstraint(cf, r.constraint, state, ie, vs)
+        is ConstraintRule -> transpileConstraint(cf, r.constraint, state)
         is DefinitionRule -> cf.formulaFactory().equivalence(
-            transpileConstraint(cf, r.feature, state, ie, vs),
-            transpileConstraint(cf, r.definition, state, ie, vs)
+            transpileConstraint(cf, r.feature, state),
+            transpileConstraint(cf, r.definition, state)
         )
         is ExclusionRule -> cf.formulaFactory().implication(
-            transpileConstraint(cf, r.ifConstraint, state, ie, vs),
-            transpileConstraint(cf, r.thenNotConstraint, state, ie, vs).negate(cf.formulaFactory())
+            transpileConstraint(cf, r.ifConstraint, state),
+            transpileConstraint(cf, r.thenNotConstraint, state).negate(cf.formulaFactory())
         )
-        is ForbiddenFeatureRule -> transpileConstraint(cf, r.constraint, state, ie, vs)
-        is MandatoryFeatureRule -> transpileConstraint(cf, r.constraint, state, ie, vs)
+        is ForbiddenFeatureRule -> transpileConstraint(cf, r.constraint, state)
+        is MandatoryFeatureRule -> transpileConstraint(cf, r.constraint, state)
         is GroupRule -> transpileGroupRule(cf.formulaFactory(), r, state)
         is InclusionRule -> cf.formulaFactory().implication(
-            transpileConstraint(cf, r.ifConstraint, state, ie, vs),
-            transpileConstraint(cf, r.thenConstraint, state, ie, vs)
+            transpileConstraint(cf, r.ifConstraint, state),
+            transpileConstraint(cf, r.thenConstraint, state)
         )
-        is IfThenElseRule -> transpileConstraint(cf, r.ifConstraint, state, ie, vs).let { ifPart ->
+        is IfThenElseRule -> transpileConstraint(cf, r.ifConstraint, state).let { ifPart ->
             cf.formulaFactory().or(
-                cf.formulaFactory().and(ifPart, transpileConstraint(cf, r.thenConstraint, state, ie, vs)),
+                cf.formulaFactory().and(ifPart, transpileConstraint(cf, r.thenConstraint, state)),
                 cf.formulaFactory().and(
                     ifPart.negate(cf.formulaFactory()),
-                    transpileConstraint(cf, r.elseConstraint, state, ie, vs)
+                    transpileConstraint(cf, r.elseConstraint, state)
                 )
             )
         }
