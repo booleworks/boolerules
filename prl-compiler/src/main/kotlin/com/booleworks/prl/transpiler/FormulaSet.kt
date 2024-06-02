@@ -28,6 +28,7 @@ import com.booleworks.prl.model.slices.SliceSet
 import com.booleworks.prl.model.slices.SliceType.ALL
 import com.booleworks.prl.model.slices.SliceType.ANY
 import com.booleworks.prl.model.slices.SliceType.SPLIT
+import java.util.SortedMap
 
 typealias PrlProposition = ExtendedProposition<RuleInformation>
 
@@ -57,7 +58,7 @@ data class RuleInformation(val ruleType: RuleType, val rule: AnyRule?, val slice
 fun PrlProposition.substitute(f: FormulaFactory, substitution: Substitution) =
     PrlProposition(backpack(), formula().substitute(f, substitution))
 
-data class SliceTranslation(val sliceSet: SliceSet, val info: TranslationInfo) {
+data class SliceTranslation(val sliceSet: SliceSet, val info: TranspilationInfo) {
     val propositions = info.propositions
     val knownVariables = info.knownVariables
     val booleanVariables = info.booleanVariables
@@ -69,7 +70,7 @@ data class SliceTranslation(val sliceSet: SliceSet, val info: TranslationInfo) {
     val unknownFeatures = info.unknownFeatures
 }
 
-data class MergedSliceTranslation(val sliceSelectors: Map<String, SliceTranslation>, val info: TranslationInfo) {
+data class MergedSliceTranslation(val sliceSelectors: Map<String, SliceTranslation>, val info: TranspilationInfo) {
     val propositions = info.propositions
     val knownVariables = info.knownVariables
     val booleanVariables = info.booleanVariables
@@ -122,61 +123,54 @@ data class FeatureInstantiation(
     }
 }
 
-interface TranspilerCoreInfo {
-    val theoryMap: Map<String, Theory>
-    val featureInstantiations: FeatureInstantiation
-    val unknownFeatures: Set<Feature>
-    val booleanVariables: Set<Variable>
-    val integerVariables: Set<LngIntVariable>
+data class TranspilationInfo(
+    val cf: CspFactory, // The CSP and formula factory for the transpilation (model)
+    val theoryMap: Map<String, Theory>, // A mapping from each feature to its theory (model)
+    val featureInstantiations: FeatureInstantiation, // A mapping from each feature to its definition (slice)
+    val encodingContext: CspEncodingContext, // The context for CSP encodings (model)
+    val integerStore: IntegerStore, // The store for integer variables (model)
+    val intPredicateMapping: Map<IntPredicate, Variable>, // A mapping for all integer predicates (slice)
+    val versionMapping: Map<String, SortedMap<Int, Variable>>, // All known enum variables and their values (slice)
+    val booleanVariables: Set<Variable>, // All known boolean variables (slice)
+    val enumMapping: Map<String, Map<String, Variable>>, // All known enum variables and their values (slice)
+    val knownVariables: Set<Variable>, // All known problem variables (slice)
+    val unknownFeatures: Set<Feature>, // All used but unknown features (slice)
+
+    val propositions: MutableList<PrlProposition> = mutableListOf(),
+) {
+    val enumVariables: Set<Variable>
     val versionVariables: Set<Variable>
-    val enumMapping: Map<String, Map<String, Variable>>
-    val intPredicateMapping: Map<IntPredicate, Variable>
-    val encodingContext: CspEncodingContext
-    val versionMapping: Map<String, Map<Int, Variable>>
-    val integerStore: IntegerEncodingStore
-    val versionStore: VersionStore
+    val integerVariables: Set<LngIntVariable>
 
-    fun translateConstraint(cf: CspFactory, input: String): Pair<Constraint, Formula>? {
-        val processed = processConstraint(input, theoryMap) ?: return null
-        val constraint = processed.constraint
-        val formula = transpileConstraint(cf, constraint, this)
-        return Pair(constraint, formula)
-    }
-}
-
-data class TranslationInfo(
-    val propositions: List<PrlProposition> = mutableListOf(),
-    val knownVariables: Set<Variable>,
-    override val integerStore: IntegerEncodingStore,
-    override val theoryMap: Map<String, Theory>,
-    override val featureInstantiations: FeatureInstantiation,
-    override val booleanVariables: Set<Variable>,
-    override val integerVariables: Set<LngIntVariable>,
-    override val versionVariables: Set<Variable>,
-    override val enumMapping: Map<String, Map<String, Variable>>,
-    override val unknownFeatures: Set<Feature>,
-    override val intPredicateMapping: Map<IntPredicate, Variable>,
-    override val encodingContext: CspEncodingContext,
-    override val versionMapping: Map<String, Map<Int, Variable>>,
-    override val versionStore: VersionStore
-) : TranspilerCoreInfo {
-    val enumVariables: Set<Variable> = enumMapping.values.flatMap { it.values }.toSet()
     private val var2enum = mutableMapOf<Variable, Pair<String, String>>()
     private val var2version = mutableMapOf<Variable, Pair<String, Int>>()
 
     init {
+        enumVariables = mutableSetOf()
         enumMapping.forEach { (feature, vs) ->
             vs.forEach { (value, variable) ->
+                enumVariables.add(variable)
                 var2enum[variable] = Pair(feature, value)
             }
         }
+        versionVariables = mutableSetOf()
         versionMapping.forEach { (feature, vs) ->
-            vs.forEach { (value, variable) ->
-                var2version[variable] = Pair(feature, value)
+            vs.forEach { (ver, variable) ->
+                versionVariables.add(variable)
+                var2version[variable] = Pair(feature, ver)
             }
         }
+        integerVariables = featureInstantiations.integerFeatures.values
+            .map { integerStore.getVariable(featureInstantiations[it.feature]!!)!! }.toSet()
     }
 
     fun getFeatureAndValue(v: Variable) = var2enum[v]
     fun getFeatureAndVersion(v: Variable) = var2version[v]
+
+    fun translateConstraint(f: FormulaFactory, input: String): Pair<Constraint, Formula>? {
+        val processed = processConstraint(input, theoryMap) ?: return null
+        val constraint = processed.constraint
+        val formula = transpileConstraint(f, constraint, this)
+        return Pair(constraint, formula)
+    }
 }

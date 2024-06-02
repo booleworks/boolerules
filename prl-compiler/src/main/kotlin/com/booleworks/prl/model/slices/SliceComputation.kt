@@ -22,6 +22,7 @@ import com.booleworks.prl.model.SlicingPropertyDefinition
 import com.booleworks.prl.model.constraints.IntFeature
 import com.booleworks.prl.model.constraints.VersionedBooleanFeature
 import com.booleworks.prl.model.rules.AnyRule
+import com.booleworks.prl.model.rules.ConstraintRule
 import java.time.LocalDate
 import java.util.IdentityHashMap
 
@@ -32,9 +33,11 @@ class MaxNumberOfSlicesExceededException(override val message: String) : Excepti
 data class SliceSet(
     val slices: MutableList<Slice>,
     val definitions: List<AnyFeatureDef>,
-    val rules: MutableList<AnyRule>,
-    val additionalConstraints: MutableSet<AnyRule>
+    val rules: List<AnyRule>,
+    val additionalConstraints: List<ConstraintRule>,
+    val consideredConstraints: List<ConstraintRule>
 ) {
+    val allRules = rules + consideredConstraints
     fun hasIntFeatures() = definitions.any { it.feature is IntFeature }
     fun hasVersionFeatures() = definitions.any { it.feature is VersionedBooleanFeature }
 
@@ -46,7 +49,12 @@ data class SliceSet(
     }
 }
 
-fun computeSliceSets(slices: List<Slice>, model: PrlModel): List<SliceSet> {
+fun computeSliceSets(
+    slices: List<Slice>,
+    model: PrlModel,
+    constraints: List<ConstraintRule>,
+    consider: List<ConstraintRule>,
+): List<SliceSet> {
     class RuleFeatureIdentitySet(featureDefs: List<AnyFeatureDef>, rules: List<AnyRule>) {
         private val features = IdentityHashMap(featureDefs.associateWith { true })
         private val rules = IdentityHashMap(rules.associateWith { true })
@@ -65,9 +73,9 @@ fun computeSliceSets(slices: List<Slice>, model: PrlModel): List<SliceSet> {
     val sliceMap = mutableMapOf<RuleFeatureIdentitySet, SliceSet>()
     slices.forEach { slice ->
         val featureDefs = model.featureDefinitions(slice)
-        val rules = model.rules(slice).toMutableList()
+        val rules = model.rules(slice) + constraints
         sliceMap.computeIfAbsent(RuleFeatureIdentitySet(featureDefs, rules)) {
-            SliceSet(mutableListOf(), featureDefs, rules, mutableSetOf())
+            SliceSet(mutableListOf(), featureDefs, rules, constraints, consider)
         }.slices.add(slice)
     }
     return sliceMap.values.toList()

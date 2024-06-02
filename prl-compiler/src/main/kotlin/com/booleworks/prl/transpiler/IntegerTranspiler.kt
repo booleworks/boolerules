@@ -57,11 +57,11 @@ import com.booleworks.prl.transpiler.RuleType.FEATURE_EQUIVALENCE_OVER_SLICES
 const val PREDICATE_PREFIX = "@PREDICATE"
 const val FEATURE_DEF_PREFIX = "@DEF"
 
-fun encodeIntFeatures(
+fun initIntegerStore(
     context: CspEncodingContext,
     cf: CspFactory,
     store: FeatureStore
-): IntegerEncodingStore = IntegerEncodingStore(store.intFeatures.values.associate { defs ->
+): IntegerStore = IntegerStore(store.intFeatures.values.associate { defs ->
     val feature = defs.first().code
     val map1 = defs.mapIndexed { index, d ->
         val def = d as IntFeatureDefinition
@@ -124,7 +124,7 @@ fun createIntVariableEquivalence(
 
 fun getAllIntPredicates(f: FormulaFactory, sliceSet: SliceSet): MutableMap<IntPredicate, Variable> {
     val map = LinkedHashMap<IntPredicate, Variable>()
-    sliceSet.rules.forEach { rule ->
+    sliceSet.allRules.forEach { rule ->
         when (rule) {
             is ConstraintRule -> getAllIntPredicates(f, map, rule.constraint)
             is DefinitionRule -> {
@@ -176,7 +176,7 @@ fun getAllIntPredicates(f: FormulaFactory, map: MutableMap<IntPredicate, Variabl
 
 fun transpileIntPredicate(
     cf: CspFactory,
-    integerEncodings: IntegerEncodingStore,
+    integerEncodings: IntegerStore,
     instantiation: FeatureInstantiation,
     predicate: IntPredicate
 ): ComparisonPredicate =
@@ -187,7 +187,7 @@ fun transpileIntPredicate(
 
 fun transpileIntComparisonPredicate(
     cf: CspFactory,
-    integerEncodings: IntegerEncodingStore,
+    integerEncodings: IntegerStore,
     instantiation: FeatureInstantiation,
     predicate: IntComparisonPredicate
 ): ComparisonPredicate {
@@ -205,7 +205,7 @@ fun transpileIntComparisonPredicate(
 
 fun transpileIntInPredicate(
     cf: CspFactory,
-    integerEncodings: IntegerEncodingStore,
+    integerEncodings: IntegerStore,
     instantiation: FeatureInstantiation,
     predicate: IntInPredicate
 ): ComparisonPredicate {
@@ -216,7 +216,7 @@ fun transpileIntInPredicate(
 
 fun transpileIntTerm(
     cf: CspFactory,
-    integerEncodings: IntegerEncodingStore,
+    integerEncodings: IntegerStore,
     instantiation: FeatureInstantiation,
     term: IntTerm
 ): Term = when (term) {
@@ -231,13 +231,13 @@ fun transpileIntTerm(
 
 fun transpileIntMul(
     cf: CspFactory,
-    integerEncodings: IntegerEncodingStore,
+    integerEncodings: IntegerStore,
     instantiation: FeatureInstantiation,
     feature: IntMul
 ): Term = cf.mul(feature.coefficient, transpileIntFeature(integerEncodings, instantiation, feature.feature))
 
 fun transpileIntFeature(
-    integerEncodings: IntegerEncodingStore,
+    integerEncodings: IntegerStore,
     instantiation: FeatureInstantiation,
     feature: IntFeature
 ) = integerEncodings.getVariable(instantiation[feature]!!)!!.variable
@@ -248,7 +248,7 @@ fun transpileIntDomain(domain: PropertyRange<Int>): IntegerDomain = when (domain
     else -> throw IllegalArgumentException("Invalid integer domain ${domain.javaClass}")
 }
 
-data class IntegerEncodingStore(val store: Map<String, IntFeatureEncodingInfo>) : Cloneable {
+data class IntegerStore(val store: Map<String, IntFeatureEncodingInfo>) : Cloneable {
 
     fun getEncoding(variable: LngIntVariable) =
         getInfo(variable.feature)?.getEncoding(variable.variable)
@@ -258,10 +258,10 @@ data class IntegerEncodingStore(val store: Map<String, IntFeatureEncodingInfo>) 
 
     fun getInfo(feature: String) = store[feature]
 
-    public override fun clone() = IntegerEncodingStore(store.mapValues { (_, info) -> info.clone() })
+    public override fun clone() = IntegerStore(store.mapValues { (_, info) -> info.clone() })
 
     companion object {
-        fun empty() = IntegerEncodingStore(mutableMapOf())
+        fun empty() = IntegerStore(mutableMapOf())
     }
 }
 

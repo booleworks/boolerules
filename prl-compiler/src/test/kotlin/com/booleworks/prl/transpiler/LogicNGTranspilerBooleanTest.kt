@@ -17,15 +17,20 @@ class LogicNGTranspilerBooleanTest {
     private val model = PrlCompiler().compile(parseRuleFile("../test-files/prl/compiler/boolean_with_properties.prl"))
     private val rules = model.rules
     private val sliceSets =
-        computeSliceSets(computeAllSlices(listOf(), listOf(model.propertyDefinition("active"))), model)
+        computeSliceSets(
+            computeAllSlices(listOf(), listOf(model.propertyDefinition("active"))),
+            model,
+            listOf(),
+            listOf()
+        )
     private val ss1 = sliceSets[0]
     private val ss2 = sliceSets[1]
     private val f = FormulaFactory.caching()
     private val cf = CspFactory(f)
     private val context = CspEncodingContext()
-    private val varDef = encodeIntFeatures(context, cf, model.featureStore)
-    private val translation1 = transpileSliceSet(model.theoryMap(), context, cf, varDef, emptyList(), emptyList(), ss1)
-    private val translation2 = transpileSliceSet(model.theoryMap(), context, cf, varDef, emptyList(), emptyList(), ss2)
+    private val varDef = initIntegerStore(context, cf, model.featureStore)
+    private val translation1 = transpileSliceSet(model.theoryMap(), context, cf, varDef, ss1)
+    private val translation2 = transpileSliceSet(model.theoryMap(), context, cf, varDef, ss2)
     private val modelTranslation =
         transpileModel(cf, model, listOf(BooleanSliceSelection("active", BooleanRange.list(true))))
 

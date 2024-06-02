@@ -1,6 +1,8 @@
 package com.booleworks.prl.transpiler
 
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.csp.encodings.CspEncodingContext
+import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.prl.model.BooleanProperty
 import com.booleworks.prl.model.DateProperty
 import com.booleworks.prl.model.EnumProperty
@@ -58,22 +60,23 @@ class ModelTranslationTest {
         )
     )
 
+    private val cf = CspFactory(FormulaFactory.caching())
     private val st1 = SliceTranslation(
-        SliceSet(mutableListOf(s1), listOf(), mutableListOf(), mutableSetOf()), TranslationInfo(
-            listOf(), setOf(), IntegerEncodingStore.empty(), mapOf(), FeatureInstantiation.empty(),
-            setOf(), setOf(), setOf(), mapOf(), setOf(), mapOf(), CspEncodingContext(), mapOf(), VersionStore()
+        SliceSet(mutableListOf(s1), listOf(), mutableListOf(), listOf(), listOf()), TranspilationInfo(
+            cf, mapOf(), FeatureInstantiation.empty(), CspEncodingContext(), IntegerStore.empty(),
+            mapOf(), mapOf(), sortedSetOf(), mapOf(), setOf(), setOf()
         )
     )
     private val st2 = SliceTranslation(
-        SliceSet(mutableListOf(s2, s3), listOf(), mutableListOf(), mutableSetOf()), TranslationInfo(
-            listOf(), setOf(), IntegerEncodingStore.empty(), mapOf(), FeatureInstantiation.empty(),
-            setOf(), setOf(), setOf(), mapOf(), setOf(), mapOf(), CspEncodingContext(), mapOf(), VersionStore()
+        SliceSet(mutableListOf(s2, s3), listOf(), mutableListOf(), listOf(), listOf()), TranspilationInfo(
+            cf, mapOf(), FeatureInstantiation.empty(), CspEncodingContext(), IntegerStore.empty(),
+            mapOf(), mapOf(), sortedSetOf(), mapOf(), setOf(), setOf()
         )
     )
     private val st3 = SliceTranslation(
-        SliceSet(mutableListOf(s4), listOf(), mutableListOf(), mutableSetOf()), TranslationInfo(
-            listOf(), setOf(), IntegerEncodingStore.empty(), mapOf(), FeatureInstantiation.empty(),
-            setOf(), setOf(), setOf(), mapOf(), setOf(), mapOf(), CspEncodingContext(), mapOf(), VersionStore()
+        SliceSet(mutableListOf(s4), listOf(), mutableListOf(), listOf(), listOf()), TranspilationInfo(
+            cf, mapOf(), FeatureInstantiation.empty(), CspEncodingContext(), IntegerStore.empty(),
+            mapOf(), mapOf(), sortedSetOf(), mapOf(), setOf(), setOf()
         )
     )
 

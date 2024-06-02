@@ -467,7 +467,7 @@ class SliceComputationTest {
         val rules = model.rules
 
         val slices = computeAllSlices(listOf(), listOf(i1))
-        val sliceSets = computeSliceSets(slices, model)
+        val sliceSets = computeSliceSets(slices, model, listOf(), listOf())
 
         assertThat(slices).hasSize(9)
         assertThat(sliceSets).hasSize(7)
@@ -516,7 +516,7 @@ class SliceComputationTest {
         val release = model.propertyStore.definition("release")
 
         val slices = computeAllSlices(listOf(), listOf(version, release))
-        val sliceSets = computeSliceSets(slices, model)
+        val sliceSets = computeSliceSets(slices, model, listOf(), listOf())
 
         assertThat(slices).hasSize(45)
         assertThat(sliceSets).hasSize(4)
