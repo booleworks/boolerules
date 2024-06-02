@@ -29,6 +29,7 @@ data class PrlModel(
         return feature as T
     }
 
+    fun theoryMap() = featureStore.theoryMap
     fun features() = booleanFeatures() + enumFeatures() + intFeatures()
     fun booleanFeatures() = featureStore.booleanFeatures()
     fun enumFeatures() = featureStore.enumFeatures()

@@ -26,7 +26,6 @@ import com.booleworks.prl.parser.PrlBooleanFeatureDefinition
 import com.booleworks.prl.parser.PrlConstraintRule
 import com.booleworks.prl.parser.PrlDefinitionRule
 import com.booleworks.prl.parser.PrlExclusionRule
-import com.booleworks.prl.parser.PrlFeature
 import com.booleworks.prl.parser.PrlFeatureDefinition
 import com.booleworks.prl.parser.PrlFeatureRule
 import com.booleworks.prl.parser.PrlForbiddenFeatureRule
@@ -274,7 +273,7 @@ class PrlCompiler {
     }
 
     private fun validateFeature(prl: PrlFeatureRule, map: Tmap): Feature {
-        val theory = map[prl.feature]
+        val theory = map[prl.feature.featureCode]
         if (theory == Theory.BOOL && (prl.enumValue != null || prl.intValueOrVersion != null)) {
             return invalidBoolean()
         } else if (theory == Theory.VERSIONED_BOOL && prl.intValueOrVersion == null) {
@@ -337,5 +336,5 @@ internal class CompilerContext(
     }
 }
 
-typealias Tmap = Map<PrlFeature, Theory>
+typealias Tmap = Map<String, Theory>
 

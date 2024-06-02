@@ -6,7 +6,6 @@ import com.booleworks.prl.model.IntFeatureDefinition
 import com.booleworks.prl.model.IntRange
 import com.booleworks.prl.model.Theory
 import com.booleworks.prl.model.constraints.VersionedBooleanFeature
-import com.booleworks.prl.parser.PrlFeature
 
 val b1Definition = BooleanFeatureDefinition("b1")
 val b2Definition = BooleanFeatureDefinition("b2")
@@ -28,14 +27,14 @@ val i2 = i2Definition.feature
 val i3 = i3Definition.feature
 val v = vDefinition.feature as VersionedBooleanFeature
 
-val theoryMap: Map<PrlFeature, Theory> = mapOf(
-    Pair(PrlFeature("b1"), Theory.BOOL),
-    Pair(PrlFeature("b2"), Theory.BOOL),
-    Pair(PrlFeature("b3"), Theory.BOOL),
-    Pair(PrlFeature("v"), Theory.VERSIONED_BOOL),
-    Pair(PrlFeature("e1"), Theory.ENUM),
-    Pair(PrlFeature("e2"), Theory.ENUM),
-    Pair(PrlFeature("i1"), Theory.INT),
-    Pair(PrlFeature("i2"), Theory.INT),
-    Pair(PrlFeature("i3"), Theory.INT),
+val theoryMap: Map<String, Theory> = mapOf(
+    Pair("b1", Theory.BOOL),
+    Pair("b2", Theory.BOOL),
+    Pair("b3", Theory.BOOL),
+    Pair("v", Theory.VERSIONED_BOOL),
+    Pair("e1", Theory.ENUM),
+    Pair("e2", Theory.ENUM),
+    Pair("i1", Theory.INT),
+    Pair("i2", Theory.INT),
+    Pair("i3", Theory.INT),
 )

@@ -3,8 +3,10 @@
 
 package com.booleworks.prl.transpiler
 
+import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.csp.encodings.CspEncodingContext
 import com.booleworks.logicng.datastructures.Substitution
+import com.booleworks.logicng.formulas.Formula
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.formulas.Variable
 import com.booleworks.logicng.propositions.ExtendedProposition
@@ -12,6 +14,7 @@ import com.booleworks.logicng.propositions.PropositionBackpack
 import com.booleworks.prl.model.BooleanFeatureDefinition
 import com.booleworks.prl.model.EnumFeatureDefinition
 import com.booleworks.prl.model.IntFeatureDefinition
+import com.booleworks.prl.model.Theory
 import com.booleworks.prl.model.constraints.BooleanFeature
 import com.booleworks.prl.model.constraints.Constraint
 import com.booleworks.prl.model.constraints.EnumFeature
@@ -35,7 +38,6 @@ enum class RuleType(val description: String) {
     ENUM_FEATURE_CONSTRAINT("EXO constraint for enum feature values"),
     INTEGER_VARIABLE("Definition of an int feature"),
     INTEGER_PREDICATE_DEFINITION("Definition of predicate auxiliary variable"),
-    VERSION_INTERVAL_VARIABLE("Interval variable for versioned feature"),
     VERSION_AMO_CONSTRAINT("AMO constraint for versioned feature"),
     VERSION_EQUIVALENCE("Equivalence constraint for versioned feature"),
     ADDITIONAL_RESTRICTION("Additional user-provided restriction")
@@ -121,6 +123,7 @@ data class FeatureInstantiation(
 }
 
 interface TranspilerCoreInfo {
+    val theoryMap: Map<String, Theory>
     val featureInstantiations: FeatureInstantiation
     val unknownFeatures: Set<Feature>
     val booleanVariables: Set<Variable>
@@ -130,12 +133,22 @@ interface TranspilerCoreInfo {
     val intPredicateMapping: Map<IntPredicate, Variable>
     val encodingContext: CspEncodingContext
     val versionMapping: Map<String, Map<Int, Variable>>
+    val integerStore: IntegerEncodingStore
+    val versionStore: VersionStore
+
+    fun translateConstraint(cf: CspFactory, input: String): Pair<Constraint, Formula>? {
+        val processed = processConstraint(input, theoryMap) ?: return null
+        val constraint = processed.constraint
+        val formula = transpileConstraint(cf, constraint, this, integerStore, versionStore)
+        return Pair(constraint, formula)
+    }
 }
 
 data class TranslationInfo(
     val propositions: List<PrlProposition>,
     val knownVariables: Set<Variable>,
-    val integerEncodings: IntegerEncodingStore,
+    override val integerStore: IntegerEncodingStore,
+    override val theoryMap: Map<String, Theory>,
     override val featureInstantiations: FeatureInstantiation,
     override val booleanVariables: Set<Variable>,
     override val integerVariables: Set<LngIntVariable>,
@@ -145,6 +158,7 @@ data class TranslationInfo(
     override val intPredicateMapping: Map<IntPredicate, Variable>,
     override val encodingContext: CspEncodingContext,
     override val versionMapping: Map<String, Map<Int, Variable>>,
+    override val versionStore: VersionStore
 ) : TranspilerCoreInfo {
     val enumVariables: Set<Variable> = enumMapping.values.flatMap { it.values }.toSet()
     private val var2enum = mutableMapOf<Variable, Pair<String, String>>()

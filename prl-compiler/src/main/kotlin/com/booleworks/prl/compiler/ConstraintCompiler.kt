@@ -83,7 +83,7 @@ class ConstraintCompiler {
         }
 
     private fun compileBooleanFeature(feature: PrlFeature, theoryMap: Tmap) =
-        when (val theory = theoryMap[feature]) {
+        when (val theory = theoryMap[feature.featureCode]) {
             null -> unknownFeature(feature)
             Theory.BOOL -> boolFt(feature.featureCode)
             Theory.VERSIONED_BOOL -> versionFt(feature.featureCode)
@@ -96,7 +96,7 @@ class ConstraintCompiler {
     ): Collection<BooleanFeature> =
         mutableListOf<BooleanFeature>().apply {
             features.forEach {
-                when (val theory = featuresMap[it]) {
+                when (val theory = featuresMap[it.featureCode]) {
                     null -> unknownFeature(it)
                     Theory.BOOL -> add(boolFt(it.featureCode))
                     else -> wrongFeatureTheory(it, theory, Theory.BOOL)
@@ -105,14 +105,14 @@ class ConstraintCompiler {
         }
 
     private fun compileIntFeature(feature: PrlFeature, theoryMap: Tmap): IntFeature =
-        when (val theory = theoryMap[feature]) {
+        when (val theory = theoryMap[feature.featureCode]) {
             null -> unknownFeature(feature)
             Theory.INT -> intFt(feature.featureCode)
             else -> wrongFeatureTheory(feature, theory, Theory.INT)
         }
 
     private fun compileEnumFeature(feature: PrlFeature, theoryMap: Tmap): EnumFeature =
-        when (val theory = theoryMap[feature]) {
+        when (val theory = theoryMap[feature.featureCode]) {
             null -> unknownFeature(feature)
             Theory.ENUM -> enumFt(feature.featureCode)
             else -> wrongFeatureTheory(feature, theory, Theory.ENUM)
@@ -252,7 +252,7 @@ class ConstraintCompiler {
     ): Theory {
         var theory: Theory? = null
         predicate.features().forEach { feature ->
-            theoryMap[feature].let { found ->
+            theoryMap[feature.featureCode].let { found ->
                 when {
                     found == null -> unknownFeature(feature)
                     theory == null -> theory = found

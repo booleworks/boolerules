@@ -47,31 +47,31 @@ data class FeatureStore internal constructor(
         addDefinitionToMap(definition, slicingProperties, map, isGroup, state)
     }
 
-    private fun fullTheoryMap(): Map<PrlFeature, Theory> {
-        val map = mutableMapOf<PrlFeature, Theory>()
+    private fun fullTheoryMap(): Map<String, Theory> {
+        val map = mutableMapOf<String, Theory>()
         booleanFeatures.forEach { (k, v) ->
             if ((v.first() as BooleanFeatureDefinition).versioned) {
-                map[PrlFeature(k)] = Theory.VERSIONED_BOOL
+                map[k] = Theory.VERSIONED_BOOL
             } else {
-                map[PrlFeature(k)] = Theory.BOOL
+                map[k] = Theory.BOOL
             }
         }
-        enumFeatures.keys.forEach { map[PrlFeature(it)] = Theory.ENUM }
-        intFeatures.keys.forEach { map[PrlFeature(it)] = Theory.INT }
+        enumFeatures.keys.forEach { map[it] = Theory.ENUM }
+        intFeatures.keys.forEach { map[it] = Theory.INT }
         return map
     }
 
     internal fun generateTheoryMap(
         features: Collection<PrlFeature>,
         state: CompilerState
-    ): Map<PrlFeature, Theory> {
-        val map = mutableMapOf<PrlFeature, Theory>()
+    ): Map<String, Theory> {
+        val map = mutableMapOf<String, Theory>()
         for (feature in features) {
             val definitions = findMatchingDefinitions(feature.featureCode)
             if (definitions.isEmpty()) {
                 state.addError("No feature definition found for ${feature.featureCode}")
             } else {
-                map[feature] = when (val def = definitions.first()) {
+                map[feature.featureCode] = when (val def = definitions.first()) {
                     is BooleanFeatureDefinition -> if (def.versioned) Theory.VERSIONED_BOOL else Theory.BOOL
                     is EnumFeatureDefinition -> Theory.ENUM
                     is IntFeatureDefinition -> Theory.INT

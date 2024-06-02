@@ -15,6 +15,7 @@ import com.booleworks.prl.model.BooleanFeatureDefinition
 import com.booleworks.prl.model.EnumFeatureDefinition
 import com.booleworks.prl.model.IntFeatureDefinition
 import com.booleworks.prl.model.PrlModel
+import com.booleworks.prl.model.Theory
 import com.booleworks.prl.model.constraints.Amo
 import com.booleworks.prl.model.constraints.And
 import com.booleworks.prl.model.constraints.BooleanFeature
@@ -65,31 +66,33 @@ fun transpileModel(
     model: PrlModel,
     selectors: List<AnySliceSelection>,
     maxNumberOfSlices: Int = MAXIMUM_NUMBER_OF_SLICES,
-    additionalConstraints: List<String> = emptyList()
+    additionalConstraints: List<String> = emptyList(),
+    considerConstraints: List<String> = emptyList(),
 ): ModelTranslation {
     val allSlices = computeAllSlices(selectors, model.propertyStore.allDefinitions(), maxNumberOfSlices)
     val sliceSets = computeSliceSets(allSlices, model)
     val context = CspEncodingContext()
     val intVarDefinitions = encodeIntFeatures(context, cf, model.featureStore)
     val skippedConstraints = mutableListOf<String>()
-    val globalContraints = additionalConstraints.mapNotNull { processConstraint(it, model, skippedConstraints) }
+    val theoryMap = model.featureStore.theoryMap
+    val globalContraints = additionalConstraints.mapNotNull { processConstraint(it, theoryMap, skippedConstraints) }
+    val consider = considerConstraints.mapNotNull { processConstraint(it, theoryMap, skippedConstraints) }
     return ModelTranslation(sliceSets.map {
-        transpileSliceSet(context, cf, intVarDefinitions, globalContraints, it)
+        transpileSliceSet(theoryMap, context, cf, intVarDefinitions, globalContraints, consider, it)
     }, skippedConstraints)
 }
 
 fun processConstraint(
     constraint: String,
-    model: PrlModel,
-    skippedConstraints: MutableList<String>,
+    theoryMap: Map<String, Theory>,
+    skippedConstraints: MutableList<String>? = null,
 ): ConstraintRule? {
     val parsed = parseConstraint<PrlConstraint>(constraint)
-    val theoryMap = model.featureStore.theoryMap
     try {
         val compiled = ConstraintCompiler().compileConstraint(parsed, theoryMap)
         return ConstraintRule(compiled, description = "Additional Constraint")
     } catch (_: CoCoException) {
-        skippedConstraints.add(constraint)
+        skippedConstraints?.add(constraint)
         return null
     }
 }
@@ -158,7 +161,7 @@ fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTran
     val booleanVariables = mutableSetOf<Variable>()
     val intPredicateMapping = mutableMapOf<IntPredicate, Variable>()
     val encodingContext = CspEncodingContext(slices[0].info.encodingContext)
-    val integerEncodings = slices[0].info.integerEncodings.clone()
+    val integerEncodings = slices[0].info.integerStore.clone()
 
     val instantiation = mergeFeatureInstantiations(slices)
     instantiation.integerFeatures.values.forEach {
@@ -224,6 +227,7 @@ fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTran
             propositions,
             knownVariables,
             integerEncodings,
+            mapOf(), // TODO merged theory map
             instantiation,
             booleanVariables,
             integerVariables,
@@ -232,7 +236,8 @@ fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTran
             unknownFeatures,
             intPredicateMapping,
             encodingContext,
-            mapOf() //TODO merged version features
+            mapOf(), //TODO merged version features
+            VersionStore()  //TODO merged version features
         )
     )
 }
@@ -259,17 +264,19 @@ fun mergeFeatureInstantiations(slices: List<SliceTranslation>): FeatureInstantia
 }
 
 fun transpileSliceSet(
+    theoryMap: Map<String, Theory>,
     context: CspEncodingContext,
     cf: CspFactory,
     ie: IntegerEncodingStore,
     constraints: List<ConstraintRule>,
+    consider: List<ConstraintRule>,
     sliceSet: SliceSet
 ): SliceTranslation {
     val f = cf.formulaFactory()
     sliceSet.rules.addAll(constraints)
     sliceSet.additionalConstraints.addAll(constraints)
-    val versionStore = if (sliceSet.hasVersionFeatures()) initVersionStore(sliceSet.rules) else null
-    val state = initState(context, cf, sliceSet, ie, versionStore)
+    val versionStore = if (sliceSet.hasVersionFeatures()) initVersionStore(sliceSet.rules) else VersionStore()
+    val state = initState(theoryMap, context, cf, sliceSet, ie, versionStore)
     val propositions = sliceSet.rules.map { transpileRule(cf, it, sliceSet, state, ie, versionStore) }.toMutableList()
     propositions += state.enumMapping.values.map {
         PrlProposition(
@@ -296,15 +303,19 @@ fun transpileSliceSet(
 }
 
 private fun initState(
+    theoryMap: Map<String, Theory>,
     context: CspEncodingContext,
     cf: CspFactory,
     sliceSet: SliceSet,
     integerEncodings: IntegerEncodingStore,
-    versionStore: VersionStore?
+    versionStore: VersionStore
 ) = TranspilerState(
+    integerEncodings,
+    theoryMap = theoryMap,
     featureInstantiations = getFeatureInstantiations(sliceSet),
     intPredicateMapping = getAllIntPredicates(cf.formulaFactory(), sliceSet),
-    encodingContext = context
+    encodingContext = context,
+    versionStore = versionStore
 ).apply {
     sliceSet.rules.flatMap { it.features() }.filter { featureInstantiations[it] == null }
         .forEach { unknownFeatures.add(it) }
@@ -320,7 +331,7 @@ private fun initState(
             .map { integerEncodings.getVariable(featureInstantiations[it.feature]!!)!! }
     )
 
-    versionStore?.usedValues?.forEach { (fea, maxVer) ->
+    versionStore.usedValues.forEach { (fea, maxVer) ->
         versionMapping[fea.featureCode] = mutableMapOf()
         for (ver in 1..maxVer) {
             val i = versionVar(cf.formulaFactory(), fea, ver)
@@ -394,6 +405,8 @@ private fun filterFeatures(f: FormulaFactory, fs: Collection<BooleanFeature>, in
     fs.filter { info.booleanVariables.contains(f.variable(it.featureCode)) }.map { f.variable(it.featureCode) }
 
 data class TranspilerState(
+    override val integerStore: IntegerEncodingStore,
+    override val theoryMap: Map<String, Theory>,
     override val featureInstantiations: FeatureInstantiation,
     override val unknownFeatures: MutableSet<Feature> = mutableSetOf(),
     override val booleanVariables: MutableSet<Variable> = mutableSetOf(),
@@ -403,6 +416,7 @@ data class TranspilerState(
     override val intPredicateMapping: MutableMap<IntPredicate, Variable> = mutableMapOf(),
     override val encodingContext: CspEncodingContext,
     override val versionMapping: MutableMap<String, MutableMap<Int, Variable>> = mutableMapOf(),
+    override val versionStore: VersionStore
 ) : TranspilerCoreInfo {
     private fun knownVariables() = (booleanVariables + enumMapping.values.flatMap { it.values }).toSortedSet()
     fun toTranslationInfo(propositions: List<PrlProposition>, integerEncodings: IntegerEncodingStore) =
@@ -410,6 +424,7 @@ data class TranspilerState(
             propositions,
             knownVariables(),
             integerEncodings,
+            theoryMap,
             featureInstantiations,
             booleanVariables,
             integerVariables,
@@ -418,6 +433,7 @@ data class TranspilerState(
             unknownFeatures,
             intPredicateMapping,
             encodingContext,
-            versionMapping
+            versionMapping,
+            versionStore
         )
 }
