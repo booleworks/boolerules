@@ -129,7 +129,7 @@ private fun handleAddRemove(
     }
     when (solver.solve()) {
         MaxSAT.MaxSATResult.OPTIMUM -> return extractResult(slice, req, info, solver.model())
-        MaxSAT.MaxSATResult.UNDEF -> throw IllegalStateException("cannot happen, not called with handler")
+        MaxSAT.MaxSATResult.UNDEF -> error("cannot happen, not called with handler")
         MaxSAT.MaxSATResult.UNSATISFIABLE -> {
             status.addWarning("installation request for slice $slice is not satisfiable -> skipping")
             return PackageSolvingInternalResult(slice, listOf(), listOf(), listOf())
@@ -158,7 +158,7 @@ private fun handleUpgrade(
     }
     when (solver.solve()) {
         MaxSAT.MaxSATResult.OPTIMUM -> return extractResult(slice, req, info, solver.model())
-        MaxSAT.MaxSATResult.UNDEF -> throw IllegalStateException("cannot happen, not called with handler")
+        MaxSAT.MaxSATResult.UNDEF -> error("cannot happen, not called with handler")
         MaxSAT.MaxSATResult.UNSATISFIABLE -> {
             status.addWarning("installation request for slice $slice is not satisfiable -> skipping")
             return PackageSolvingInternalResult(slice, listOf(), listOf(), listOf())

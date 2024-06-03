@@ -32,9 +32,7 @@ data class PackageSolvingRequest(
     @field:Schema(description = "Update a maximum number of packages to their latest version")
     val update: Boolean = false,
 ) : ComputationRequest {
-    override fun considerConstraints(): List<String> {
-        return currentInstallation + install + remove
-    }
+    override fun considerConstraints() = currentInstallation + install + remove
 
     fun isUpdateRequest() = update
 }
