@@ -5,7 +5,6 @@ package com.booleworks.boolerules.computations.generic
 
 import com.booleworks.boolerules.config.ComputationConfig
 import com.booleworks.logicng.csp.CspFactory
-import com.booleworks.logicng.formulas.Formula
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.formulas.FormulaFactoryConfig
 import com.booleworks.logicng.formulas.FormulaFactoryConfig.FormulaMergeStrategy.IMPORT
@@ -14,21 +13,15 @@ import com.booleworks.logicng.solvers.MaxSATSolver
 import com.booleworks.logicng.solvers.SATSolver
 import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSATConfig
 import com.booleworks.logicng.solvers.sat.SATSolverConfig
-import com.booleworks.prl.compiler.ConstraintCompiler
 import com.booleworks.prl.model.FeatureDefinition
 import com.booleworks.prl.model.PrlModel
-import com.booleworks.prl.model.Theory
 import com.booleworks.prl.model.slices.AnySliceSelection
 import com.booleworks.prl.model.slices.Slice
-import com.booleworks.prl.parser.PrlConstraint
 import com.booleworks.prl.parser.PrlFeature
-import com.booleworks.prl.parser.parseConstraint
-import com.booleworks.prl.transpiler.IntegerEncodingStore
 import com.booleworks.prl.transpiler.ModelTranslation
 import com.booleworks.prl.transpiler.SliceTranslation
-import com.booleworks.prl.transpiler.TranslationInfo
+import com.booleworks.prl.transpiler.TranspilationInfo
 import com.booleworks.prl.transpiler.mergeSlices
-import com.booleworks.prl.transpiler.transpileConstraint
 import com.booleworks.prl.transpiler.transpileModel
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -96,14 +89,13 @@ sealed class Computation<
      * @param info the translation info including propositions, variables and
      *             variable mappings
      * @param model the compiled PRL model
-     * @param cf the CSP factory for the computation
      * @param status the status builder
      * @return the internal result for the computation
      */
     internal abstract fun computeForSlice(
         request: REQUEST,
         slice: Slice,
-        info: TranslationInfo,
+        info: TranspilationInfo,
         model: PrlModel,
         cf: CspFactory,
         status: ComputationStatusBuilder,
@@ -123,7 +115,8 @@ sealed class Computation<
         request.validateAndAugmentSliceSelection(model, allowedSliceTypes())
         val modelTranslation = transpileModel(
             cspFactory, model, request.modelSliceSelection(),
-            additionalConstraints = request.additionalConstraints
+            additionalConstraints = request.additionalConstraints,
+            considerConstraints = request.considerConstraints()
         )
         status.numberOfSlices = modelTranslation.allSlices.size
         status.sliceSets = computeProjectedSliceSets(modelTranslation.computations, request)
@@ -224,12 +217,12 @@ sealed class Computation<
 
     internal fun satSolver(
         config: SATSolverConfig,
-        cf: CspFactory,
-        info: TranslationInfo,
+        f: FormulaFactory,
+        info: TranspilationInfo,
         slice: Slice,
         status: ComputationStatusBuilder
     ): SATSolver {
-        val solver = SATSolver.newSolver(cf.formulaFactory(), config)
+        val solver = SATSolver.newSolver(f, config)
         solver.addPropositions(info.propositions)
         if (!solver.sat()) {
             status.addWarning(
@@ -243,41 +236,12 @@ sealed class Computation<
     internal fun maxSat(
         config: MaxSATConfig,
         algo: (FormulaFactory, MaxSATConfig) -> MaxSATSolver,
-        cf: CspFactory,
-        info: TranslationInfo,
+        f: FormulaFactory,
+        info: TranspilationInfo,
     ): MaxSATSolver {
-        val solver = algo(cf.formulaFactory(), config)
+        val solver = algo(f, config)
         info.propositions.forEach { solver.addHardFormula(it.formula()) }
         return solver
-    }
-
-    internal fun processConstraint(
-        cf: CspFactory,
-        constraint: String,
-        model: PrlModel,
-        info: TranslationInfo,
-        status: ComputationStatusBuilder
-    ): Formula? {
-        val parsed = parseConstraint<PrlConstraint>(constraint)
-        val theoryMap = model.featureStore.theoryMap
-        if (!checkTheoryMap(parsed, theoryMap, status)) return null
-        val compiled = ConstraintCompiler().compileConstraint(parsed, theoryMap)
-        // TODO: integer store & version store
-        return transpileConstraint(cf, compiled, info, IntegerEncodingStore.empty(), null)
-    }
-
-    private fun checkTheoryMap(
-        parsed: PrlConstraint,
-        theoryMap: Map<PrlFeature, Theory>,
-        status: ComputationStatusBuilder
-    ): Boolean {
-        parsed.features().forEach { feature ->
-            if (!theoryMap.contains(feature)) {
-                errorResult(status, "Feature '${feature.featureCode}' not defined in current rule files")
-                return false
-            }
-        }
-        return true
     }
 
     private fun errorResult(
@@ -312,11 +276,18 @@ abstract class SingleComputation<
         model: PrlModel,
         sliceSelection: List<AnySliceSelection>,
         additionalConstraints: List<String>,
+        considerConstraints: List<String>,
         splitProperties: Set<String>
     ): SplitComputationDetail<DETAIL> {
         val f = FormulaFactory.caching()
         val cf = CspFactory(f)
-        val modelTranslation = transpileModel(cf, model, sliceSelection, additionalConstraints = additionalConstraints)
+        val modelTranslation = transpileModel(
+            cf,
+            model,
+            sliceSelection,
+            additionalConstraints = additionalConstraints,
+            considerConstraints = considerConstraints
+        )
         assert(modelTranslation.computations.size == 1) { "Expected to get exactly one slice" }
         val slice = modelTranslation.allSlices.first()
         val translation = modelTranslation.computations.first().info
@@ -326,12 +297,11 @@ abstract class SingleComputation<
     abstract fun computeDetailForSlice(
         slice: Slice,
         model: PrlModel,
-        info: TranslationInfo,
+        info: TranspilationInfo,
         additionalConstraints: List<String>,
         splitProperties: Set<String>,
         cf: CspFactory
     ): SplitComputationDetail<DETAIL>
-
 }
 
 abstract class ListComputation<

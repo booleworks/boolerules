@@ -25,7 +25,7 @@ import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSAT.MaxSATResult.OPTI
 import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSATConfig
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
-import com.booleworks.prl.transpiler.TranslationInfo
+import com.booleworks.prl.transpiler.TranspilationInfo
 
 val MINMAXCONFIG =
     object : ComputationType<MinMaxConfigRequest, MinMaxConfigResponse, Int, MinMaxConfigDetail, NoElement> {
@@ -68,14 +68,14 @@ internal object MinMaxConfigComputation :
     override fun computeForSlice(
         request: MinMaxConfigRequest,
         slice: Slice,
-        info: TranslationInfo,
+        info: TranspilationInfo,
         model: PrlModel,
         cf: CspFactory,
         status: ComputationStatusBuilder,
     ): MinMaxInternalResult {
         val f = cf.formulaFactory()
         val relevantVars = computeRelevantVars(f, info, request.features)
-        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, cf, info)
+        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, cf.formulaFactory(), info)
         relevantVars.forEach { solver.addSoftFormula(f.literal(it.name(), request.computationType == MAX), 1) }
         return if (solver.solve() == OPTIMUM) {
             val example = extractModel(solver.model().positiveVariables(), info)
@@ -93,7 +93,7 @@ internal object MinMaxConfigComputation :
     override fun computeDetailForSlice(
         slice: Slice,
         model: PrlModel,
-        info: TranslationInfo,
+        info: TranspilationInfo,
         additionalConstraints: List<String>,
         splitProperties: Set<String>,
         cf: CspFactory

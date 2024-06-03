@@ -31,7 +31,9 @@ data class CoverageRequest(
                 "must be covered. So for constraints A, B, and C, the combinations A+B, A+C, and B+C must be covered."
     )
     val pairwiseCover: Boolean = false
-) : ComputationRequest
+) : ComputationRequest {
+    override fun considerConstraints() = constraintsToCover
+}
 
 @Schema(description = "The details for a coverage computation")
 data class CoverageDetail(

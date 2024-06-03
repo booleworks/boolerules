@@ -4,7 +4,6 @@
 package com.booleworks.boolerules.service
 
 import com.booleworks.boolerules.computations.backbone.BACKBONE
-import com.booleworks.boolerules.computations.bomcheck.BOMCHECK
 import com.booleworks.boolerules.computations.computationManagementRoute
 import com.booleworks.boolerules.computations.consistency.CONSISTENCY
 import com.booleworks.boolerules.computations.coverage.COVERAGE
@@ -15,6 +14,7 @@ import com.booleworks.boolerules.computations.minmaxconfig.MINMAXCONFIG
 import com.booleworks.boolerules.computations.modelcount.MODELCOUNT
 import com.booleworks.boolerules.computations.modelenumeration.MODELENUMERATION
 import com.booleworks.boolerules.computations.optimization.OPTIMIZATION
+import com.booleworks.boolerules.computations.packagesolving.PACKAGESOLVING
 import com.booleworks.boolerules.computations.reconfiguration.RECONFIGURATION
 import com.booleworks.boolerules.config.ApplicationConfig
 import com.booleworks.boolerules.config.ComputationConfig
@@ -112,16 +112,15 @@ fun Application.module() {
             route(PATH_COMPUTATION) { addComputationApi(OPTIMIZATION, this@route) }
             route(PATH_COMPUTATION) { detailsRoute(OPTIMIZATION) }
 
-            route(PATH_COMPUTATION) { addComputationApi(BOMCHECK, this@route) }
-            route(PATH_COMPUTATION) { detailsRoute(BOMCHECK) }
-
             route(PATH_COMPUTATION) { addComputationApi(COVERAGE, this@route) }
             route(PATH_COMPUTATION) { detailsRoute(COVERAGE) }
             route(PATH_COMPUTATION) { coverageGraphRoute() }
 
             route(PATH_COMPUTATION) { addComputationApi(RECONFIGURATION, this@route) }
 
-            // Rulefile management
+            route(PATH_COMPUTATION) { addComputationApi(PACKAGESOLVING, this@route) }
+
+            // Rule file management
             route(PATH_RULEFILE) { rulefileRoute() }
             route(PATH_EXPORT) { exportRoute() }
 

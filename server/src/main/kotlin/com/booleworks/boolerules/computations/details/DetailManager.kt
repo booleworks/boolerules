@@ -58,7 +58,9 @@ private fun computeConsistencyDetail(request: DetailRequest): DetailResponse<NoE
         }
         val constraints = consistencyReq.additionalConstraints
         val splitProperties = consistencyReq.splitProperties()
-        computationDetail = ConsistencyComputation.computeDetail(model, sliceSelection, constraints, splitProperties)
+        computationDetail = ConsistencyComputation.computeDetail(
+            model, sliceSelection, constraints, listOf(), splitProperties
+        )
     }
     return DetailResponse(null, mainResult, computationDetail)
 }

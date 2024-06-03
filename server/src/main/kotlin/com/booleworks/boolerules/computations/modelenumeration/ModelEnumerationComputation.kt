@@ -24,7 +24,7 @@ import com.booleworks.logicng.formulas.Variable
 import com.booleworks.logicng.solvers.SATSolver
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
-import com.booleworks.prl.transpiler.TranslationInfo
+import com.booleworks.prl.transpiler.TranspilationInfo
 import java.util.SortedSet
 
 val MODELENUMERATION = object : ComputationType<
@@ -77,7 +77,7 @@ internal object ModelEnumerationComputation : ListComputation<
     override fun computeForSlice(
         request: ModelEnumerationRequest,
         slice: Slice,
-        info: TranslationInfo,
+        info: TranspilationInfo,
         model: PrlModel,
         cf: CspFactory,
         status: ComputationStatusBuilder,
@@ -85,7 +85,7 @@ internal object ModelEnumerationComputation : ListComputation<
         val f = cf.formulaFactory()
         val relevantVars = computeRelevantVars(f, info, request.features)
 
-        val solver = satSolver(NON_PT_CONFIG, cf, info, slice, status).also {
+        val solver = satSolver(NON_PT_CONFIG, f, info, slice, status).also {
             if (!status.successful()) return ModelEnumerationInternalResult(slice, mutableMapOf())
         }
         addTautologyClauses(solver, relevantVars)

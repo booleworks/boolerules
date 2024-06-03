@@ -158,8 +158,7 @@ internal class ReconfigurationComputationTest : TestWithConfig() {
         assertThat(status.statistics.numberOfSliceComputations).isEqualTo(1)
         assertThat(status.errors).isEmpty()
         assertThat(status.warnings).containsExactly(
-            "The order contains invalid features which must always be "
-                    + "removed: YYYY, XXXX"
+            "The order contains invalid features which must always be removed: YYYY, XXXX"
         )
         assertThat(status.infos).isEmpty()
 

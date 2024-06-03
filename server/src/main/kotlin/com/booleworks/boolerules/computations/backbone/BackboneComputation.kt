@@ -23,7 +23,7 @@ import com.booleworks.boolerules.computations.generic.extractFeature
 import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
-import com.booleworks.prl.transpiler.TranslationInfo
+import com.booleworks.prl.transpiler.TranspilationInfo
 
 val BACKBONE =
     object : ComputationType<
@@ -72,15 +72,16 @@ internal object BackboneComputation : ListComputation<
     override fun computeForSlice(
         request: BackboneRequest,
         slice: Slice,
-        info: TranslationInfo,
+        info: TranspilationInfo,
         model: PrlModel,
         cf: CspFactory,
         status: ComputationStatusBuilder,
     ): BackboneInternalResult {
+        val f = cf.formulaFactory()
         val result = BackboneInternalResult(slice, LinkedHashMap())
-        val relevantVars = computeRelevantVars(cf.formulaFactory(), info, request.features)
+        val relevantVars = computeRelevantVars(f, info, request.features)
 
-        val solver = satSolver(NON_PT_CONFIG, cf, info, slice, status).also { if (!status.successful()) return result }
+        val solver = satSolver(NON_PT_CONFIG, f, info, slice, status).also { if (!status.successful()) return result }
         val backbone = solver.backbone(relevantVars)
         if (backbone.isSat) {
             backbone.positiveBackbone.forEach { result.backbone[extractFeature(it, info)] = BackboneType.MANDATORY }

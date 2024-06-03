@@ -25,7 +25,7 @@ import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSAT.MaxSATResult.OPTI
 import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSATConfig
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
-import com.booleworks.prl.transpiler.TranslationInfo
+import com.booleworks.prl.transpiler.TranspilationInfo
 import kotlin.math.absoluteValue
 
 val OPTIMIZATION = object : ComputationType<
@@ -71,24 +71,26 @@ internal object OptimizationComputation :
     override fun computeForSlice(
         request: OptimizationRequest,
         slice: Slice,
-        info: TranslationInfo,
+        info: TranspilationInfo,
         model: PrlModel,
         cf: CspFactory,
         status: ComputationStatusBuilder,
     ): OptimizationInternalResult {
-        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, cf, info)
+        val f = cf.formulaFactory()
+        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, f, info)
         val mapping = mutableMapOf<Formula, Int>()
         val constraintMap = mutableMapOf<Formula, String>()
         request.weightings.forEach { wp ->
-            val constraint = processConstraint(cf, wp.constraint, model, info, status)
-            if (constraint == null) {
+            val cPair = info.translateConstraint(f, wp.constraint)
+            if (cPair == null) {
                 status.addError("Could not process constraint ${wp.constraint}")
             } else {
+                val constraint = cPair.second
                 val formula =
                     if (request.computationType == MIN && wp.weight >= 0 ||
                         request.computationType == MAX && wp.weight < 0
                     ) {
-                        constraint.negate(cf.formulaFactory())
+                        constraint.negate(f)
                     } else {
                         constraint
                     }
@@ -119,7 +121,7 @@ internal object OptimizationComputation :
     override fun computeDetailForSlice(
         slice: Slice,
         model: PrlModel,
-        info: TranslationInfo,
+        info: TranspilationInfo,
         additionalConstraints: List<String>,
         splitProperties: Set<String>,
         cf: CspFactory

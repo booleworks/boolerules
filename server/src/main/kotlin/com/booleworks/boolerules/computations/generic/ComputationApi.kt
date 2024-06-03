@@ -50,6 +50,8 @@ interface ComputationRequest {
     val sliceSelection: MutableList<PropertySelectionDO>
     val additionalConstraints: List<String>
 
+    fun considerConstraints(): List<String> = listOf()
+
     fun validateAndAugmentSliceSelection(model: PrlModel, allowedSliceTypes: Set<SliceTypeDO>) {
         val sliceMap = sliceSelection.associateBy { it.property }
         for (def in model.propertyStore.allDefinitions()) {
