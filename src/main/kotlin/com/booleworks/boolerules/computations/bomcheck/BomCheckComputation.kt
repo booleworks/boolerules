@@ -82,6 +82,7 @@ internal object BomCheckComputation :
         val positionElements: MutableList<PositionElementDO> = mutableListOf()
         // check if solver is sat with the rules from rule file
         request.positions.forEach { position ->
+            val stateBeforePosition = solver.saveState()
             val positionConstraint = processConstraint(f, position.constraint, model, info, status)
             solver.add(positionConstraint)
             if (!solver.sat()) {
@@ -102,28 +103,31 @@ internal object BomCheckComputation :
                         deadPVs.add(pv)
                     }
                 }
-                val initialState = solver.saveState()
-                solver.add(pvConstraint)
-                if (!solver.sat()) {
-                    // Do something
-                }
-                solver.loadState(initialState)
             }
 
             // Check if position is complete -> (Detail with example that does not hit a pv?)
-            val initialState = solver.saveState()
-            pvConstraintMap.values.forEach {
-                solver.add(f.not(it.formula()))
+            // a position is complete if there is no solution if all pvs are not buildable
+            val allPvConstraintsNegatedConjunction = f.and(pvConstraintMap.values.map { f.not(it.formula()) })
+            solver.satCall().addFormulas(allPvConstraintsNegatedConjunction).solve().use { satCall ->
+                if (satCall.satResult != Tristate.TRUE) {
+                    // TODO generate model as example
+                    isComplete = false
+                }
             }
-            if (solver.sat()) {
-                // TODO generate model as example
-                isComplete = false
-            }
-            solver.loadState(initialState)
+
 
             // Check if pv is unique (?) -> List of pvs and a flag that indicates if it is unique
-            // Add pv rule to solver and next rule to solver then check if satisfiable -> if yes, then the two rules are not unique
-
+            val pvConstraintIterator = pvConstraintMap.iterator()
+            while (pvConstraintIterator.hasNext()) {
+                val currentPv = pvConstraintIterator.next()
+                pvConstraintIterator.forEachRemaining {
+                    solver.satCall().addPropositions(currentPv.value, it.value).solve().use { satCall ->
+                        if (satCall.satResult == Tristate.TRUE) {
+                            nonUniquePVs.add(Pair(currentPv.key, it.key))
+                        }
+                    }
+                }
+            }
 
             // build result
             positionElements.add(
@@ -132,14 +136,15 @@ internal object BomCheckComputation :
                     position.description,
                     position.constraint,
                     isComplete,
-                    nonUniquePVs.isEmpty(),
-                    deadPVs.isEmpty()
+                    nonUniquePVs.isNotEmpty(),
+                    deadPVs.isNotEmpty()
                 )
             )
 
+            solver.loadState(stateBeforePosition)
         }
 
-        TODO()
+        return BomCheckInternalResult(slice, positionElements.associateWith { slice }.toMutableMap())
     }
 
     override fun extractElements(internalResult: BomCheckInternalResult): Set<PositionElementDO> = internalResult.positions.keys

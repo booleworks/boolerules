@@ -69,7 +69,7 @@ data class PositionElementDO(
     val description: String,
 
     @field:Schema(description = "The formula for the position")
-    val formula: String,
+    val constraint: String,
 
     @field:Schema(description = "A flag that indicates if the position is complete")
     val isComplete: Boolean,
