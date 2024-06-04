@@ -33,8 +33,6 @@ data class PackageSolvingRequest(
     val update: Boolean = false,
 ) : ComputationRequest {
     override fun considerConstraints() = currentInstallation + install + remove
-
-    fun isUpdateRequest() = update
 }
 
 @Schema(description = "The result of the package solving request")

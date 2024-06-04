@@ -90,7 +90,7 @@ object PackageSolvingComputation :
             ?: return PackageSolvingInternalResult(slice, emptyList(), emptyList(), emptyList())
 
         val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, f, info)
-        return if (!request.isUpdateRequest()) {
+        return if (!request.update) {
             handleAddRemove(f, req, solver, info, slice, status)
         } else {
             handleUpgrade(f, req, solver, info, slice, status)
