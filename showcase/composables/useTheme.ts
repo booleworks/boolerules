@@ -7,7 +7,7 @@ export default () => {
     const THEME_LINK = 'theme-link'
     const DARK = 'bw-dark'
     const LIGHT = 'bw-light'
-    const currentTheme = ref(useSessionStorage(THEME, DARK))
+    const currentTheme = ref(useSessionStorage(THEME, LIGHT))
 
     const switchTheme = () => {
         const ct = currentTheme.value

@@ -18,7 +18,7 @@ export default defineNuxtConfig({
                 {
                     id: 'theme-link',
                     rel: 'stylesheet',
-                    href: '/themes/bw-dark/theme.css'
+                    href: '/themes/bw-light/theme.css'
                 }
             ],
         },

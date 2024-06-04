@@ -20,6 +20,12 @@ export type Configuration = {
     features: { feature: string }[]
 }
 
+export type SoftwareElement = {
+    package: string
+    version: string
+    action: string
+}
+
 // Generic computation datatypes
 export type SingleComputationResponse<MAIN> = {
     status: ComputationStatus

@@ -20,9 +20,10 @@
         <MenuItem v-for="algo in optimizationAlgos" :item="algo" />
         <!-- <div class="menu-header"><i class="pi pi pi-fw pi-sitemap"></i>{{ $t('computation.header_bom').toUpperCase() }}</div> -->
         <!-- <MenuItem v-for="algo in bomAlgos" :item="algo" /> -->
-        <!-- <div class="menu-header"><i class="pi pi pi-fw pi-desktop"></i>{{ $t('computation.header_software').toUpperCase() }} -->
-        <!-- </div> -->
-        <!-- <MenuItem v-for="algo in softwareAlgos" :item="algo" /> -->
+        <div class="menu-header"><i class="pi pi pi-fw pi-desktop"></i>{{
+            $t('computation.header_software').toUpperCase() }}
+        </div>
+        <MenuItem v-for="algo in softwareAlgos" :item="algo" />
         <!-- <div class="menu-header"><i class="pi pi pi-fw pi-share-alt"></i>{{ $t('computation.header_vis').toUpperCase() }} -->
         <!-- </div> -->
         <!-- <MenuItem v-for="algo in visualizationAlgos" :item="algo" /> -->
@@ -55,11 +56,11 @@ const optimizationAlgos = ref([
 //   { label: t('computation.pos_uniqueness'), to: '' },
 //   { label: t('computation.pos_dead'), to: '' },
 // ])
-// const softwareAlgos = ref([
-//   { label: t('computation.pkg_buildability'), to: '' },
-//   { label: t('computation.pkg_solving'), to: '' },
-//   { label: t('computation.pkg_optimization'), to: '' },
-// ])
+const softwareAlgos = ref([
+    //   { label: t('computation.pkg_buildability'), to: '' },
+    { label: t('computation.pkg_solving'), to: '/computation/software/packagesolving' },
+    //   { label: t('computation.pkg_optimization'), to: '' },
+])
 // const visualizationAlgos = ref([
 //   { label: t('computation.constraint_graph'), to: '' },
 //   { label: t('computation.feature_cloud'), to: '' },
