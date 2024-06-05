@@ -8,40 +8,46 @@
             class="md:w-8rem" />
     </td>
     <td v-if="booleanValues && booleanValues.length > 0">
-        <Dropdown v-if="onlySingleSlice" v-model="singleBooleanValue" :options="booleanValues" :placeholder="$t('slices.single_select')" />
-        <MultiSelect v-else v-model="selection.range.booleanValues" :options="booleanValues" :placeholder="$t('slices.filter')" />
+        <Dropdown v-if="onlySingleSlice" v-model="singleBooleanValue" :options="booleanValues"
+            :placeholder="$t('slices.single_select')" />
+        <MultiSelect v-else v-model="selection.range.booleanValues" :options="booleanValues"
+            :placeholder="$t('slices.filter')" />
     </td>
     <td v-if="enumValues && enumValues.length > 0">
         <div>
-            <Dropdown v-if="onlySingleSlice" v-model="singleEnumValue" :options="enumValues" :placeholder="$t('slices.single_select')" />
-            <MultiSelect v-else v-model="selection.range.enumValues" :options="enumValues" :placeholder="$t('slices.filter')" />
+            <Dropdown v-if="onlySingleSlice" v-model="singleEnumValue" :options="enumValues"
+                :placeholder="$t('slices.single_select')" />
+            <MultiSelect v-else v-model="selection.range.enumValues" :options="enumValues"
+                :placeholder="$t('slices.filter')" />
         </div>
     </td>
     <td v-else-if="intValues && intValues.length > 0 && onlySingleSlice">
-        <Dropdown v-model="singleIntValue" :options="intValues" :placeholder="$t('slices.single_select')" :disabled="selection.range.intMin != null || selection.range.intMax != null" />
+        <Dropdown v-model="singleIntValue" :options="intValues" :placeholder="$t('slices.single_select')"
+            :disabled="selection.range.intMin != null || selection.range.intMax != null" />
     </td>
     <td v-else-if="intValues && intValues.length > 0">
         <MultiSelect v-model="selection.range.intValues" :options="intValues" :placeholder="$t('slices.filter')"
-                     :disabled="selection.range.intMin != null || selection.range.intMax != null" class="mr-3" />
+            :disabled="selection.range.intMin != null || selection.range.intMax != null" class="mr-3" />
         <InputNumber v-model="selection.range.intMin" placeholder="From" mode="decimal" showButtons id="intStart"
-            :min="intStart" :max="intEnd" :disabled="selection.range.intValues && selection.range.intValues.length > 0" class="mr-3" />
+            :min="intStart" :max="intEnd" :disabled="selection.range.intValues && selection.range.intValues.length > 0"
+            class="mr-3" />
         <InputNumber v-model="selection.range.intMax" placeholder="To" mode="decimal" showButtons :min="intStart"
             :max="intEnd" :disabled="selection.range.intValues && selection.range.intValues.length > 0" />
     </td>
     <td v-else-if="dateValues && dateValues.length > 0 && onlySingleSlice">
         <Dropdown v-model="singleDateValue" :options="dateValues" :placeholder="$t('slices.single_select')"
-                     :disabled="selection.range.dateMin != null || selection.range.dateMax != null" />
+            :disabled="selection.range.dateMin != null || selection.range.dateMax != null" />
     </td>
     <td v-else-if="dateValues && dateValues.length > 0">
         <MultiSelect v-model="selection.range.dateValues" :options="dateValues" :placeholder="$t('slices.filter')"
             :disabled="selection.range.dateMin != null || selection.range.dateMax != null
                 " class="mr-3" />
-        <Calendar id="dateFrom" v-model="selection.range.dateMin" :placeholder="$t('slices.from')" showIcon showButtonBar
-                  dateFormat="yy-mm-dd" :minDate="dateStart" :maxDate="dateEnd"
-                  :disabled="selection.range.dateValues && selection.range.dateValues.length > 0" class="mr-3" />
+        <Calendar id="dateFrom" v-model="selection.range.dateMin" :placeholder="$t('slices.from')" showIcon
+            showButtonBar dateFormat="yy-mm-dd" :minDate="dateStart" :maxDate="dateEnd"
+            :disabled="selection.range.dateValues && selection.range.dateValues.length > 0" class="mr-3" />
         <Calendar id="dateTo" v-model="selection.range.dateMax" :placeholder="$t('slices.to')" dateFormat="yy-mm-dd"
-                  :minDate="dateStart" :maxDate="dateEnd" showIcon showButtonBar
-                  :disabled="selection.range.dateValues && selection.range.dateValues.length > 0" />
+            :minDate="dateStart" :maxDate="dateEnd" showIcon showButtonBar
+            :disabled="selection.range.dateValues && selection.range.dateValues.length > 0" />
     </td>
 </template>
 
@@ -81,19 +87,19 @@ const dateEnd = computed(() =>
 );
 const singleBooleanValue = computed({
     get() { return props.selection.range.booleanValues && props.selection.range.booleanValues.length > 0 ? props.selection.range.booleanValues[0] : null },
-    set(newValue: boolean) { props.selection.range.booleanValues = newValue ? [newValue] : []}
+    set(newValue) { props.selection.range.booleanValues = newValue ? [newValue] : [] }
 });
 const singleIntValue = computed({
     get() { return props.selection.range.intValues && props.selection.range.intValues.length > 0 ? props.selection.range.intValues[0] : null },
-    set(newValue: number) { props.selection.range.intValues = newValue ? [newValue] : []}
+    set(newValue) { props.selection.range.intValues = newValue ? [newValue] : [] }
 });
 const singleEnumValue = computed({
     get() { return props.selection.range.enumValues && props.selection.range.enumValues.length > 0 ? props.selection.range.enumValues[0] : null },
-    set(newValue: string) { props.selection.range.enumValues = newValue ? [newValue] : []}
+    set(newValue) { props.selection.range.enumValues = newValue ? [newValue] : [] }
 });
 const singleDateValue = computed({
     get() { return props.selection.range.dateValues && props.selection.range.dateValues.length > 0 ? props.selection.range.dateValues[0] : null },
-    set(newValue: string) { props.selection.range.dateValues = newValue ? [newValue] : []}
+    set(newValue) { props.selection.range.dateValues = newValue ? [newValue] : [] }
 });
 
 function format(t: PropertyType) {
