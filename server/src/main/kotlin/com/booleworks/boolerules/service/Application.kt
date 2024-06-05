@@ -16,6 +16,7 @@ import com.booleworks.boolerules.computations.modelenumeration.MODELENUMERATION
 import com.booleworks.boolerules.computations.optimization.OPTIMIZATION
 import com.booleworks.boolerules.computations.packagesolving.PACKAGESOLVING
 import com.booleworks.boolerules.computations.reconfiguration.RECONFIGURATION
+import com.booleworks.boolerules.computations.visualization.VISUALIZATION
 import com.booleworks.boolerules.config.ApplicationConfig
 import com.booleworks.boolerules.config.ComputationConfig
 import com.booleworks.boolerules.export.exportRoute
@@ -26,21 +27,15 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.github.smiley4.ktorswaggerui.SwaggerUI
 import io.github.smiley4.ktorswaggerui.dsl.get
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
-import io.ktor.serialization.jackson.jackson
-import io.ktor.server.application.Application
-import io.ktor.server.application.call
-import io.ktor.server.application.install
-import io.ktor.server.application.log
-import io.ktor.server.cio.EngineMain
-import io.ktor.server.plugins.callloging.CallLogging
-import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.plugins.cors.routing.CORS
-import io.ktor.server.response.respond
-import io.ktor.server.routing.route
-import io.ktor.server.routing.routing
+import io.ktor.http.*
+import io.ktor.serialization.jackson.*
+import io.ktor.server.application.*
+import io.ktor.server.cio.*
+import io.ktor.server.plugins.callloging.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import org.slf4j.event.Level
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -119,6 +114,8 @@ fun Application.module() {
             route(PATH_COMPUTATION) { addComputationApi(RECONFIGURATION, this@route) }
 
             route(PATH_COMPUTATION) { addComputationApi(PACKAGESOLVING, this@route) }
+
+            route(PATH_COMPUTATION) { addComputationApi(VISUALIZATION, this@route) }
 
             // Rule file management
             route(PATH_RULEFILE) { rulefileRoute() }
