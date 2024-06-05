@@ -70,11 +70,11 @@ fun transpileModel(
     val intStore = initIntegerStore(context, cf, model.featureStore)
     val skippedConstraints = mutableListOf<String>()
     val theoryMap = model.featureStore.theoryMap
-    val globalContraints = additionalConstraints.mapNotNull { processConstraint(it, theoryMap, skippedConstraints) }
+    val globalConstraints = additionalConstraints.mapNotNull { processConstraint(it, theoryMap, skippedConstraints) }
     val consider = considerConstraints.mapNotNull { processConstraint(it, theoryMap, skippedConstraints) }
 
     val allSlices = computeAllSlices(selectors, model.propertyStore.allDefinitions(), maxNumberOfSlices)
-    val sliceSets = computeSliceSets(allSlices, model, globalContraints, consider)
+    val sliceSets = computeSliceSets(allSlices, model, globalConstraints, consider)
     return ModelTranslation(
         sliceSets.map { transpileSliceSet(theoryMap, context, cf, intStore, it) },
         skippedConstraints
