@@ -99,8 +99,8 @@ fun transpileSliceSet(
     }
     propositions += state.intPredicateMapping.entries.map {
         val lngPredicate = transpileIntPredicate(cf, integerStore, state.featureInstantiations, it.key)
-        val clauses = cf.encodeConstraint(lngPredicate, context)
-        val formula = f.equivalence(it.value, f.and(clauses))
+        val clauses = if (lngPredicate == null) f.falsum() else f.and(cf.encodeConstraint(lngPredicate, context))
+        val formula = f.equivalence(it.value, clauses)
         PrlProposition(RuleInformation(INTEGER_PREDICATE_DEFINITION, sliceSet), formula)
     }
     propositions += state.integerVariables.map {

@@ -179,7 +179,7 @@ fun transpileIntPredicate(
     integerEncodings: IntegerStore,
     instantiation: FeatureInstantiation,
     predicate: IntPredicate
-): ComparisonPredicate =
+): ComparisonPredicate? =
     when (predicate) {
         is IntComparisonPredicate -> transpileIntComparisonPredicate(cf, integerEncodings, instantiation, predicate)
         is IntInPredicate -> transpileIntInPredicate(cf, integerEncodings, instantiation, predicate)
@@ -190,9 +190,9 @@ fun transpileIntComparisonPredicate(
     integerEncodings: IntegerStore,
     instantiation: FeatureInstantiation,
     predicate: IntComparisonPredicate
-): ComparisonPredicate {
-    val left = transpileIntTerm(cf, integerEncodings, instantiation, predicate.left)
-    val right = transpileIntTerm(cf, integerEncodings, instantiation, predicate.right)
+): ComparisonPredicate? {
+    val left = transpileIntTerm(cf, integerEncodings, instantiation, predicate.left) ?: return null
+    val right = transpileIntTerm(cf, integerEncodings, instantiation, predicate.right) ?: return null
     return when (predicate.comparison) {
         ComparisonOperator.EQ -> cf.eq(left, right)
         ComparisonOperator.GE -> cf.ge(left, right)
@@ -208,8 +208,8 @@ fun transpileIntInPredicate(
     integerEncodings: IntegerStore,
     instantiation: FeatureInstantiation,
     predicate: IntInPredicate
-): ComparisonPredicate {
-    val term = transpileIntTerm(cf, integerEncodings, instantiation, predicate.term)
+): ComparisonPredicate? {
+    val term = transpileIntTerm(cf, integerEncodings, instantiation, predicate.term) ?: return null
     val v = cf.auxVariable(transpileIntDomain(predicate.range))
     return cf.eq(term, v)
 }
@@ -219,14 +219,18 @@ fun transpileIntTerm(
     integerEncodings: IntegerStore,
     instantiation: FeatureInstantiation,
     term: IntTerm
-): Term = when (term) {
+): Term? = when (term) {
     is IntValue -> cf.constant(term.value)
     is IntFeature -> transpileIntFeature(integerEncodings, instantiation, term)
-    is IntMul -> cf.mul(term.coefficient, transpileIntFeature(integerEncodings, instantiation, term.feature))
-    is IntSum -> cf.add(
-        cf.add(term.operands.map { transpileIntMul(cf, integerEncodings, instantiation, it) }),
-        cf.constant(term.offset)
-    )
+    is IntMul -> transpileIntFeature(integerEncodings, instantiation, term.feature)?.let { cf.mul(term.coefficient, it) }
+    is IntSum -> {
+       val ops = term.operands.mapNotNull { transpileIntMul(cf, integerEncodings, instantiation, it) }
+       if (ops.size == term.operands.size) {
+           cf.add(cf.add(ops), cf.constant(term.offset))
+       } else {
+           null
+       }
+    }
 }
 
 fun transpileIntMul(
@@ -234,13 +238,13 @@ fun transpileIntMul(
     integerEncodings: IntegerStore,
     instantiation: FeatureInstantiation,
     feature: IntMul
-): Term = cf.mul(feature.coefficient, transpileIntFeature(integerEncodings, instantiation, feature.feature))
+): Term? = transpileIntFeature(integerEncodings, instantiation, feature.feature)?.let { cf.mul(feature.coefficient, it) }
 
 fun transpileIntFeature(
     integerEncodings: IntegerStore,
     instantiation: FeatureInstantiation,
     feature: IntFeature
-) = integerEncodings.getVariable(instantiation[feature]!!)!!.variable
+) = instantiation[feature]?.let { integerEncodings.getVariable(it)!!.variable }
 
 fun transpileIntDomain(domain: PropertyRange<Int>): IntegerDomain = when (domain) {
     is IntList, EmptyIntRange -> IntegerSetDomain(domain.allValues())
