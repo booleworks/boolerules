@@ -146,8 +146,7 @@ data class PropertyRangeDO(
 
     @JsonIgnore
     fun isContinuous(): Boolean =
-        booleanValues.isNullOrEmpty() && enumValues.isNullOrEmpty() && intValues.isNullOrEmpty()
-                && dateValues.isNullOrEmpty()
+        dateMin != null || dateMax != null || intMin != null || intMax != null
 
     fun toBooleanRange(): BooleanRange = if (booleanValues != null) {
         BooleanRange.list(booleanValues as Set<Boolean>)

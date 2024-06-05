@@ -83,6 +83,7 @@ interface ComputationRequest {
                             "Set values and a range of int property '${propertySelection.property}' at the same time"
                         }
                     } else {
+                        propertySelection.range.intValues = null
                         if (propertySelection.range.intMin == null) {
                             propertySelection.range.intMin = def.min()
                         }
@@ -95,6 +96,7 @@ interface ComputationRequest {
                             "Set values and a range of date property '${propertySelection.property}' at the same time"
                         }
                     } else {
+                        propertySelection.range.dateValues = null
                         if (propertySelection.range.dateMin == null) {
                             propertySelection.range.dateMin = def.min()
                         }
