@@ -20,6 +20,7 @@
     "@pinia/nuxt": "^0.4.11",
     "@vueuse/nuxt": "^9.13.0",
     "chart.js": "^4.4.3",
+    "force-graph": "^1.43.5",
     "typescript": "^5.1.6"
   }
 }

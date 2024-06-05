@@ -26,12 +26,12 @@
         <MenuItem v-for="algo in softwareAlgos" :item="algo" />
         <!-- <div class="menu-header"><i class="pi pi pi-fw pi-share-alt"></i>{{ $t('computation.header_vis').toUpperCase() }} -->
         <!-- </div> -->
-        <!-- <MenuItem v-for="algo in visualizationAlgos" :item="algo" /> -->
+         <MenuItem v-for="algo in visualizationAlgos" :item="algo" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
+import {useI18n} from 'vue-i18n'
 
 const { t } = useI18n()
 const { currentLogo } = useTheme()
@@ -61,10 +61,10 @@ const softwareAlgos = ref([
     { label: t('computation.pkg_solving'), to: '/computation/software/packagesolving' },
     //   { label: t('computation.pkg_optimization'), to: '' },
 ])
-// const visualizationAlgos = ref([
-//   { label: t('computation.constraint_graph'), to: '' },
-//   { label: t('computation.feature_cloud'), to: '' },
-// ])
+const visualizationAlgos = ref([
+  { label: t('computation.constraint_graph'), to: '/computation/visualization/constraintgraph' },
+  // { label: t('computation.feature_cloud'), to: '' },
+])
 
 </script>
 

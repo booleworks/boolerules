@@ -18,4 +18,5 @@ export default defineAppConfig({
     coverage_graph: hostname + "/computation/coverage/graph",
     reconfiguration: hostname + "/computation/reconfiguration/synchronous",
     packagesolving: hostname + "/computation/packagesolving/synchronous",
+    constraintgraph: hostname + "/computation/visualization/synchronous",
 })

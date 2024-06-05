@@ -26,6 +26,17 @@ export type SoftwareElement = {
     action: string
 }
 
+export type Graph = {
+    nodes: {
+        id: string
+        name: String
+    }[]
+    links: {
+        source: string
+        target: string
+    }[]
+}
+
 // Generic computation datatypes
 export type SingleComputationResponse<MAIN> = {
     status: ComputationStatus
