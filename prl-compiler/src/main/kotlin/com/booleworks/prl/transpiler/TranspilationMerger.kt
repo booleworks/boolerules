@@ -18,6 +18,7 @@ import com.booleworks.prl.transpiler.RuleType.UNKNOWN_FEATURE_IN_SLICE
 fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTranslation {
     //TODO version/int merging
     val f = cf.formulaFactory()
+    val theoryMap = slices[0].info.theoryMap
     val knownVariables = slices.flatMap { it.knownVariables }.toSortedSet()
     val sliceSelectors = mutableMapOf<String, SliceTranslation>()
     val propositions = mutableListOf<PrlProposition>()
@@ -86,23 +87,21 @@ fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTran
         slice.propositions.forEach { propositions.add(it.substitute(f, substitution)) }
     }
 
-    return MergedSliceTranslation(
-        sliceSelectors,
-        TranspilationInfo(
-            cf,
-            mapOf(), // TODO merged theory map
-            instantiation,
-            encodingContext,
-            integerEncodings,
-            intPredicateMapping,
-            mapOf(),  //TODO merged version features
-            booleanVariables,
-            enumMapping,
-            knownVariables,
-            unknownFeatures,
-            propositions,
-        )
+    val info = TranspilationInfo(
+        cf,
+        theoryMap,
+        instantiation,
+        encodingContext,
+        integerEncodings,
+        intPredicateMapping,
+        mapOf(),  //TODO merged version features
+        booleanVariables,
+        enumMapping,
+        knownVariables,
+        unknownFeatures,
+        propositions,
     )
+    return MergedSliceTranslation(sliceSelectors, info)
 }
 
 fun mergeFeatureInstantiations(slices: List<SliceTranslation>): FeatureInstantiation {
