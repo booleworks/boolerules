@@ -89,13 +89,13 @@ fun createIntVariableEquivalence(
     encodingContext: CspEncodingContext,
     f: FormulaFactory
 ): PrlProposition {
-    val constraints = mutableListOf<Formula>();
-    val mergedDomain = mergedVar.domain;
-    val sliceDomain = sliceVariable.domain;
+    val constraints = mutableListOf<Formula>()
+    val mergedDomain = mergedVar.domain
+    val sliceDomain = sliceVariable.domain
     var mergedCounter = 0
     var sliceCounter = 0
-    var c = sliceDomain.lb();
-    var lastGeneralVar: Variable? = null;
+    var c = sliceDomain.lb()
+    var lastGeneralVar: Variable? = null
     while (c < sliceDomain.ub()) {
         if (sliceDomain.contains(c)) {
             val vEncodedVar = encodingContext.variableMap[sliceVariable]!![sliceCounter]!!
