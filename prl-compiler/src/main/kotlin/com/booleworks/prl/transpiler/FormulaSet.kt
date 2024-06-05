@@ -3,7 +3,6 @@
 
 package com.booleworks.prl.transpiler
 
-import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.csp.encodings.CspEncodingContext
 import com.booleworks.logicng.datastructures.Substitution
 import com.booleworks.logicng.formulas.Formula
@@ -124,7 +123,6 @@ data class FeatureInstantiation(
 }
 
 data class TranspilationInfo(
-    val cf: CspFactory, // The CSP and formula factory for the transpilation (model)
     val theoryMap: Map<String, Theory>, // A mapping from each feature to its theory (model)
     val featureInstantiations: FeatureInstantiation, // A mapping from each feature to its definition (slice)
     val encodingContext: CspEncodingContext, // The context for CSP encodings (model)

@@ -104,7 +104,7 @@ internal object ConsistencyComputation :
         val solver = prepareSolver(cf, true, info)
         return solver.satCall().solve().use { satCall ->
             assert(satCall.satResult == Tristate.FALSE) { "Detail computation should only be called for inconsistent slices" }
-            val explanation = computeExplanation(satCall, model.propertyStore.allDefinitions(), info.cf)
+            val explanation = computeExplanation(satCall, model.propertyStore.allDefinitions(), cf)
             val result = ConsistencyInternalResult(slice, false, null, explanation)
             SplitComputationDetail(result, splitProperties)
         }

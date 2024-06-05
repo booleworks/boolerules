@@ -88,7 +88,6 @@ fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTran
     }
 
     val info = TranspilationInfo(
-        cf,
         theoryMap,
         instantiation,
         encodingContext,

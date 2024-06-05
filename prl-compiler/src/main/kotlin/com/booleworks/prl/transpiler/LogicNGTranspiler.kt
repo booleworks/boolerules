@@ -194,7 +194,7 @@ private fun initState(
     knownVariables.addAll(enumMapping.values.flatMap { it.values })
     knownVariables.addAll(versionMapping.values.flatMap { it.values })
     return TranspilationInfo(
-        cf, theoryMap, insts, context, integerStore, intPredicateMapping, versionMapping,
+        theoryMap, insts, context, integerStore, intPredicateMapping, versionMapping,
         booleanVariables, enumMapping, knownVariables, unknownFeatures
     )
 }
