@@ -24,6 +24,7 @@ import com.booleworks.logicng.solvers.SATSolver
 import com.booleworks.logicng.solvers.sat.SATSolverConfig
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
+import com.booleworks.prl.transpiler.LngIntVariable
 import com.booleworks.prl.transpiler.TranspilationInfo
 
 val CONSISTENCY = object : ComputationType<
@@ -75,7 +76,12 @@ internal object ConsistencyComputation :
         if (!status.successful()) return ConsistencyInternalResult(slice, false, null, null)
         return solver.satCall().solve().use { satCall ->
             if (satCall.satResult == Tristate.TRUE) {
-                val example = extractModel(satCall.model(info.knownVariables).positiveVariables(), info)
+                val integerAssignment = cf.decode(
+                    satCall.model(info.encodingContext.relevantSatVariables),
+                    info.integerVariables.map(LngIntVariable::variable),
+                    info.encodingContext
+                )
+                val example = extractModel(satCall.model(info.knownVariables).positiveVariables(), integerAssignment, info)
                 ConsistencyInternalResult(slice, true, example, null)
             } else {
                 //TODO beautify explanation

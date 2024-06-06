@@ -25,6 +25,7 @@ import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSAT.MaxSATResult.OPTI
 import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSATConfig
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
+import com.booleworks.prl.transpiler.LngIntVariable
 import com.booleworks.prl.transpiler.TranspilationInfo
 import kotlin.math.absoluteValue
 
@@ -106,7 +107,8 @@ internal object OptimizationComputation :
             val solverModel = solver.model()
             val evaluatedWeights = mapping.filter { (k, _) -> k.evaluate(solverModel) }
             val weight = evaluatedWeights.map { it.value }.sum()
-            val example = extractModel(solverModel.positiveVariables(), info)
+            val integerAssignment = cf.decode(solverModel, info.integerVariables.map(LngIntVariable::variable), info.encodingContext)
+            val example = extractModel(solverModel.positiveVariables(), integerAssignment, info)
             val usedWeights = evaluatedWeights.map { WeightPair(constraintMap[it.key]!!, it.value) }
             OptimizationInternalResult(slice, request.computationType, weight, example, usedWeights)
         } else {

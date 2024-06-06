@@ -16,6 +16,7 @@ import com.booleworks.boolerules.computations.generic.OptimizationType.MIN
 import com.booleworks.boolerules.computations.generic.SingleComputation
 import com.booleworks.boolerules.computations.generic.SingleComputationRunner
 import com.booleworks.boolerules.computations.generic.computationDoc
+import com.booleworks.boolerules.computations.generic.computeRelevantIntVars
 import com.booleworks.boolerules.computations.generic.computeRelevantVars
 import com.booleworks.boolerules.computations.generic.extractModel
 import com.booleworks.boolerules.computations.minmaxconfig.MinMaxConfigComputation.MinMaxInternalResult
@@ -25,6 +26,7 @@ import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSAT.MaxSATResult.OPTI
 import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSATConfig
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
+import com.booleworks.prl.transpiler.LngIntVariable
 import com.booleworks.prl.transpiler.TranspilationInfo
 
 val MINMAXCONFIG =
@@ -75,10 +77,12 @@ internal object MinMaxConfigComputation :
     ): MinMaxInternalResult {
         val f = cf.formulaFactory()
         val relevantVars = computeRelevantVars(f, info, request.features)
+        val relevantIntVars = computeRelevantIntVars(info, request.features).map(LngIntVariable::variable)
         val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, cf.formulaFactory(), info)
         relevantVars.forEach { solver.addSoftFormula(f.literal(it.name(), request.computationType == MAX), 1) }
         return if (solver.solve() == OPTIMUM) {
-            val example = extractModel(solver.model().positiveVariables(), info)
+            val integerAssignment = cf.decode(solver.model(), relevantIntVars, info.encodingContext)
+            val example = extractModel(solver.model().positiveVariables(), integerAssignment, info)
             val numberOfFeatures = example.size
             MinMaxInternalResult(slice, request.computationType, numberOfFeatures, example)
         } else {

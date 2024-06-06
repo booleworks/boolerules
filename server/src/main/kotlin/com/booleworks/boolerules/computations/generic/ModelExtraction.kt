@@ -3,6 +3,7 @@
 
 package com.booleworks.boolerules.computations.generic
 
+import com.booleworks.logicng.csp.CspAssignment
 import com.booleworks.logicng.formulas.Variable
 import com.booleworks.prl.transpiler.TranspilationInfo
 import com.fasterxml.jackson.annotation.JsonIgnore
@@ -41,6 +42,17 @@ internal fun extractModel(variables: Collection<Variable>, info: TranspilationIn
     FeatureModelDO(variables.filter { info.knownVariables.contains(it) }
         .map { variable -> extractFeature(variable, info) }.sorted())
 
+internal fun extractModel(variables: Collection<Variable>, integerAssignment: CspAssignment, info: TranspilationInfo): FeatureModelDO =
+    FeatureModelDO(variables.filter { info.knownVariables.contains(it) }
+        .map { variable -> extractFeature(variable, info) }.sorted() + extractIntFeatures(integerAssignment, info))
+
+
+internal fun extractIntFeatures(integerAssignment: CspAssignment, info: TranspilationInfo): Collection<FeatureDO> =
+    integerAssignment.integerAssignments.map { (variable, value) ->
+        val v = info.integerVariables.find { it.variable.name == variable.name }!!
+        FeatureDO.int(v.feature, value)
+    }
+
 internal fun extractFeature(variable: Variable, info: TranspilationInfo) =
     if (info.booleanVariables.contains(variable)) {
         FeatureDO.boolean(variable.name(), true)
@@ -48,6 +60,6 @@ internal fun extractFeature(variable: Variable, info: TranspilationInfo) =
         val (feature, value) = info.getFeatureAndValue(variable)!!
         FeatureDO.enum(feature, value)
     } else {
-        error("Currently only boolean and enum features are supported.")
+        error("Cannot extract unknown variable.")
     }
 
