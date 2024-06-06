@@ -19,7 +19,7 @@ export default defineNuxtConfig({
                 {
                     id: 'theme-link',
                     rel: 'stylesheet',
-                    href: '/themes/aura-light-cyan/theme.css'
+                    href: '/themes/lara-light-green/theme.css'
                 }
             ],
         },
