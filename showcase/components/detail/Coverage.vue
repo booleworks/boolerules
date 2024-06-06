@@ -1,8 +1,7 @@
 <template>
     <DetailHeader />
     <Button class="mt-3" :label="$t('details.btn_compute')" icon="pi pi-info-circle" @click="computeDetails()" />
-    <Button class="mt-3 ml-3" :label="$t('details.btn_compute_graph')" icon="pi pi-info-circle"
-        @click="computeGraph()" />
+    <Button class="mt-3 ml-3" :label="$t('details.btn_compute_graph')" icon="pi pi-chart-bar" @click="computeGraph()" />
     <div v-if="details.mainResult" class="mt-5">
         <DataTable :value="details.detail.detail.configurations">
             <Column field="coveredConstraints" :header="$t('details.covered_constraints')" style="vertical-align: top">

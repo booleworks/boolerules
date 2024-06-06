@@ -18,7 +18,7 @@
             <div class="flex-column">
                 <div class="flex">
                     <Button :label="$t('algo.reconfiguration.btn_edit_configuration')" icon="pi pi-table"
-                            severity="warning" class="mb-3 mr-3" @click="showConfigurationDialog()" />
+                        severity="secondary" class="mb-3 mr-3" @click="showConfigurationDialog()" />
                     <div v-if="getConfiguration().features" class="mb-3 align-content-center">
                         {{
                             $t('algo.reconfiguration.loaded_configuration') + ": " + getConfiguration().features.length
@@ -39,13 +39,13 @@
                 </table>
                 <div class="flex">
                     <Button class="mt-2" :label="$t('algo.reconfiguration.btn_compute')" @click="compute()"
-                            icon="pi pi-desktop" :disabled="!buttonActive" />
+                        icon="pi pi-desktop" :disabled="!buttonActive" />
                 </div>
             </div>
         </ClientOnly>
 
         <Dialog v-model:visible="showConfiguration" modal :header="$t('algo.reconfiguration.configuration')"
-                :style="{ width: '50vw' }" :dismissableMask="true">
+            :style="{ width: '50vw' }" :dismissableMask="true">
             <ConfigurationDialog />
         </Dialog>
 
@@ -58,17 +58,16 @@
             <AccordionTab :header="$t('result.header')">
                 <div v-if="status.success">
                     <div>
-                        <span class="features-to-add mr-1">{{result.featuresToAdd.length}} </span>
-                        <span class="mr-3">{{$t('algo.reconfiguration.features_to_add')}}</span>
-                        <span class="features-to-remove mr-1">{{result.featuresToRemove.length}} </span>
-                        <span>{{$t('algo.reconfiguration.features_to_remove')}}</span>
+                        <span class="features-to-add mr-1">{{ result.featuresToAdd.length }} </span>
+                        <span class="mr-3">{{ $t('algo.reconfiguration.features_to_add') }}</span>
+                        <span class="features-to-remove mr-1">{{ result.featuresToRemove.length }} </span>
+                        <span>{{ $t('algo.reconfiguration.features_to_remove') }}</span>
                     </div>
                     <div class="flex mt-2">
                         <DataTable :value="result.featuresToAdd" showGridlines class="p-datatable-sm mt-3 pb-3 mr-3"
-                                   sortField="result" :sortOrder="1">
-                            <Column sortable
-                                    :header="$t('algo.reconfiguration.features_to_add')"
-                                    class="font-bold" style="width: 20rem">
+                            sortField="result" :sortOrder="1">
+                            <Column sortable :header="$t('algo.reconfiguration.features_to_add')" class="font-bold"
+                                style="width: 20rem">
                                 <template #body="slotProps">
                                     <div class="features-to-add">
                                         {{ slotProps.data }}
@@ -76,14 +75,12 @@
                                 </template>
                             </Column>
                         </DataTable>
-                        <DataTable :value="result.featuresToRemove" showGridlines
-                                   class="p-datatable-sm mt-3 pb-3"
-                                   sortField="result" :sortOrder="1">
-                            <Column sortable
-                                    :header="$t('algo.reconfiguration.features_to_remove')"
-                                    class="font-bold" style="width: 20rem">
+                        <DataTable :value="result.featuresToRemove" showGridlines class="p-datatable-sm mt-3 pb-3"
+                            sortField="result" :sortOrder="1">
+                            <Column sortable :header="$t('algo.reconfiguration.features_to_remove')" class="font-bold"
+                                style="width: 20rem">
                                 <template #body="slotProps">
-                                    <div class="text-red-700">
+                                    <div class="features-to-remove">
                                         {{ slotProps.data }}
                                     </div>
                                 </template>
@@ -154,7 +151,6 @@ async function compute() {
     }).then((res) => {
         const cRes = res as ReconfigurationResponse
         setJobId(cRes.status.jobId)
-        // openTopTabs.value = []
         openResultTabs.value = cRes.status.success ? [1] : [0]
         status.value = cRes.status
         result.value = cRes.results[0].result
@@ -168,11 +164,13 @@ async function compute() {
 }
 
 .features-to-add {
+    font-family: monospace;
     font-weight: 700 !important;
     color: var(--green-700) !important;
 }
 
 .features-to-remove {
+    font-family: monospace;
     font-weight: 700 !important;
     color: var(--red-700) !important;
 }

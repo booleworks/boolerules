@@ -9,7 +9,8 @@
             </AccordionTab>
 
             <AccordionTab :header="$t('slices.selection')">
-                <SliceSelection defaultSliceType="SPLIT" :allowedSliceTypes="['SPLIT', 'ANY', 'ALL']" :only-single-slice="false"/>
+                <SliceSelection defaultSliceType="SPLIT" :allowedSliceTypes="['SPLIT', 'ANY', 'ALL']"
+                    :only-single-slice="false" />
             </AccordionTab>
         </Accordion>
 
@@ -36,14 +37,11 @@
 
             <AccordionTab :header="$t('result.header')">
                 <div v-if="status.success">
+                    <div class="flex flex-wrap align-items-center justify-content-end">
+                        <Button :label="$t('details.btn_show')" icon="pi pi-info-circle" @click="showDetails()" />
+                    </div>
                     <DataTable :value="result" resizableColumns showGridlines class="p-datatable-sm mt-3 pb-3"
                         sortField="result" :sortOrder="1">
-                        <template #header>
-                            <div class="flex flex-wrap align-items-center justify-content-end">
-                                <Button :label="$t('details.btn_show')" icon="pi pi-info-circle"
-                                    @click="showDetails()" />
-                            </div>
-                        </template>
                         <Column sortable field="result" :header="$t('result.header')" class="font-bold"
                             style="width: 15rem" />
                         <Column v-for="(col, index) in splitPropsSingleResult(result)" :key="col"

@@ -17,7 +17,7 @@
         <ClientOnly>
             <div class="flex-column">
                 <div class="flex">
-                    <Button :label="$t('algo.packagesolving.btn_edit_software')" icon="pi pi-table" severity="warning"
+                    <Button :label="$t('algo.packagesolving.btn_edit_software')" icon="pi pi-table" severity="secondary"
                         class="mb-3 mr-3" @click="showSoftwareDialog()" />
                     <div v-if="getCustomSoftware().value.length > 0" class="mb-3 align-content-center">
                         {{

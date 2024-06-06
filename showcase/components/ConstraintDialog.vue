@@ -2,7 +2,13 @@
     <div>
         <DataTable :value="getCustomConstraints()" showGridlines class="p-datatable-sm mb-3" scrollable
             scrollHeight="600px">
-            <Column field="constraint" :header="$t('common.constraint')" />
+            <Column field="constraint" :header="$t('common.constraint')">
+                <template #body="slotProps">
+                    <div class="constraint">
+                        {{ slotProps.data.constraint }}
+                    </div>
+                </template>
+            </Column>
         </DataTable>
         <div class="flex flex-grow-1 align-items-center">
             <FileUpload mode="basic" uploadIcon="pi pi-cloud-upload" :auto="true" :multiple="false" name="weights[]"
@@ -19,3 +25,9 @@ const uploadConstraints = async (event: any) => {
     uploadCsv(event.files[0] as File)
 }
 </script>
+
+<style scoped>
+.constraint {
+    font-family: monospace;
+}
+</style>

@@ -9,7 +9,8 @@
             </AccordionTab>
 
             <AccordionTab :header="$t('slices.selection')">
-                <SliceSelection defaultSliceType="SPLIT" :allowedSliceTypes="['SPLIT', 'ANY', 'ALL']" :only-single-slice="false" />
+                <SliceSelection defaultSliceType="SPLIT" :allowedSliceTypes="['SPLIT', 'ANY', 'ALL']"
+                    :only-single-slice="false" />
             </AccordionTab>
         </Accordion>
 
@@ -32,13 +33,10 @@
 
             <AccordionTab :header="$t('result.header')">
                 <div v-if="status.success">
+                    <div class="flex flex-wrap align-items-center justify-content-end">
+                        <Button :label="$t('details.btn_show')" icon="pi pi-info-circle" @click="showDetails()" />
+                    </div>
                     <DataTable :value="result" scrollable showGridlines class="p-datatable-sm mt-3 pb-3">
-                        <template #header>
-                            <div class="flex flex-wrap align-items-center justify-content-end">
-                                <Button :label="$t('details.btn_show')" icon="pi pi-info-circle"
-                                    @click="showDetails()" />
-                            </div>
-                        </template>
                         <Column field="result" sortable :header="$t('result.header')" class="font-bold"
                             style="width: 15rem">
                             <template #body="bdy">

@@ -7,8 +7,6 @@
             <div v-else class="flex flex-grow-1 align-items-center">
                 <span class="font-bold">{{ $t('rulefilebar.filename') }}</span>
                 <span>: {{ summary.fileName }}</span>
-                <span class="ml-3 font-bold"># {{ $t('rulefilebar.rules') }}</span>
-                <span>: {{ summary.numberOfRules }}</span>
                 <span class="ml-3 font-bold"># {{ $t('rulefilebar.features') }}</span>
                 <span>: {{ summary.numberOfFeatures }}</span>
                 <FeatureTags class="ml-4" :boolFeature="summary.hasBooleanFeatures"

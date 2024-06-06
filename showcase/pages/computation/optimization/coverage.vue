@@ -17,7 +17,7 @@
         <ClientOnly>
             <div class="flex-column">
                 <div class="flex">
-                    <Button :label="$t('algo.coverage.btn_edit_constraints')" icon="pi pi-table" severity="warning"
+                    <Button :label="$t('algo.coverage.btn_edit_constraints')" icon="pi pi-table" severity="secondary"
                         class="mb-3 mr-3" @click="showConstraintDialog()" />
                     <div v-if="getCustomConstraintsAsStrings().length > 0" class="mb-3 align-content-center">
                         {{ $t('algo.coverage.loaded_constraints') + ": " + getCustomConstraintsAsStrings().length }}
@@ -35,7 +35,7 @@
         </ClientOnly>
 
         <Dialog v-model:visible="showConstraints" modal :header="$t('algo.coverage.constraints')"
-            :style="{ width: '80vw' }">
+            :style="{ width: '80vw' }" :dismissableMask="true">
             <ConstraintDialog />
         </Dialog>
 
@@ -48,14 +48,11 @@
 
             <AccordionTab :header="$t('result.header')">
                 <div v-if="status.success">
+                    <div class="flex flex-wrap align-items-center justify-content-end">
+                        <Button :label="$t('details.btn_show')" icon="pi pi-info-circle" @click="showDetails()" />
+                    </div>
                     <DataTable :value="result" resizableColumns showGridlines class="p-datatable-sm mt-3 pb-3"
                         sortField="result" :sortOrder="1">
-                        <template #header>
-                            <div class="flex flex-wrap align-items-center justify-content-end">
-                                <Button :label="$t('details.btn_show')" icon="pi pi-info-circle"
-                                    @click="showDetails()" />
-                            </div>
-                        </template>
                         <Column sortable field="result.requiredConfigurations"
                             :header="$t('algo.coverage.header_required_configurations')" class="font-bold"
                             style="width: 10rem" />

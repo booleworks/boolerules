@@ -2,7 +2,13 @@
     <div>
         <DataTable :value="getCustomWeights().value" showGridlines class="p-datatable-sm mb-3" scrollable
             scrollHeight="600px">
-            <Column field="constraint" :header="$t('common.constraint')" sortable />
+            <Column field="constraint" :header="$t('common.constraint')" sortable>
+                <template #body="slotProps">
+                    <div class="constraint">
+                        {{ slotProps.data.constraint }}
+                    </div>
+                </template>
+            </Column>
             <Column field="weight" :header="$t('algo.optimization.weighting')" sortable />
         </DataTable>
         <div class="flex flex-grow-1 align-items-center">
@@ -20,3 +26,9 @@ const uploadWeights = async (event: any) => {
     uploadCsv(event.files[0] as File)
 }
 </script>
+
+<style scoped>
+.constraint {
+    font-family: monospace;
+}
+</style>

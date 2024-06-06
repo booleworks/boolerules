@@ -2,7 +2,13 @@
     <div>
         <DataTable :value="getCustomSoftware().value" showGridlines class="p-datatable-sm mb-3" scrollable
             scrollHeight="600px">
-            <Column field="package" :header="$t('algo.packagesolving.package')" sortable />
+            <Column field="package" :header="$t('algo.packagesolving.package')" sortable>
+                <template #body="slotProps">
+                    <div class="constraint">
+                        {{ slotProps.data.package }}
+                    </div>
+                </template>
+            </Column>
             <Column field="version" :header="$t('algo.packagesolving.version')" sortable />
             <Column field="action" :header="$t('algo.packagesolving.action')" sortable />
         </DataTable>
@@ -21,3 +27,9 @@ const uploadSoftware = async (event: any) => {
     uploadCsv(event.files[0] as File)
 }
 </script>
+
+<style scoped>
+.constraint {
+    font-family: monospace;
+}
+</style>
