@@ -18,11 +18,17 @@ import com.booleworks.boolerules.computations.generic.NON_CACHING_USE_FF
 import com.booleworks.boolerules.computations.generic.NON_PT_CONFIG
 import com.booleworks.boolerules.computations.generic.SliceTypeDO
 import com.booleworks.boolerules.computations.generic.computationDoc
+import com.booleworks.boolerules.computations.generic.computeRelevantIntVars
 import com.booleworks.boolerules.computations.generic.computeRelevantVars
 import com.booleworks.boolerules.computations.generic.extractFeature
 import com.booleworks.logicng.csp.CspFactory
+import com.booleworks.logicng.csp.encodings.CspEncodingContext
+import com.booleworks.logicng.formulas.Formula
+import com.booleworks.logicng.formulas.FormulaFactory
+import com.booleworks.logicng.formulas.Variable
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
+import com.booleworks.prl.transpiler.LngIntVariable
 import com.booleworks.prl.transpiler.TranspilationInfo
 
 val BACKBONE =
@@ -79,20 +85,67 @@ internal object BackboneComputation : ListComputation<
     ): BackboneInternalResult {
         val f = cf.formulaFactory()
         val result = BackboneInternalResult(slice, LinkedHashMap())
-        val relevantVars = computeRelevantVars(f, info, request.features)
+        val relevantVars = computeRelevantVars(f, info, request.features).intersect(info.knownVariables)
+        val relevantIntVars = computeRelevantIntVars(info, request.features)
+        val (translationFormula, translationMap) = computeTranslatedIntVars(relevantIntVars, cf.formulaFactory(), info)
 
         val solver = satSolver(NON_PT_CONFIG, f, info, slice, status).also { if (!status.successful()) return result }
-        val backbone = solver.backbone(relevantVars)
+        solver.add(translationFormula)
+        val backbone = solver.backbone(relevantVars + translationMap.keys)
+
+        val mandatoryIntFeatures = mutableSetOf<String>()
+        fun addToBackbone(variable: Variable, type: BackboneType) {
+            if (translationMap.containsKey(variable)) {
+                val (intVar, value) = translationMap[variable]!!
+                if (!mandatoryIntFeatures.contains(intVar.feature)) {
+                    val feature = FeatureDO.int(intVar.feature, value)
+                    result.backbone[feature] = type
+                    if (type == BackboneType.MANDATORY) mandatoryIntFeatures.add(intVar.feature)
+                }
+            } else result.backbone[extractFeature(variable, info)] = type
+        }
+
         if (backbone.isSat) {
-            backbone.positiveBackbone.forEach { result.backbone[extractFeature(it, info)] = BackboneType.MANDATORY }
-            backbone.negativeBackbone.forEach { result.backbone[extractFeature(it, info)] = BackboneType.FORBIDDEN }
-            backbone.optionalVariables.forEach { result.backbone[extractFeature(it, info)] = BackboneType.OPTIONAL }
+            backbone.positiveBackbone.forEach { addToBackbone(it, BackboneType.MANDATORY) }
+            backbone.negativeBackbone.forEach { addToBackbone(it, BackboneType.FORBIDDEN) }
+            backbone.optionalVariables.forEach { addToBackbone(it, BackboneType.OPTIONAL) }
         } else {
-            relevantVars.forEach {
-                result.backbone[extractFeature(it, info)] = BackboneType.FORBIDDEN
-            }
+            relevantVars.forEach { addToBackbone(it, BackboneType.FORBIDDEN) }
         }
         return result
+    }
+
+    private fun computeTranslatedIntVars(variables: Set<LngIntVariable>, f: FormulaFactory, info: TranspilationInfo): Pair<Formula, Map<Variable, Pair<LngIntVariable, Int>>> {
+        val clauses = mutableListOf<Formula>()
+        val map = mutableMapOf<Variable, Pair<LngIntVariable, Int>>()
+        variables.forEach { intVar ->
+            val satVars = info.encodingContext.variableMap[intVar.variable]!!
+            val domain = intVar.variable.domain
+            var previousVar: Variable? = null
+            var index = 0
+            var c = domain.lb()
+            while (c < domain.ub()) {
+                if (domain.contains(c)) {
+                    val originalVar = satVars[index]!!
+                    val translatedVar = f.newAuxVariable(CspEncodingContext.CSP_AUX_LNG_VARIABLE)
+                    if (previousVar == null) {
+                        clauses.add(f.equivalence(originalVar, translatedVar))
+                    } else {
+                        clauses.add(f.equivalence(f.and(previousVar.negate(f), originalVar), translatedVar))
+                    }
+                    map[translatedVar] = Pair(intVar, c)
+                    previousVar = originalVar;
+                    ++index
+                }
+                ++c
+            }
+            if (previousVar != null) {
+                val translatedVar = f.newAuxVariable(CspEncodingContext.CSP_AUX_LNG_VARIABLE)
+                clauses.add(f.equivalence(previousVar.negate(f), translatedVar))
+                map[translatedVar] = Pair(intVar, domain.ub())
+            }
+        }
+        return Pair(f.and(clauses), map)
     }
 
     override fun extractElements(

@@ -5,6 +5,7 @@ package com.booleworks.boolerules.computations.generic
 
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.formulas.Variable
+import com.booleworks.prl.transpiler.LngIntVariable
 import com.booleworks.prl.transpiler.TranspilationInfo
 import java.util.SortedSet
 import java.util.TreeSet
@@ -29,3 +30,9 @@ fun computeRelevantVars(f: FormulaFactory, info: TranspilationInfo, features: Li
         }
         vars
     }
+
+fun computeRelevantIntVars(info: TranspilationInfo, features: List<String>): SortedSet<LngIntVariable> =
+    if (features.isEmpty()) info.integerVariables.toSortedSet { a, b -> a.variable.compareTo(b.variable) }
+    else info.integerVariables.filter { features.contains(it.feature) }.toSortedSet { a, b -> a.variable.compareTo(b.variable) }
+
+
