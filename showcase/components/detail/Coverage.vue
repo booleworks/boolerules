@@ -47,6 +47,7 @@
 </template>
 
 <script setup lang="ts">
+import Chart from 'primevue/chart';
 import { type DetailRequest, type FeatureModel, type Slice } from '~/types/computations'
 
 const { t } = useI18n();
