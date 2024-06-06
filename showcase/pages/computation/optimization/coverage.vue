@@ -43,7 +43,7 @@
         <!-- Result panels -->
         <Accordion :multiple="true" :activeIndex="openResultTabs" class="mt-5 mr-3">
             <AccordionTab :header="$t('common.result_status')">
-                <ComputationStatusTab :status="status" />
+                <ComputationStatusTab :status="status" :enable-download="false" />
             </AccordionTab>
 
             <AccordionTab :header="$t('result.header')">

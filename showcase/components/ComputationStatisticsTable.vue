@@ -19,7 +19,7 @@
             </table>
         </div>
 
-        <div class="flex align-items-center justify-content-center">
+        <div v-if="enableDownload" class="flex align-items-center justify-content-center">
             <Button class="ml-5" :label="$t('comp_stat.btn_download')" @click="download()" icon="pi pi-cloud-download" />
         </div>
     </div>
@@ -33,6 +33,7 @@ const appConfig = useAppConfig()
 let props = defineProps<{
     jobId: string
     statistics: ComputationStatistics
+    enableDownload: boolean
 }>()
 
 async function download() {

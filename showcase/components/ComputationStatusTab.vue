@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="status.success">
-            <ComputationStatisticsTable :job-id="status.jobId" :statistics="status.statistics" />
+            <ComputationStatisticsTable :job-id="status.jobId" :statistics="status.statistics" :enable-download="enableDownload"/>
         </div>
 
         <div v-if="status.errors?.length > 0">
@@ -25,6 +25,6 @@ import { type ComputationStatus } from '~/types/computations'
 
 defineProps<{
     status: ComputationStatus
+    enableDownload: boolean
 }>()
 </script>
-
