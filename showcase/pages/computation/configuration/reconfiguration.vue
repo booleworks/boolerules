@@ -103,12 +103,12 @@ import { type SingleComputationResponse, type ComputationStatus, } from '~/types
 
 const appConfig = useAppConfig()
 const { isPresent, getId } = useCurrentRuleFile()
-const { currentSliceSelection } = useCurrentSliceSelection()
+const { currentSliceSelection, allSlicesSelected } = useCurrentSliceSelection()
 const { getConstraintList } = useAdditionalConstraints()
 const { setJobId, initDetailSelection, } = useComputation()
 const { getConfiguration, uploadCsv } = useConfiguration()
 
-const buttonActive = computed(() => isPresent() && getConfiguration().features)
+const buttonActive = computed(() => isPresent() && getConfiguration().features && allSlicesSelected())
 const openTopTabs = ref([1])
 const openResultTabs = ref([] as number[])
 const showConfiguration = ref(false)
@@ -129,8 +129,8 @@ type ReconfigurationRequest = {
 type ReconfigurationAlgorithm = 'MAX_COV' | 'MIN_DIFF'
 
 type ReconfigurationResult = {
-    featuresToRemove: number,
-    featuresToAdd: number,
+    featuresToRemove: string[],
+    featuresToAdd: string[],
 }
 
 type ReconfigurationResponse = SingleComputationResponse<ReconfigurationResult>
@@ -154,7 +154,7 @@ async function compute() {
     }).then((res) => {
         const cRes = res as ReconfigurationResponse
         setJobId(cRes.status.jobId)
-        openTopTabs.value = []
+        // openTopTabs.value = []
         openResultTabs.value = cRes.status.success ? [1] : [0]
         status.value = cRes.status
         result.value = cRes.results[0].result

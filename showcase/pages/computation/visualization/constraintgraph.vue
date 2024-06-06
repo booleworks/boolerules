@@ -1,6 +1,6 @@
 <template>
     <div class="flex-column w-full">
-        <AlgorithmHeader :header="$t('computation.constraintgraph')" boolFeature enumFeature intFeature />
+        <AlgorithmHeader :header="$t('computation.constraint_graph')" boolFeature enumFeature intFeature />
 
         <!-- Top panels -->
         <Accordion :multiple="true" :activeIndex="openTopTabs" class="mt-5 mr-3 mb-5">
@@ -28,14 +28,11 @@
             <AccordionTab :header="$t('common.result_status')">
                 <ComputationStatusTab :status="status" />
             </AccordionTab>
-
-            <AccordionTab :header="$t('result.header')">
-                <div v-if="status.success">
-                    <ForceGraph :graph="resultGraph"/>
-                </div>
-                <div v-else class="text-600 text">{{ $t('algo.nothing_computed') }}</div>
-            </AccordionTab>
         </Accordion>
+
+        <Dialog id="GraphDialog" v-model:visible="showGraph" modal :dismissable-mask=true :show-header="false" :style="{ width: '80vw', height: '80vh' }">
+            <ForceGraph :graph="resultGraph" :relWidth=.8 :relHeight=.8 />
+        </Dialog>
     </div>
 </template>
 
@@ -47,14 +44,16 @@ import ForceGraph from "~/components/ForceGraph.vue";
 const appConfig = useAppConfig()
 const { isPresent, getId } = useCurrentRuleFile()
 const { setJobId, initDetailSelection, } = useComputation()
-const { currentSliceSelection } = useCurrentSliceSelection()
+const { currentSliceSelection, allSlicesSelected } = useCurrentSliceSelection()
 
-const buttonActive = computed(() => isPresent())
+const buttonActive = computed(() => isPresent() && allSlicesSelected())
 const openTopTabs = ref([1])
 const openResultTabs = ref([] as number[])
 
 const resultGraph = ref({} as Graph)
 const status = ref({} as ComputationStatus)
+
+const showGraph = ref(false)
 
 // data types
 type VisualizationRequest = {
@@ -76,26 +75,21 @@ async function compute() {
     }).then((res) => {
         const cRes = res as VisualizationResponse
         setJobId(cRes.status.jobId)
-        openTopTabs.value = []
-        openResultTabs.value = cRes.status.success ? [1] : [0]
+        // openTopTabs.value = []
+        openResultTabs.value = [0]
         status.value = cRes.status
-        resultGraph.value = cRes.results[0].result
+        if (cRes.status.success) {
+            resultGraph.value = cRes.results[0].result
+            showGraph.value = true
+        }
     })
 }
 </script>
 
-<style scoped>
-.divider-text :deep(.p-divider-content) {
-    background-color: var(--surface-ground) !important;
-}
-
-.features-to-add {
-    font-weight: 700 !important;
-    color: var(--green-700) !important;
-}
-
-.features-to-remove {
-    font-weight: 700 !important;
-    color: var(--red-700) !important;
+<style>
+#GraphDialog .p-dialog-content {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
 }
 </style>

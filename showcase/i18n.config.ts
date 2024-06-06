@@ -236,7 +236,11 @@ export default defineI18nConfig(() => ({
                     downgraded: 'Downgraded Features',
                     old: 'Old',
                     new: 'New',
-                }
+                },
+                constraintgraph: {
+                    desc: 'Compute dependencies between features',
+                    btn_compute: 'Compute Constraint Graph',
+                },
             },
         },
         de: {
@@ -470,7 +474,11 @@ export default defineI18nConfig(() => ({
                     downgraded: 'Downgegradete Features',
                     old: 'Alt',
                     new: 'Neu',
-                }
+                },
+                constraintgraph: {
+                    desc: 'Berechnung von Abhängigkeiten zwischen Features',
+                    btn_compute: 'Berechne Regel Graph',
+                },
             },
         }
     }

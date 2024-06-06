@@ -49,5 +49,25 @@ export default () => {
         return Array.from(sliceSelection.value.values())
     }
 
-    return { initSliceSelection, selectionForProperty, currentSliceSelection }
+    const allSlicesSelected = (): boolean => {
+        for (const sel of currentSliceSelection()) {
+            switch (sel.propertyType) {
+                case "BOOLEAN":
+                    if (!sel.range.booleanValues?.length) return false;
+                    break;
+                case "INT":
+                    if (!(sel.range.intValues?.length || sel.range.intMin || sel.range.intMax)) return false;
+                    break;
+                case "ENUM":
+                    if (!sel.range.enumValues?.length) return false;
+                    break;
+                case "DATE":
+                    if (!(sel.range.dateValues?.length || sel.range.dateMin || sel.range.dateMax)) return false;
+                    break;
+            }
+        }
+        return true
+    }
+
+    return { initSliceSelection, selectionForProperty, currentSliceSelection, allSlicesSelected }
 }

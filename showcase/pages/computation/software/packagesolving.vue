@@ -150,12 +150,12 @@ import { type SingleComputationResponse, type ComputationStatus, type SoftwareEl
 
 const appConfig = useAppConfig()
 const { isPresent, getId } = useCurrentRuleFile()
-const { currentSliceSelection } = useCurrentSliceSelection()
+const { currentSliceSelection, allSlicesSelected } = useCurrentSliceSelection()
 const { getConstraintList } = useAdditionalConstraints()
 const { setJobId, initDetailSelection, } = useComputation()
 const { getCustomSoftware, uploadCsv } = useSoftware()
 
-const buttonActive = computed(() => isPresent() && getCustomSoftware().value.length > 0)
+const buttonActive = computed(() => isPresent() && getCustomSoftware().value.length > 0 && allSlicesSelected())
 const openTopTabs = ref([1])
 const openResultTabs = ref([] as number[])
 const showSoftware = ref(false)
