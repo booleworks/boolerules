@@ -5,8 +5,8 @@ export default () => {
 
     const THEME = 'brTheme'
     const THEME_LINK = 'theme-link'
-    const DARK = 'bw-dark'
-    const LIGHT = 'bw-light'
+    const DARK = 'aura-dark-cyan'
+    const LIGHT = 'aura-light-cyan'
     const currentTheme = ref(useSessionStorage(THEME, LIGHT))
 
     const switchTheme = () => {
