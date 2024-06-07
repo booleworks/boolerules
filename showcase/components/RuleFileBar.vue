@@ -17,15 +17,8 @@
                     <Button :icon="currentIcon()" class="mr-3" rounded @click="switchTheme()" />
                     <Button :label="$t('rulefilebar.management')" icon="pi pi-file" class="mr-3"
                         @click="fetchRuleFiles()" />
-                    <FileUpload mode="basic" uploadIcon="pi pi-cloud-upload" :url="appConfig.rulefile" class="mr-3"
-                        :auto="true" :multiple="false" accept=".prl" @upload="onUpload" @error="onError"
-                        :chooseLabel="!isPresent() ? $t('rulefilebar.btn_upload') : $t('rulefilebar.btn_upload_new')" />
                 </div>
             </div>
-            <Dialog v-model:visible="showDialog" modal :header="$t('upload.summary')" :style="{ width: '50vw' }"
-                :dismissableMask="true">
-                <UploadDialog :summary="summary" />
-            </Dialog>
             <Dialog v-model:visible="showFileManagement" modal :header="$t('rulefilebar.management')"
                 :style="{ width: '80vw' }" :dismissableMask="true">
                 <FileManagementDialog :initial-files="ruleFiles" />
@@ -35,42 +28,14 @@
 </template>
 
 <script setup lang="ts">
-import {
-    type FileUploadErrorEvent,
-    type FileUploadUploadEvent,
-} from 'primevue/fileupload'
 import { type UploadSummary } from '~/types/rulefiles'
 
 const appConfig = useAppConfig()
-const { getSummary, setSummary, isPresent } = useCurrentRuleFile()
-const { initSliceSelection } = useCurrentSliceSelection()
-const { clearSelectedFeatures } = useFeatureSelection()
+const { getSummary, isPresent } = useCurrentRuleFile()
 const { switchTheme, currentIcon } = useTheme()
 
-const showDialog = ref(false)
 const showFileManagement = ref(false)
 const ruleFiles = ref([] as UploadSummary[])
-
-const onError = (event: FileUploadErrorEvent) => {
-    console.error(event)
-    if (event.xhr.response) {
-        const summary: UploadSummary = JSON.parse(event.xhr.response)
-        setSummary(summary)
-    } else {
-        setSummary({} as UploadSummary)
-    }
-    showDialog.value = true
-}
-
-const onUpload = (event: FileUploadUploadEvent) => {
-    const summary: UploadSummary = JSON.parse(event.xhr.response)
-    console.log('successfully uploaded PRL file')
-    console.log(summary)
-    initSliceSelection(summary)
-    setSummary(summary)
-    clearSelectedFeatures()
-    showDialog.value = true
-}
 
 async function fetchRuleFiles() {
     $fetch(appConfig.rulefile, { method: 'GET' }).then((res) => {
