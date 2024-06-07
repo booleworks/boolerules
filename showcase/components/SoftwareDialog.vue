@@ -11,6 +11,7 @@
             <Column field="action" :header="$t('algo.packagesolving.action')" sortable />
         </DataTable>
         <div class="flex flex-grow items-center">
+            <div class="flex flex-grow"></div>
             <FileUpload mode="basic" uploadIcon="pi pi-cloud-upload" :auto="true" :multiple="false" name="weights[]"
                 accept=".csv" customUpload @uploader="uploadSoftware"
                 :chooseLabel="$t('algo.packagesolving.btn_upload_software')" />

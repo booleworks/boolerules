@@ -10,6 +10,7 @@ export default () => {
     const currentTheme = ref(useSessionStorage(THEME, LIGHT))
 
     const switchTheme = () => {
+        document.documentElement.classList.toggle('dark');
         const ct = currentTheme.value
         const nt = currentTheme.value === DARK ? LIGHT : DARK
         PrimeVue.changeTheme(ct, nt, THEME_LINK, () => { });

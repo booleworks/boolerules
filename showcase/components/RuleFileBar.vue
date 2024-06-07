@@ -14,7 +14,7 @@
             </div>
             <div class="flex flex-none">
                 <div class="flex content-center">
-                    <Button :icon="currentIcon()" class="mr-3" rounded @click="switchTheme()" />
+                    <!--<Button :icon="currentIcon()" class="mr-3" rounded @click="switchTheme()" />-->
                     <Button :label="$t('rulefilebar.management')" icon="pi pi-file" class="mr-3"
                         @click="fetchRuleFiles()" />
                 </div>
