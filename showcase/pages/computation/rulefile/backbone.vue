@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-column w-full">
+    <div class="flex-col w-full">
         <AlgorithmHeader :header="$t('computation.backbone')" boolFeature enumFeature intFeature />
 
         <!-- Top panels -->
@@ -9,17 +9,18 @@
             </AccordionTab>
 
             <AccordionTab :header="$t('slices.selection')">
-                <SliceSelection defaultSliceType="SPLIT" :allowedSliceTypes="['SPLIT', 'ALL']" :only-single-slice="false" />
+                <SliceSelection defaultSliceType="SPLIT" :allowedSliceTypes="['SPLIT', 'ALL']"
+                    :only-single-slice="false" />
             </AccordionTab>
         </Accordion>
 
         <!-- Computation paramters & button -->
         <ClientOnly>
-            <div class="flex-column">
+            <div class="flex-col">
                 <ComputationParams additionalConstraints autocompleteFeatures />
                 <div class="flex">
-                    <Button :label="$t('algo.backbone.btn_compute')" @click="compute()" icon="pi pi-desktop"
-                        :disabled="!buttonActive" />
+                    <Button class="mt-2" :label="$t('algo.backbone.btn_compute')" @click="compute()"
+                        icon="pi pi-desktop" :disabled="!buttonActive" />
                 </div>
             </div>
         </ClientOnly>
@@ -34,7 +35,7 @@
                 <div v-if="status.success">
                     <DataTable :value="result" rowGroupMode="rowspan" groupRowsBy="element" resizableColumns
                         columnResizeMode="expand" scrollable scrollHeight="flex" showGridlines sortField="element"
-                        :sortOrder="1" class="mt-3 pb-3 p-datatable-sm">
+                        :sortOrder="1" size="small" class="mt-3 pb-3">
                         <Column field="element" header="Feature" sortable>
                             <template #body="slotProps">
                                 <div class="flex align-items-center gap-2">
@@ -61,7 +62,7 @@
                         </Column>
                     </DataTable>
                 </div>
-                <div v-else class="text-600 text">{{ $t("algo.nothing_computed") }}</div>
+                <div v-else class="text-gray-600 text">{{ $t("algo.nothing_computed") }}</div>
             </AccordionTab>
         </Accordion>
     </div>

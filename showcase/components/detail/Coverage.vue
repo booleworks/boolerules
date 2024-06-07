@@ -3,7 +3,7 @@
     <Button class="mt-3" :label="$t('details.btn_compute')" icon="pi pi-info-circle" @click="computeDetails()" />
     <Button class="mt-3 ml-3" :label="$t('details.btn_compute_graph')" icon="pi pi-chart-bar" @click="computeGraph()" />
     <div v-if="details.mainResult" class="mt-5">
-        <DataTable :value="details.detail.detail.configurations">
+        <DataTable size="small" :value="details.detail.detail.configurations">
             <Column field="coveredConstraints" :header="$t('details.covered_constraints')" style="vertical-align: top">
                 <template #body="slotProps">
                     <div v-for="constraint of slotProps.data.coveredConstraints" class="covered-constraints mb-4">{{

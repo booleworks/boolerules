@@ -1,7 +1,7 @@
 <template>
     <div class="flex">
         <div class="flex">
-            <table class="text-600">
+            <table class="text-gray-600">
                 <tr>
                     <th class="font-bold text-left">{{ $t('comp_stat.time') }}</th>
                     <th class="font-bold text-left">{{ $t('comp_stat.slices') }}</th>
@@ -19,8 +19,9 @@
             </table>
         </div>
 
-        <div v-if="enableDownload" class="flex align-items-center justify-content-center">
-            <Button class="ml-5" :label="$t('comp_stat.btn_download')" @click="download()" icon="pi pi-cloud-download" />
+        <div v-if="enableDownload" class="flex items-center justify-center">
+            <Button class="ml-5" :label="$t('comp_stat.btn_download')" @click="download()"
+                icon="pi pi-cloud-download" />
         </div>
     </div>
 </template>

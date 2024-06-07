@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-column w-full">
+    <div class="flex-col w-full">
         <AlgorithmHeader :header="$t('computation.enumeration')" boolFeature enumFeature intFeature />
 
         <!-- Top panels -->
@@ -9,17 +9,18 @@
             </AccordionTab>
 
             <AccordionTab :header="$t('slices.selection')">
-                <SliceSelection defaultSliceType="SPLIT" :allowedSliceTypes="['SPLIT', 'ANY', 'ALL']" :only-single-slice="false" />
+                <SliceSelection defaultSliceType="SPLIT" :allowedSliceTypes="['SPLIT', 'ANY', 'ALL']"
+                    :only-single-slice="false" />
             </AccordionTab>
         </Accordion>
 
         <!-- Computation paramters & button -->
         <ClientOnly>
-            <div class="flex-column">
+            <div class="flex-col">
                 <ComputationParams additionalConstraints autocompleteFeatures />
                 <div class="flex">
-                    <Button :label="$t('algo.enumeration.btn_compute')" @click="compute()" icon="pi pi-desktop"
-                        :disabled="!buttonActive" />
+                    <Button class="mt-2" :label="$t('algo.enumeration.btn_compute')" @click="compute()"
+                        icon="pi pi-desktop" :disabled="!buttonActive" />
                 </div>
             </div>
         </ClientOnly>
@@ -32,11 +33,11 @@
             <AccordionTab :header="$t('result.header')">
                 <div v-if="status.success">
                     <DataTable :value="result" rowGroupMode="rowspan" groupRowsBy="element" resizableColumns
-                        columnResizeMode="expand" showGridlines sortField="element" :sortOrder="1"
-                        class="p-datatable-sm mt-3 pb-3">
+                        columnResizeMode="expand" showGridlines sortField="element" :sortOrder="1" size="small"
+                        class="mt-3 pb-3">
                         <Column field="element" :header="$t('algo.enumeration.combination')">
                             <template #body="slotProps">
-                                <div class="flex align-items-center gap-2">
+                                <div class="flex items-center gap-2">
                                     <FeatureModelColumn :model="slotProps.data.element.content" />
                                 </div>
                             </template>
@@ -49,7 +50,7 @@
                         </Column>
                     </DataTable>
                 </div>
-                <div v-else class="text-600 text">{{ $t('algo.nothing_computed') }}</div>
+                <div v-else class="text-gray-600 text">{{ $t('algo.nothing_computed') }}</div>
             </AccordionTab>
         </Accordion>
     </div>

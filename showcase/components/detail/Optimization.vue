@@ -2,12 +2,18 @@
     <DetailHeader />
     <Button class="mt-3" :label="$t('details.btn_compute')" icon="pi pi-info-circle" @click="computeDetails()" />
     <div v-if="details.mainResult" class="mt-5">
-        <h3>{{ $t('details.optimum') }}</h3>
+        <div class="mt-5 mb-2 text-2xl font-bold">{{ $t('details.optimum') }}</div>
         <div> {{ details.mainResult.result }} </div>
 
-        <h3>{{ $t('details.used_weights') }}</h3>
-        <DataTable :value="details.detail.detail.usedWeightings">
-            <Column field="constraint" :header="$t('common.constraint')" sortable />
+        <div class="mt-5 mb-2 text-2xl font-bold">{{ $t('details.used_weights') }}</div>
+        <DataTable size="small" :value="details.detail.detail.usedWeightings">
+            <Column field="constraint" :header="$t('common.constraint')" sortable>
+                <template #body="slotProps">
+                    <div class="constraint">
+                        {{ slotProps.data.constraint }}
+                    </div>
+                </template>
+            </Column>
             <Column field="weight" :header="$t('algo.optimization.weighting')" sortable />
         </DataTable>
 
@@ -47,3 +53,9 @@ async function computeDetails() {
     })
 }
 </script>
+
+<style scoped>
+.constraint {
+    font-family: monospace;
+}
+</style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-column w-full">
+    <div class="flex-col w-full">
         <AlgorithmHeader :header="$t('computation.minmax')" boolFeature enumFeature intFeature />
 
         <!-- Top panels -->
@@ -16,13 +16,13 @@
 
         <!-- Computation paramters & button -->
         <ClientOnly>
-            <div class="flex-column">
+            <div class="flex-col">
                 <ComputationParams additionalConstraints />
                 <div class="flex">
-                    <div class="flex align-items-center">
-                        <Button :label="$t('algo.minmax.btn_compute_min')" @click="compute(false)" icon="pi pi-desktop"
-                            :disabled="!buttonActive" />
-                        <Button class="ml-5" :label="$t('algo.minmax.btn_compute_max')" @click="compute(true)"
+                    <div class="flex items-center">
+                        <Button class="mt-2" :label="$t('algo.minmax.btn_compute_min')" @click="compute(false)"
+                            icon="pi pi-desktop" :disabled="!buttonActive" />
+                        <Button class="mt-2 ml-5" :label="$t('algo.minmax.btn_compute_max')" @click="compute(true)"
                             icon="pi pi-desktop" :disabled="!buttonActive" />
                     </div>
                 </div>
@@ -37,10 +37,10 @@
 
             <AccordionTab :header="$t('result.header')">
                 <div v-if="status.success">
-                    <div class="flex flex-wrap align-items-center justify-content-end">
+                    <div class="flex flex-wrap items-center justify-end">
                         <Button :label="$t('details.btn_show')" icon="pi pi-info-circle" @click="showDetails()" />
                     </div>
-                    <DataTable :value="result" resizableColumns showGridlines class="p-datatable-sm mt-3 pb-3"
+                    <DataTable :value="result" resizableColumns showGridlines size="small" class="mt-3 pb-3"
                         sortField="result" :sortOrder="1">
                         <Column sortable field="result" :header="$t('result.header')" class="font-bold"
                             style="width: 15rem" />

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <DataTable :value="getConfiguration().features" showGridlines class="p-datatable-sm mb-3" scrollable
+        <DataTable :value="getConfiguration().features" showGridlines size="small" class="mb-3" scrollable
             scrollHeight="600px">
             <Column field="feature" sortable :header="$t('common.features')">
                 <template #body="slotProps">
@@ -10,7 +10,8 @@
                 </template>
             </Column>
         </DataTable>
-        <div class="flex flex-grow-1 align-items-center">
+        <div class="flex flex-grow items-center">
+            <div class="flex flex-grow"></div>
             <FileUpload mode="basic" uploadIcon="pi pi-cloud-upload" :auto="true" :multiple="false" name="weights[]"
                 accept=".csv" customUpload @uploader="uploadConfiguration"
                 :chooseLabel="$t('algo.reconfiguration.btn_upload_configuration')" />

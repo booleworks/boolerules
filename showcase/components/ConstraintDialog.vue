@@ -1,6 +1,6 @@
 <template>
     <div>
-        <DataTable :value="getCustomConstraints()" showGridlines class="p-datatable-sm mb-3" scrollable
+        <DataTable :value="getCustomConstraints()" size="small" showGridlines class="mb-3" scrollable
             scrollHeight="600px">
             <Column field="constraint" :header="$t('common.constraint')">
                 <template #body="slotProps">
@@ -10,7 +10,8 @@
                 </template>
             </Column>
         </DataTable>
-        <div class="flex flex-grow-1 align-items-center">
+        <div class="flex flex-grow items-center">
+            <div class="flex flex-grow"></div>
             <FileUpload mode="basic" uploadIcon="pi pi-cloud-upload" :auto="true" :multiple="false" name="weights[]"
                 accept=".csv" customUpload @uploader="uploadConstraints"
                 :chooseLabel="$t('algo.coverage.btn_upload_constraints')" />

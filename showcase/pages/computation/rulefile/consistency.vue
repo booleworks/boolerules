@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-column w-full">
+    <div class="flex-col w-full">
         <AlgorithmHeader :header="$t('computation.consistency')" boolFeature enumFeature intFeature />
 
         <!-- Top panels -->
@@ -16,7 +16,7 @@
 
         <!-- Computation paramters & button -->
         <ClientOnly>
-            <div class="flex-column">
+            <div class="flex-col">
                 <ComputationParams additionalConstraints />
                 <div class="flex">
                     <Button class="mt-2" :label="$t('algo.consistency.btn_compute')" @click="compute()"
@@ -33,17 +33,17 @@
 
             <AccordionTab :header="$t('result.header')">
                 <div v-if="status.success">
-                    <div class="flex flex-wrap align-items-center justify-content-end">
+                    <div class="flex flex-wrap items-center justify-end">
                         <Button :label="$t('details.btn_show')" icon="pi pi-info-circle" @click="showDetails()" />
                     </div>
-                    <DataTable :value="result" scrollable showGridlines class="p-datatable-sm mt-3 pb-3">
+                    <DataTable :value="result" scrollable showGridlines size="small" class="mt-3 pb-3">
                         <Column field="result" sortable :header="$t('result.header')" class="font-bold"
                             style="width: 15rem">
                             <template #body="bdy">
-                                <div v-if="bdy.data.result" class="text-green-700">
+                                <div v-if="bdy.data.result" class="text-green-600">
                                     {{ $t('algo.consistency.consistent') }}
                                 </div>
-                                <div v-else class="text-red-700">
+                                <div v-else class="text-red-600">
                                     {{ $t('algo.consistency.inconsistent') }}
                                 </div>
                             </template>
@@ -56,7 +56,7 @@
                         </Column>
                     </DataTable>
                 </div>
-                <div v-else class="text-600 text">{{ $t('algo.nothing_computed') }}</div>
+                <div v-else class="text-gray-600 text">{{ $t('algo.nothing_computed') }}</div>
             </AccordionTab>
         </Accordion>
     </div>

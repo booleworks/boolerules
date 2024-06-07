@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-column w-full">
+    <div class="flex-col w-full">
         <AlgorithmHeader :header="$t('computation.counting')" boolFeature enumFeature intFeature />
 
         <!-- Top panels -->
@@ -9,17 +9,18 @@
             </AccordionTab>
 
             <AccordionTab :header="$t('slices.selection')">
-                <SliceSelection defaultSliceType="SPLIT" :allowedSliceTypes="['SPLIT', 'ALL']" :only-single-slice="false" />
+                <SliceSelection defaultSliceType="SPLIT" :allowedSliceTypes="['SPLIT', 'ALL']"
+                    :only-single-slice="false" />
             </AccordionTab>
         </Accordion>
 
         <!-- Computation paramters & button -->
         <ClientOnly>
-            <div class="flex-column">
+            <div class="flex-col">
                 <ComputationParams additionalConstraints />
                 <div class="flex">
-                    <Button :label="$t('algo.counting.btn_compute')" @click="compute()" icon="pi pi-desktop"
-                        :disabled="!buttonActive" />
+                    <Button class="mt-2" :label="$t('algo.counting.btn_compute')" @click="compute()"
+                        icon="pi pi-desktop" :disabled="!buttonActive" />
                 </div>
             </div>
         </ClientOnly>
@@ -32,7 +33,7 @@
 
             <AccordionTab :header="$t('result.header')">
                 <div v-if="status.success">
-                    <DataTable :value="result" resizableColumns showGridlines class="p-datatable-sm mt-3 pb-3">
+                    <DataTable :value="result" resizableColumns showGridlines size="small" class="mt-3 pb-3">
                         <Column sortable field="result" :header="$t('result.header')" class="font-bold"
                             style="max-width: 8rem">
                             <template #body="bdy">
@@ -47,7 +48,7 @@
                         </Column>
                     </DataTable>
                 </div>
-                <div v-else class="text-600 text">{{ $t('algo.nothing_computed') }}</div>
+                <div v-else class="text-gray-600 text">{{ $t('algo.nothing_computed') }}</div>
             </AccordionTab>
         </Accordion>
     </div>
@@ -107,17 +108,3 @@ async function performComputation(request: ModelCountRequest) {
     })
 }
 </script>
-
-<style scoped>
-.divider-text :deep(.p-divider-content) {
-    background-color: var(--surface-ground) !important;
-}
-
-.feature-autocomplete :deep(.p-autocomplete-token-label) {
-    margin-right: 5px !important;
-}
-
-.feature-autocomplete {
-    max-width: 50% !important;
-}
-</style>

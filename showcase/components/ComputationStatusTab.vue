@@ -1,7 +1,8 @@
 <template>
     <div>
         <div v-if="status.success">
-            <ComputationStatisticsTable :job-id="status.jobId" :statistics="status.statistics" :enable-download="enableDownload"/>
+            <ComputationStatisticsTable :job-id="status.jobId" :statistics="status.statistics"
+                :enable-download="enableDownload" />
         </div>
 
         <div v-if="status.errors?.length > 0">
@@ -16,7 +17,7 @@
                 {{ warning }}
             </div>
         </div>
-        <div v-if="!status.jobId" class="text-600 text">{{ $t('algo.nothing_computed') }}</div>
+        <div v-if="!status.jobId" class="text-gray-600 text">{{ $t('algo.nothing_computed') }}</div>
     </div>
 </template>
 

@@ -1,6 +1,6 @@
 <template>
     <div v-if="model">
-        <h3>{{ $t('details.example') }}</h3>
+        <div class="mt-5 mb-3 text-2xl font-bold">{{ $t('details.example') }}</div>
         <div v-if="model?.features.length > 0">
             <div v-for="feature of model.features" class="mr-1 feature-span">
                 <div v-if="feature.booleanValue" class="mr-1">
@@ -13,7 +13,7 @@
                 <div v-if="feature.intValue" class="mr-1">
                     <span class="unimportant-info">{{ feature.code }}=</span>
                     <span class="important-info">{{ feature.intValue
-                    }}</span>
+                        }}</span>
                 </div>
                 <div v-if="feature.version" class="mr-1">
                     <span class="unimportant-info">{{ feature.code }}=</span>
@@ -42,4 +42,3 @@ defineProps<{ model?: FeatureModel }>()
     font-weight: bold;
 }
 </style>
-

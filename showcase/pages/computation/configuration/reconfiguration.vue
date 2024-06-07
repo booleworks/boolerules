@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-column w-full">
+    <div class="flex-col w-full">
         <AlgorithmHeader :header="$t('computation.reconfiguration')" boolFeature enumFeature intFeature />
 
         <!-- Top panels -->
@@ -15,16 +15,16 @@
 
         <!-- Computation parameters & button -->
         <ClientOnly>
-            <div class="flex-column">
+            <div class="flex-col">
                 <div class="flex">
                     <Button :label="$t('algo.reconfiguration.btn_edit_configuration')" icon="pi pi-table"
                         severity="secondary" class="mb-3 mr-3" @click="showConfigurationDialog()" />
-                    <div v-if="getConfiguration().features" class="mb-3 align-content-center">
+                    <div v-if="getConfiguration().features" class="mb-3 content-center">
                         {{
                             $t('algo.reconfiguration.loaded_configuration') + ": " + getConfiguration().features.length
                         }}
                     </div>
-                    <div v-else class="mb-3 align-content-center">
+                    <div v-else class="mb-3 content-center">
                         {{ $t('algo.reconfiguration.no_configuration') }}
                     </div>
                 </div>
@@ -38,7 +38,7 @@
                     </tr>
                 </table>
                 <div class="flex">
-                    <Button class="mt-2" :label="$t('algo.reconfiguration.btn_compute')" @click="compute()"
+                    <Button class="mt-3" :label="$t('algo.reconfiguration.btn_compute')" @click="compute()"
                         icon="pi pi-desktop" :disabled="!buttonActive" />
                 </div>
             </div>
@@ -64,7 +64,7 @@
                         <span>{{ $t('algo.reconfiguration.features_to_remove') }}</span>
                     </div>
                     <div class="flex mt-2">
-                        <DataTable :value="result.featuresToAdd" showGridlines class="p-datatable-sm mt-3 pb-3 mr-3"
+                        <DataTable :value="result.featuresToAdd" size="small" showGridlines class="mt-3 pb-3 mr-3"
                             sortField="result" :sortOrder="1">
                             <Column sortable :header="$t('algo.reconfiguration.features_to_add')" class="font-bold"
                                 style="width: 20rem">
@@ -75,7 +75,7 @@
                                 </template>
                             </Column>
                         </DataTable>
-                        <DataTable :value="result.featuresToRemove" showGridlines class="p-datatable-sm mt-3 pb-3"
+                        <DataTable :value="result.featuresToRemove" size="small" showGridlines class="mt-3 pb-3"
                             sortField="result" :sortOrder="1">
                             <Column sortable :header="$t('algo.reconfiguration.features_to_remove')" class="font-bold"
                                 style="width: 20rem">
@@ -88,7 +88,7 @@
                         </DataTable>
                     </div>
                 </div>
-                <div v-else class="text-600 text">{{ $t('algo.nothing_computed') }}</div>
+                <div v-else class="text-gray-600 text">{{ $t('algo.nothing_computed') }}</div>
             </AccordionTab>
         </Accordion>
     </div>
@@ -159,19 +159,15 @@ async function compute() {
 </script>
 
 <style scoped>
-.divider-text :deep(.p-divider-content) {
-    background-color: var(--surface-ground) !important;
-}
-
 .features-to-add {
     font-family: monospace;
-    font-weight: 700 !important;
-    color: var(--green-700) !important;
+    font-weight: 700;
+    color: rgb(22 163 74);
 }
 
 .features-to-remove {
     font-family: monospace;
-    font-weight: 700 !important;
-    color: var(--red-700) !important;
+    font-weight: 700;
+    color: rgb(239 68 68);
 }
 </style>

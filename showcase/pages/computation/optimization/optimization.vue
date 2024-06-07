@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-column w-full">
+    <div class="flex-col w-full">
         <AlgorithmHeader :header="$t('computation.weights')" boolFeature enumFeature intFeature />
 
         <!-- Top panels -->
@@ -16,24 +16,24 @@
 
         <!-- Computation paramters & button -->
         <ClientOnly>
-            <div class="flex-column">
+            <div class="flex-col">
                 <div class="flex">
                     <Button :label="$t('algo.optimization.btn_edit_weights')" icon="pi pi-table" severity="secondary"
                         class="mb-3 mr-3" @click="showWeightsDialog()" />
-                    <div v-if="getCustomWeights().value.length > 0" class="mb-3 align-content-center">
+                    <div v-if="getCustomWeights().value.length > 0" class="mb-3 content-center">
                         {{ $t('algo.optimization.loaded_weights') + ": " + getCustomWeights().value.length }}
                     </div>
-                    <div v-else class="mb-3 align-content-center">
+                    <div v-else class="mb-3 content-center">
                         {{ $t('algo.optimization.no_weights') }}
                     </div>
                 </div>
                 <ComputationParams weights additionalConstraints />
                 <div class="flex">
-                    <div class="flex align-items-center">
-                        <Button :label="$t('algo.optimization.btn_compute_min')" @click="compute(false)"
+                    <div class="flex items-center">
+                        <Button class="mt-2" :label="$t('algo.optimization.btn_compute_min')" @click="compute(false)"
                             icon="pi pi-desktop" :disabled="!buttonActive" />
-                        <Button class="ml-5" :label="$t('algo.optimization.btn_compute_max')" @click="compute(true)"
-                            icon="pi pi-desktop" :disabled="!buttonActive" />
+                        <Button class="mt-2 ml-5" :label="$t('algo.optimization.btn_compute_max')"
+                            @click="compute(true)" icon="pi pi-desktop" :disabled="!buttonActive" />
                     </div>
                 </div>
             </div>
@@ -52,10 +52,10 @@
 
             <AccordionTab :header="$t('result.header')">
                 <div v-if="status.success">
-                    <div class="flex flex-wrap align-items-center justify-content-end">
+                    <div class="flex flex-wrap items-center justify-end">
                         <Button :label="$t('details.btn_show')" icon="pi pi-info-circle" @click="showDetails()" />
                     </div>
-                    <DataTable :value="result" resizableColumns showGridlines class="p-datatable-sm mt-3 pb-3"
+                    <DataTable :value="result" resizableColumns showGridlines size="small" class="mt-3 pb-3"
                         sortField="result" :sortOrder="1">
                         <Column sortable field="result" :header="$t('result.header')" class="font-bold"
                             style="width: 15rem" />
@@ -72,7 +72,7 @@
         </Accordion>
     </div>
 
-    <Sidebar v-model:visible="detailView" position="right" class="" style="width: 50rem;">
+    <Sidebar v-model:visible="detailView" position="right" style="width: 50rem;">
         <DetailOptimization />
     </Sidebar>
 </template>
@@ -149,9 +149,3 @@ function showDetails() {
     detailView.value = true
 }
 </script>
-
-<style scoped>
-.divider-text :deep(.p-divider-content) {
-    background-color: var(--surface-ground) !important;
-}
-</style>

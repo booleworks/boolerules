@@ -1,10 +1,10 @@
 <template>
-    <div id="br-topbar" class="flex flex-grow-1 p-2 surface-100 border-bottom-1 surface-border">
+    <div id="br-topbar" class="flex flex-grow p-2 bg-gray-100 border-b border-gray-300">
         <ClientOnly>
-            <div v-if="!isPresent()" class="flex flex-grow-1 align-items-center">
+            <div v-if="!isPresent()" class="flex flex-grow items-center">
                 {{ $t('rulefilebar.upload_first') }}
             </div>
-            <div v-else class="flex flex-grow-1 align-items-center">
+            <div v-else class="flex flex-grow items-center">
                 <span class="font-bold">{{ $t('rulefilebar.filename') }}</span>
                 <span>: {{ summary.fileName }}</span>
                 <span class="ml-3 font-bold"># {{ $t('rulefilebar.features') }}</span>
@@ -22,11 +22,12 @@
                         :chooseLabel="!isPresent() ? $t('rulefilebar.btn_upload') : $t('rulefilebar.btn_upload_new')" />
                 </div>
             </div>
-            <Dialog v-model:visible="showDialog" modal :header="$t('upload.summary')" :style="{ width: '50vw' }">
+            <Dialog v-model:visible="showDialog" modal :header="$t('upload.summary')" :style="{ width: '50vw' }"
+                :dismissableMask="true">
                 <UploadDialog :summary="summary" />
             </Dialog>
             <Dialog v-model:visible="showFileManagement" modal :header="$t('rulefilebar.management')"
-                :style="{ width: '80vw' }">
+                :style="{ width: '80vw' }" :dismissableMask="true">
                 <FileManagementDialog :initial-files="ruleFiles" />
             </Dialog>
         </ClientOnly>

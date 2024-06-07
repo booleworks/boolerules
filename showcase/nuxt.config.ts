@@ -1,10 +1,12 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import path from 'path'
+
 export default defineNuxtConfig({
     css: [
-        'primeflex/primeflex.css',
+        "public/br-theme.css",
         "primeicons/primeicons.css",
     ],
     modules: [
+        '@nuxtjs/tailwindcss',
         '@vueuse/nuxt',
         '@nuxtjs/i18n',
         'nuxt-primevue',
@@ -12,19 +14,10 @@ export default defineNuxtConfig({
     i18n: {
         vueI18n: './i18n.config.ts'
     },
-    app: {
-        baseURL: "/",
-        head: {
-            link: [
-                {
-                    id: 'theme-link',
-                    rel: 'stylesheet',
-                    href: '/themes/lara-light-green/theme.css'
-                }
-            ],
+    primevue: {
+        options: {
+            unstyled: true
         },
+        importPT: { as: 'Lara', from: path.resolve(__dirname, './presets/lara/') }
     },
-    build: {
-        //transpile: ["primevue"]
-    }
 })

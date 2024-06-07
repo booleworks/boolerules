@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-column w-full">
+    <div class="flex-col w-full">
         <AlgorithmHeader :header="$t('computation.coverage')" boolFeature enumFeature intFeature />
 
         <!-- Top panels -->
@@ -15,14 +15,14 @@
 
         <!-- Computation parameters & button -->
         <ClientOnly>
-            <div class="flex-column">
+            <div class="flex-col">
                 <div class="flex">
                     <Button :label="$t('algo.coverage.btn_edit_constraints')" icon="pi pi-table" severity="secondary"
                         class="mb-3 mr-3" @click="showConstraintDialog()" />
-                    <div v-if="getCustomConstraintsAsStrings().length > 0" class="mb-3 align-content-center">
+                    <div v-if="getCustomConstraintsAsStrings().length > 0" class="mb-3 content-center">
                         {{ $t('algo.coverage.loaded_constraints') + ": " + getCustomConstraintsAsStrings().length }}
                     </div>
-                    <div v-else class="mb-3 align-content-center">
+                    <div v-else class="mb-3 content-center">
                         {{ $t('algo.coverage.no_constraints') }}
                     </div>
                 </div>
@@ -48,10 +48,10 @@
 
             <AccordionTab :header="$t('result.header')">
                 <div v-if="status.success">
-                    <div class="flex flex-wrap align-items-center justify-content-end">
+                    <div class="flex flex-wrap items-center justify-end">
                         <Button :label="$t('details.btn_show')" icon="pi pi-info-circle" @click="showDetails()" />
                     </div>
-                    <DataTable :value="result" resizableColumns showGridlines class="p-datatable-sm mt-3 pb-3"
+                    <DataTable :value="result" resizableColumns showGridlines size="small" class="mt-3 pb-3"
                         sortField="result" :sortOrder="1">
                         <Column sortable field="result.requiredConfigurations"
                             :header="$t('algo.coverage.header_required_configurations')" class="font-bold"
@@ -67,12 +67,12 @@
                         </Column>
                     </DataTable>
                 </div>
-                <div v-else class="text-600 text">{{ $t('algo.nothing_computed') }}</div>
+                <div v-else class="text-gray-600 text">{{ $t('algo.nothing_computed') }}</div>
             </AccordionTab>
         </Accordion>
     </div>
 
-    <Sidebar v-model:visible="detailView" position="right" class="" style="width: 50rem;">
+    <Sidebar v-model:visible="detailView" position="right" style="width: 50rem;">
         <DetailCoverage />
     </Sidebar>
 </template>
@@ -145,9 +145,3 @@ function showDetails() {
     detailView.value = true
 }
 </script>
-
-<style scoped>
-.divider-text :deep(.p-divider-content) {
-    background-color: var(--surface-ground) !important;
-}
-</style>

@@ -1,28 +1,30 @@
 <template>
-    <div class="border-right-1 surface-border overflow-scroll">
+    <div class="border-r border-gray-300 overflow-scroll">
         <div class="m-3">
             <a href="/">
                 <img :src="currentLogo()" alt="Logo" width="210" />
             </a>
         </div>
-        <div class="menu-header"><i class="pi pi-fw pi-eye"></i>{{ ' ' + $t('computation.header_insights').toUpperCase()
+        <div class="menu-header text-primary"><i class="pi pi-fw pi-eye"></i>{{ ' ' +
+            $t('computation.header_insights').toUpperCase()
             }}
         </div>
         <MenuItem v-for="algo in insightAlgos" :item="algo" />
-        <div class="menu-header"><i class="pi pi-fw pi-sliders-h"></i>{{
+        <div class="menu-header text-primary"><i class="pi pi-fw pi-sliders-h"></i>{{
             ' ' + $t('computation.header_configuration').toUpperCase()
-            }}
+        }}
         </div>
         <MenuItem v-for="algo in configurationAlgos" :item="algo" />
-        <div class="menu-header"><i class="pi pi-fw pi-sort-amount-down"></i>{{
+        <div class="menu-header text-primary"><i class="pi pi-fw pi-sort-amount-down"></i>{{
             ' ' + $t('computation.header_optimization').toUpperCase() }}
         </div>
         <MenuItem v-for="algo in optimizationAlgos" :item="algo" />
-        <div class="menu-header"><i class="pi pi-fw pi-sitemap"></i>{{ ' ' + $t('computation.header_bom').toUpperCase()
+        <div class="menu-header text-primary"><i class="pi pi-fw pi-sitemap"></i>{{ ' ' +
+            $t('computation.header_bom').toUpperCase()
             }}
         </div>
         <MenuItem v-for="algo in bomAlgos" :item="algo" />
-        <div class="menu-header"><i class="pi pi-fw pi-box"></i>{{
+        <div class="menu-header text-primary"><i class="pi pi-fw pi-box"></i>{{
             ' ' + $t('computation.header_software').toUpperCase() }}
         </div>
         <MenuItem v-for="algo in softwareAlgos" :item="algo" />
@@ -68,7 +70,6 @@ const softwareAlgos = ref([
 .menu-header {
     font-weight: bold;
     font-size: 0.875rem;
-    color: var(--primary-color);
     margin-left: 1rem;
     margin-top: 2rem;
     margin-bottom: 0.75rem;

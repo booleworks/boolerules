@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-column w-full">
+    <div class="flex-col w-full">
         <AlgorithmHeader :header="$t('computation.packagesolving')" boolFeature enumFeature intFeature />
 
         <!-- Top panels -->
@@ -15,16 +15,16 @@
 
         <!-- Computation parameters & button -->
         <ClientOnly>
-            <div class="flex-column">
+            <div class="flex-col">
                 <div class="flex">
                     <Button :label="$t('algo.packagesolving.btn_edit_software')" icon="pi pi-table" severity="secondary"
                         class="mb-3 mr-3" @click="showSoftwareDialog()" />
-                    <div v-if="getCustomSoftware().value.length > 0" class="mb-3 align-content-center">
+                    <div v-if="getCustomSoftware().value.length > 0" class="mb-3 content-center">
                         {{
                             $t('algo.packagesolving.loaded_packages') + ": " + getCustomSoftware().value.length
                         }}
                     </div>
-                    <div v-else class="mb-3 align-content-center">
+                    <div v-else class="mb-3 content-center">
                         {{ $t('algo.packagesolving.no_packages') }}
                     </div>
                 </div>
@@ -52,65 +52,60 @@
             <AccordionTab :header="$t('result.header')">
                 <div v-if="status.success">
                     <div>
-                        <span class="features-to-add mr-1">{{ result.newFeatures.length }} </span>
+                        <span class="font-bold text-green-600 mr-1">{{ result.newFeatures.length }} </span>
                         <span class="mr-4">{{ $t('algo.packagesolving.add') }}</span>
-                        <span class="features-to-upgrade mr-1">{{ upgraded() }} </span>
+                        <span class="font-bold text-blue-600 mr-1">{{ upgraded() }} </span>
                         <span class="mr-4">{{ $t('algo.packagesolving.upgraded') }}</span>
-                        <span class="features-to-downgrade mr-1">{{ downgraded() }} </span>
+                        <span class="font-bold text-orange-600 mr-1">{{ downgraded() }} </span>
                         <span class="mr-3">{{ $t('algo.packagesolving.downgraded') }}</span>
-                        <span class="features-to-remove mr-1">{{ result.removedFeatures.length }} </span>
+                        <span class="font-bold text-red-600 mr-1">{{ result.removedFeatures.length }} </span>
                         <span class="mr-3">{{ $t('algo.packagesolving.remove') }}</span>
                     </div>
                     <div class="flex mt-2">
                         <DataTable v-if="result.newFeatures.length > 0" :value="result.newFeatures" showGridlines
-                            class="p-datatable-sm mt-3 pb-3 mr-3" sortField="result" :sortOrder="1">
-                            <Column sortable :header="$t('algo.packagesolving.add')" class="font-bold"
-                                style="width: 15rem">
+                            size="small" class="mt-3 pb-3 mr-3" sortField="result" :sortOrder="1">
+                            <Column sortable :header="$t('algo.packagesolving.add')" style="width: 15rem">
                                 <template #body="slotProps">
-                                    <div class="features-to-add">
+                                    <div class="font-mono text-green-600">
                                         {{ slotProps.data.feature }}
                                     </div>
                                 </template>
                             </Column>
-                            <Column sortable :header="$t('algo.packagesolving.version')" class="font-bold"
-                                style="width: 5rem">
+                            <Column sortable :header="$t('algo.packagesolving.version')" style="width: 5rem">
                                 <template #body="slotProps">
-                                    <div class="features-to-add">
+                                    <div class="text-green-600">
                                         {{ slotProps.data.versionNew }}
                                     </div>
                                 </template>
                             </Column>
                         </DataTable>
-                        <DataTable v-if="result.changedFeatures.length > 0" :value="result.changedFeatures"
-                            showGridlines class="p-datatable-sm mt-3 pb-3 mr-3" sortField="result" :sortOrder="1">
-                            <Column sortable :header="$t('algo.packagesolving.changed')" class="font-bold"
-                                style="width: 15rem">
+                        <DataTable v-if="result.changedFeatures.length > 0" :value="result.changedFeatures" size="small"
+                            showGridlines class="mt-3 pb-3 mr-3" sortField="result" :sortOrder="1">
+                            <Column sortable :header="$t('algo.packagesolving.changed')" style="width: 15rem">
                                 <template #body="slotProps">
                                     <div :class="{
-                                        'features-to-upgrade': slotProps.data.versionNew > slotProps.data.versionOld,
-                                        'features-to-downgrade': slotProps.data.versionNew < slotProps.data.versionOld,
+                                        'font-mono text-blue-600': slotProps.data.versionNew > slotProps.data.versionOld,
+                                        'font-mono text-orange-600': slotProps.data.versionNew < slotProps.data.versionOld,
                                     }">
                                         {{ slotProps.data.feature }}
                                     </div>
                                 </template>
                             </Column>
-                            <Column sortable :header="$t('algo.packagesolving.old')" class="font-bold"
-                                style="width: 5rem">
+                            <Column sortable :header="$t('algo.packagesolving.old')" style="width: 5rem">
                                 <template #body="slotProps">
                                     <div :class="{
-                                        'features-to-upgrade': slotProps.data.versionNew > slotProps.data.versionOld,
-                                        'features-to-downgrade': slotProps.data.versionNew < slotProps.data.versionOld,
+                                        'text-blue-600': slotProps.data.versionNew > slotProps.data.versionOld,
+                                        'text-orange-600': slotProps.data.versionNew < slotProps.data.versionOld,
                                     }">
                                         {{ slotProps.data.versionOld }}
                                     </div>
                                 </template>
                             </Column>
-                            <Column sortable :header="$t('algo.packagesolving.new')" class="font-bold"
-                                style="width: 5rem">
+                            <Column sortable :header="$t('algo.packagesolving.new')" style="width: 5rem">
                                 <template #body="slotProps">
                                     <div :class="{
-                                        'features-to-upgrade': slotProps.data.versionNew > slotProps.data.versionOld,
-                                        'features-to-downgrade': slotProps.data.versionNew < slotProps.data.versionOld,
+                                        'text-blue-600': slotProps.data.versionNew > slotProps.data.versionOld,
+                                        'text-orange-600': slotProps.data.versionNew < slotProps.data.versionOld,
                                     }">
                                         {{ slotProps.data.versionNew }}
                                     </div>
@@ -119,16 +114,14 @@
                         </DataTable>
                         <DataTable v-if="result.removedFeatures.length > 0" :value="result.removedFeatures"
                             showGridlines class="p-datatable-sm mt-3 pb-3 mr-3" sortField="result" :sortOrder="1">
-                            <Column sortable :header="$t('algo.packagesolving.remove')" class="font-bold"
-                                style="width: 15rem">
+                            <Column sortable :header="$t('algo.packagesolving.remove')" style="width: 15rem">
                                 <template #body="slotProps">
                                     <div class="text-red-700">
                                         {{ slotProps.data.feature }}
                                     </div>
                                 </template>
                             </Column>
-                            <Column sortable :header="$t('algo.packagesolving.version')" class="font-bold"
-                                style="width: 5rem">
+                            <Column sortable :header="$t('algo.packagesolving.version')" style="width: 5rem">
                                 <template #body="slotProps">
                                     <div class="text-red-700">
                                         {{ slotProps.data.versionOld }}
@@ -249,29 +242,3 @@ function downgraded(): Number {
     return result.value.changedFeatures.filter(it => { return it.versionOld > it.versionNew }).length
 }
 </script>
-
-<style scoped>
-.divider-text :deep(.p-divider-content) {
-    background-color: var(--surface-ground) !important;
-}
-
-.features-to-add {
-    font-weight: 700 !important;
-    color: var(--green-700) !important;
-}
-
-.features-to-remove {
-    font-weight: 700 !important;
-    color: var(--red-700) !important;
-}
-
-.features-to-upgrade {
-    font-weight: 700 !important;
-    color: var(--blue-700) !important;
-}
-
-.features-to-downgrade {
-    font-weight: 700 !important;
-    color: var(--orange-700) !important;
-}
-</style>

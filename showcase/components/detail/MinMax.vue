@@ -2,7 +2,7 @@
     <DetailHeader />
     <Button class="mt-3" :label="$t('details.btn_compute')" icon="pi pi-info-circle" @click="computeDetails()" />
     <div v-if="details.mainResult" class="mt-5">
-        <h3>{{ $t('details.optimum') }}</h3>
+        <div class="mt-5 mb-3 text-2xl font-bold">{{ $t('details.optimum') }}</div>
         <div> {{ details.mainResult.result }} </div>
         <DetailExampleConfiguration :model="details.detail.detail.exampleConfiguration" />
     </div>

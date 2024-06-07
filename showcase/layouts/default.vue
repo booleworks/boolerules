@@ -4,15 +4,15 @@
             <!-- The sidebar with the main navigation -->
             <MenuSidebar />
         </div>
-        <div class="flex-grow-1">
-            <div class="flex flow-grow-1 flex-column h-full">
+        <div class="flex-grow">
+            <div class="flex flex-grow flex-col h-full">
                 <!-- Rule File Status Bar -->
                 <div class="flex flex-none">
                     <RuleFileBar />
                 </div>
 
                 <!-- Main Content -->
-                <div class="flex flex-grow-1 surface-ground pl-3 lr-3 overflow-scroll">
+                <div class="flex flex-grow bg-gray-100 pl-3 px-3 overflow-auto">
                     <slot />
                 </div>
 
