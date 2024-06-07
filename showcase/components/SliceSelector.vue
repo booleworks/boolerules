@@ -1,5 +1,5 @@
 <template>
-    <td class="property-name font-bold" style="padding-right: 2rem">
+    <td class="font-mono font-bold" style="padding-right: 2rem">
         {{ selection.property }}
     </td>
     <td>{{ format(slice.type) }}</td>
@@ -116,10 +116,6 @@ function format(t: PropertyType) {
 </script>
 
 <style scoped>
-.property-name {
-    font-family: monospace;
-}
-
 th,
 td {
     padding-top: 10px;

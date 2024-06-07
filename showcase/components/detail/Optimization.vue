@@ -9,7 +9,7 @@
         <DataTable size="small" :value="details.detail.detail.usedWeightings">
             <Column field="constraint" :header="$t('common.constraint')" sortable>
                 <template #body="slotProps">
-                    <div class="constraint">
+                    <div class="font-mono">
                         {{ slotProps.data.constraint }}
                     </div>
                 </template>
@@ -53,9 +53,3 @@ async function computeDetails() {
     })
 }
 </script>
-
-<style scoped>
-.constraint {
-    font-family: monospace;
-}
-</style>

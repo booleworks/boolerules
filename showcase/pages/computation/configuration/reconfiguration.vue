@@ -58,30 +58,26 @@
             <AccordionTab :header="$t('result.header')">
                 <div v-if="status.success">
                     <div>
-                        <span class="features-to-add mr-1">{{ result.featuresToAdd.length }} </span>
+                        <span class="font-bold text-green-600 mr-1">{{ result.featuresToAdd.length }} </span>
                         <span class="mr-3">{{ $t('algo.reconfiguration.features_to_add') }}</span>
-                        <span class="features-to-remove mr-1">{{ result.featuresToRemove.length }} </span>
+                        <span class="font-bold text-red-600 mr-1">{{ result.featuresToRemove.length }} </span>
                         <span>{{ $t('algo.reconfiguration.features_to_remove') }}</span>
                     </div>
                     <div class="flex mt-2">
                         <DataTable :value="result.featuresToAdd" size="small" showGridlines class="mt-3 pb-3 mr-3"
                             sortField="result" :sortOrder="1">
-                            <Column sortable :header="$t('algo.reconfiguration.features_to_add')" class="font-bold"
-                                style="width: 20rem">
+                            <Column sortable :header="$t('algo.reconfiguration.features_to_add')" style="width: 20rem">
                                 <template #body="slotProps">
-                                    <div class="features-to-add">
-                                        {{ slotProps.data }}
-                                    </div>
+                                    <div class="font-mono text-green-600"> {{ slotProps.data }} </div>
                                 </template>
                             </Column>
                         </DataTable>
                         <DataTable :value="result.featuresToRemove" size="small" showGridlines class="mt-3 pb-3"
                             sortField="result" :sortOrder="1">
-                            <Column sortable :header="$t('algo.reconfiguration.features_to_remove')" class="font-bold"
+                            <Column sortable :header="$t('algo.reconfiguration.features_to_remove')"
                                 style="width: 20rem">
                                 <template #body="slotProps">
-                                    <div class="features-to-remove">
-                                        {{ slotProps.data }}
+                                    <div class="font-mono text-red-600"> {{ slotProps.data }}
                                     </div>
                                 </template>
                             </Column>
@@ -157,17 +153,3 @@ async function compute() {
     })
 }
 </script>
-
-<style scoped>
-.features-to-add {
-    font-family: monospace;
-    font-weight: 700;
-    color: rgb(22 163 74);
-}
-
-.features-to-remove {
-    font-family: monospace;
-    font-weight: 700;
-    color: rgb(239 68 68);
-}
-</style>

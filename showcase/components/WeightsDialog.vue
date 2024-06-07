@@ -4,9 +4,7 @@
             scrollHeight="600px">
             <Column field="constraint" :header="$t('common.constraint')" sortable>
                 <template #body="slotProps">
-                    <div class="constraint">
-                        {{ slotProps.data.constraint }}
-                    </div>
+                    <div class="font-mono"> {{ slotProps.data.constraint }} </div>
                 </template>
             </Column>
             <Column field="weight" :header="$t('algo.optimization.weighting')" sortable />
@@ -27,9 +25,3 @@ const uploadWeights = async (event: any) => {
     uploadCsv(event.files[0] as File)
 }
 </script>
-
-<style scoped>
-.constraint {
-    font-family: monospace;
-}
-</style>

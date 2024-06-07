@@ -1,5 +1,5 @@
 <template>
-    <td class="property-name font-bold" style="padding-right: 2rem">
+    <td class="font-mono font-bold" style="padding-right: 2rem">
         {{ selection.propertyName }}
     </td>
     <td v-if="selection.propertyType == 'BOOLEAN'">
@@ -8,8 +8,8 @@
     </td>
     <td v-if="selection.propertyType == 'ENUM'">
         <div>
-            <Dropdown v-model="selection.selectedValue.enumValue" :options="selection.possibleValues.enumValues?.toSorted()"
-                :placeholder="$t('slices.filter')" />
+            <Dropdown v-model="selection.selectedValue.enumValue"
+                :options="selection.possibleValues.enumValues?.toSorted()" :placeholder="$t('slices.filter')" />
         </div>
     </td>
     <td v-else-if="selection.propertyType == 'INT'">
@@ -30,10 +30,6 @@ defineProps<{ selection: DetailSliceSelection }>();
 </script>
 
 <style scoped>
-.property-name {
-    font-family: monospace;
-}
-
 th,
 td {
     padding-top: 10px;

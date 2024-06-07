@@ -1,6 +1,6 @@
 <template>
     <span>
-        <span class="slice-prop-value">{{ formatRange(property.range) }} </span>
+        <span class="font-mono">{{ formatRange(property.range) }} </span>
     </span>
 </template>
 
@@ -34,18 +34,3 @@ function formatRange(range: PropertyRange) {
     }
 }
 </script>
-
-<style scoped>
-.slice-prop-name {
-    font-family: monospace;
-    font-weight: bold;
-}
-
-.slice-prop-value {
-    font-family: monospace;
-}
-
-.slice-prop-divider {
-    font-family: monospace;
-}
-</style>

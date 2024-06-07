@@ -72,6 +72,6 @@ const softwareAlgos = ref([
     font-size: 0.875rem;
     margin-left: 1rem;
     margin-top: 2rem;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.1rem;
 }
 </style>

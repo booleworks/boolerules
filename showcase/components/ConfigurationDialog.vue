@@ -4,9 +4,7 @@
             scrollHeight="600px">
             <Column field="feature" sortable :header="$t('common.features')">
                 <template #body="slotProps">
-                    <div class="constraint">
-                        {{ slotProps.data.feature }}
-                    </div>
+                    <div class="font-mono"> {{ slotProps.data.feature }} </div>
                 </template>
             </Column>
         </DataTable>
@@ -26,9 +24,3 @@ const uploadConfiguration = async (event: any) => {
     uploadCsv(event.files[0] as File)
 }
 </script>
-
-<style scoped>
-.constraint {
-    font-family: monospace;
-}
-</style>

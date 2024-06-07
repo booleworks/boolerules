@@ -4,9 +4,7 @@
             scrollHeight="600px">
             <Column field="package" :header="$t('algo.packagesolving.package')" sortable>
                 <template #body="slotProps">
-                    <div class="constraint">
-                        {{ slotProps.data.package }}
-                    </div>
+                    <div class="font-mono"> {{ slotProps.data.package }} </div>
                 </template>
             </Column>
             <Column field="version" :header="$t('algo.packagesolving.version')" sortable />
@@ -27,9 +25,3 @@ const uploadSoftware = async (event: any) => {
     uploadCsv(event.files[0] as File)
 }
 </script>
-
-<style scoped>
-.constraint {
-    font-family: monospace;
-}
-</style>

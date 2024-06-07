@@ -29,7 +29,7 @@
 
 <style>
 body {
-    font-family: var(--font-family);
+    font-family: Inter var, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
 }
 
 html,

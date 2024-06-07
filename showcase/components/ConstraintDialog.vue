@@ -4,9 +4,7 @@
             scrollHeight="600px">
             <Column field="constraint" :header="$t('common.constraint')">
                 <template #body="slotProps">
-                    <div class="constraint">
-                        {{ slotProps.data.constraint }}
-                    </div>
+                    <div class="font-mono"> {{ slotProps.data.constraint }} </div>
                 </template>
             </Column>
         </DataTable>
@@ -26,9 +24,3 @@ const uploadConstraints = async (event: any) => {
     uploadCsv(event.files[0] as File)
 }
 </script>
-
-<style scoped>
-.constraint {
-    font-family: monospace;
-}
-</style>

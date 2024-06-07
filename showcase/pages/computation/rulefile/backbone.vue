@@ -128,9 +128,3 @@ async function performComputation(request: BackboneRequest) {
     })
 }
 </script>
-
-<style scoped>
-.divider-text :deep(.p-divider-content) {
-    background-color: var(--surface-ground) !important;
-}
-</style>

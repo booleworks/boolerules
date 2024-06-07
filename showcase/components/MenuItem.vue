@@ -17,11 +17,11 @@ defineProps<{ item: MenuItem }>()
 .menu-item {
     color: var(--text-color);
     padding-left: 2.5rem;
-    padding-top: 0.5rem;
+    padding-top: 0.4rem;
     padding-bottom: 0.5rem;
 }
 
 .menu-item:hover {
-    background-color: var(--surface-ground);
+    background-color: rgba(13, 185, 129, 0.1);
 }
 </style>

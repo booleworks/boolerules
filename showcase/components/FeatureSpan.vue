@@ -3,28 +3,28 @@
         <span v-if="showTag" class="mr-2">
             <Tag severity="success" value="bool" />
         </span>
-        <span class="important">{{ feature.code }}</span>
+        <span class="font-mono font-bold">{{ feature.code }}</span>
     </span>
     <span v-if="feature.type === 'ENUM'">
         <span v-if="showTag" class="mr-2">
             <Tag severity="warning" value="enum" />
         </span>
-        <span class="unimportant">{{ feature.code }}=</span>
-        <span class="important">{{ feature.enumValue }}</span>
+        <span class="font-mono text-gray-400">{{ feature.code }}=</span>
+        <span class="font-mono font-bold">{{ feature.enumValue }}</span>
     </span>
     <span v-if="feature.type === 'INT'" class="mr-1">
         <span v-if="showTag" class="mr-2">
             <Tag severity="info" value="int" />
         </span>
-        <span class="unimportant">{{ feature.code }}=</span>
-        <span class="important">{{ feature.intValue }}</span>
+        <span class="font-mono text-gray-400">{{ feature.code }}=</span>
+        <span class="font-mono font-bold">{{ feature.intValue }}</span>
     </span>
     <span v-if="feature.type === 'VERSIONED_BOOLEAN'" class="mr-1">
         <span v-if="showTag" class="mr-2">
             <Tag severity="success" value="bool" />
         </span>
-        <span class="unimportant">{{ feature.code }}=</span>
-        <span class="important">{{ feature.version }}</span>
+        <span class="font-mono text-gray-400">{{ feature.code }}=</span>
+        <span class="font-mono font-bold">{{ feature.version }}</span>
     </span>
 </template>
 
@@ -36,15 +36,3 @@ defineProps<{
     showTag: Boolean
 }>()
 </script>
-
-<style scoped>
-.unimportant {
-    font-family: monospace;
-    color: var(--text-color-secondary) !important;
-}
-
-.important {
-    font-family: monospace;
-    font-weight: bold;
-}
-</style>
