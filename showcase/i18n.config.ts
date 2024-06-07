@@ -240,7 +240,7 @@ export default defineI18nConfig(() => ({
                 welcome: "Willkommen zu",
                 first: 'Lade eine PRL Datei in der rechten oberen Ecke hoch',
                 second: 'Wähle eine Berechnung auf der linken Seite aus',
-                third: 'Auf geht\'s!',
+                third: 'Los geht\'s!',
             },
             rulefilebar: {
                 upload_first: 'Lade zuerst eine PRL Datei hoch',

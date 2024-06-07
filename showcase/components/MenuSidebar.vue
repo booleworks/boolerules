@@ -2,7 +2,7 @@
     <div class="border-r border-gray-300 overflow-scroll">
         <div class="m-3">
             <a href="/">
-                <img :src="currentLogo()" alt="Logo" width="210" />
+                <img :src="currentLogo()" alt="Logo" width="220" />
             </a>
         </div>
         <div class="menu-header text-primary"><i class="pi pi-fw pi-eye"></i>{{ ' ' +

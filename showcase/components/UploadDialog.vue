@@ -4,14 +4,14 @@
             {{ $t('upload.error') }}
         </div>
         <div v-else>
-            <div class="grid">
-                <div class="col-2"><b>{{ $t('upload.status') }}</b></div>
-                <div class="col-10" :class="{
-                    'text-green-500':
+            <div class="grid grid-cols-12 gap-4">
+                <div class="col-span-2"><b>{{ $t('upload.status') }}</b></div>
+                <div class="col-span-10" :class="{
+                    'text-green-600':
                         summary.errors.length == 0 && summary.warnings.length == 0,
-                    'text-orange-500':
+                    'text-orange-600':
                         summary.errors.length == 0 && summary.warnings.length > 0,
-                    'text-red-500': summary.errors.length > 0,
+                    'text-red-600': summary.errors.length > 0,
                 }">
                     <i class="pi" :class="{
                         'pi-check-circle':
@@ -23,25 +23,25 @@
                     {{ status }}
                 </div>
             </div>
-            <div class="grid">
-                <div class="col-2"><b>{{ $t('rulefilemgmt.filename') }}</b></div>
-                <div class="col-10">{{ summary.fileName }}</div>
+            <div class="grid grid-cols-12 gap-4">
+                <div class="col-span-2"><b>{{ $t('rulefilemgmt.filename') }}</b></div>
+                <div class="col-span-10">{{ summary.fileName }}</div>
             </div>
-            <div class="grid">
-                <div class="col-2"><b>{{ $t('rulefilemgmt.size') }}</b></div>
-                <div class="col-10">{{ formatBytes(summary.size) }}</div>
+            <div class="grid grid-cols-12 gap-4">
+                <div class="col-span-2"><b>{{ $t('rulefilemgmt.size') }}</b></div>
+                <div class="col-span-10">{{ formatBytes(summary.size) }}</div>
             </div>
-            <div class="grid">
-                <div class="col-2"><b>{{ $t('rulefilemgmt.uuid') }}</b></div>
-                <div class="col-10">{{ summary.id }}</div>
+            <div class="grid grid-cols-12 gap-4">
+                <div class="col-span-2"><b>{{ $t('rulefilemgmt.uuid') }}</b></div>
+                <div class="col-span-10">{{ summary.id }}</div>
             </div>
-            <div class="grid">
-                <div class="col-2"><b>{{ $t('rulefilemgmt.features') }}</b></div>
-                <div class="col-10">{{ summary.numberOfFeatures }}</div>
+            <div class="grid grid-cols-12 gap-4">
+                <div class="col-span-2"><b>{{ $t('rulefilemgmt.features') }}</b></div>
+                <div class="col-span-10">{{ summary.numberOfFeatures }}</div>
             </div>
-            <div class="grid">
-                <div class="col-2"><b>{{ $t('rulefilemgmt.rules') }}</b></div>
-                <div class="col-10">{{ summary.numberOfRules }}</div>
+            <div class="grid grid-cols-12 gap-4">
+                <div class="col-span-2"><b>{{ $t('rulefilemgmt.rules') }}</b></div>
+                <div class="col-span-10">{{ summary.numberOfRules }}</div>
             </div>
             <div v-if="summary.errors?.length > 0">
                 <div class="font-bold text-red-500 mt-2 mb-1">{{ $t('upload.errors') }}</div>
