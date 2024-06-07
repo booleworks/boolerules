@@ -1,5 +1,5 @@
 <template>
-    <div class="border-r border-gray-300 overflow-scroll">
+    <div class="border-r border-gray-200 overflow-scroll">
         <div class="m-3">
             <a href="/">
                 <img :src="currentLogo()" alt="Logo" width="220" />
@@ -12,7 +12,7 @@
         <MenuItem v-for="algo in insightAlgos" :item="algo" />
         <div class="menu-header text-primary"><i class="pi pi-fw pi-sliders-h"></i>{{
             ' ' + $t('computation.header_configuration').toUpperCase()
-        }}
+            }}
         </div>
         <MenuItem v-for="algo in configurationAlgos" :item="algo" />
         <div class="menu-header text-primary"><i class="pi pi-fw pi-sort-amount-down"></i>{{

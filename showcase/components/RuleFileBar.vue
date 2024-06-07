@@ -1,5 +1,5 @@
 <template>
-    <div id="br-topbar" class="flex flex-grow p-2 bg-gray-100 border-b border-gray-300">
+    <div id="br-topbar" class="flex flex-grow p-2 bg-white/50 backdrop-blur-sm border-b border-gray-200">
         <ClientOnly>
             <div v-if="!isPresent()" class="flex flex-grow items-center">
                 {{ $t('rulefilebar.upload_first') }}
@@ -13,7 +13,7 @@
                     :enumFeature="summary.hasEnumFeatures" :intFeature="summary.hasIntFeatures" />
             </div>
             <div class="flex flex-none">
-                <div class="flex">
+                <div class="flex content-center">
                     <Button :icon="currentIcon()" class="mr-3" rounded @click="switchTheme()" />
                     <Button :label="$t('rulefilebar.management')" icon="pi pi-file" class="mr-3"
                         @click="fetchRuleFiles()" />
