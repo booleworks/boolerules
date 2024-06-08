@@ -35,12 +35,15 @@
             </Column>
         </DataTable>
     </div>
-    <div v-if="graphData.labels" class="mt-5">
+    <div v-if="graphData.labels" class="mt-10">
         <!--        <DataTable :value="graphData.coverableConstraints">-->
         <!--            <Column field="numberOfConfigurations" :header="'numberOfConfigurations'" style="vertical-align: top"></Column>-->
         <!--            <Column field="maxCoverableConstraints" :header="'maxCoverableConstraints'" style="vertical-align: top"></Column>-->
         <!--        </DataTable>-->
         <Chart type="bar" :data="graphData" :options="chartOptions()" />
+    </div>
+    <div class="text-gray-600 mt-5 text-sm">
+        {{ $t('details.constraint_cover_desc') }}
     </div>
 </template>
 
@@ -109,8 +112,8 @@ async function computeGraph() {
                 {
                     label: t('algo.coverage.graph_coverable_constraints'),
                     data: graph.coverableConstraints.map(c => c.maxCoverableConstraints),
-                    backgroundColor: ['rgba(13, 185, 129, 0.5)'],
-                    borderColor: ['rgb(13, 185, 129)'],
+                    backgroundColor: ['rgba(255, 195, 18, 0.6)'],
+                    borderColor: ['rgb(255, 195, 18)'],
                     borderWidth: 1
                 }
             ]

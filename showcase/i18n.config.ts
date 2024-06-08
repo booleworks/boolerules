@@ -113,7 +113,9 @@ export default defineI18nConfig(() => ({
                 used_weights: "Used Weights",
                 covered_constraints: "Constraints covered by the Configuration",
                 error: "Explanation could not be computed. Currently explanations are not supported for all types\
-                of computations, e.g. for ALL or ANY slices."
+                of computations, e.g. for ALL or ANY slices.",
+                constraint_cover_desc: "The graph shows how many constraints can be covered with the given\
+                number of configurations."
             },
             algo: {
                 computation: 'Computation',
@@ -343,9 +345,11 @@ export default defineI18nConfig(() => ({
                 feature: "Feature",
                 optimum: "Optimum",
                 used_weights: "Ausgewählte Gewichtungen",
-                covered_constraints: "Von der Konfiguration erfüllte Bedingungen",
+                covered_constraints: "Von der Konfiguration erfüllte Constraints",
                 error: "Erklärung konnte nicht berechnet werden. Aktuell werden Erklärungen nicht für jede\
-                Berechnungsart unterstützt, z.B. für ANY oder ALL-Slices."
+                Berechnungsart unterstützt, z.B. für ANY oder ALL-Slices.",
+                constraint_cover_desc: "Der Graph zeigt, wie viele Constraints mit einer gegebenen Anzahl von\
+                Konfigurationen abgedeckt werden können."
             },
             algo: {
                 computation: 'Berechnung',
