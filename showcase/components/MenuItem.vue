@@ -3,7 +3,10 @@
         'font-bold': item.to === $route.fullPath,
         'font-normal': item.to !== $route.fullPath,
     }">
-        <div class="menu-item">{{ item.label }}</div>
+        <div :class="{
+            'menu-item chosen': item.to === $route.fullPath,
+            'menu-item': item.to !== $route.fullPath,
+        }">{{ item.label }}</div>
     </NuxtLink>
 </template>
 
@@ -21,7 +24,11 @@ defineProps<{ item: MenuItem }>()
     padding-bottom: 0.5rem;
 }
 
+.chosen {
+    background-color: rgba(0, 98, 102, 0.1) !important;
+}
+
 .menu-item:hover {
-    background-color: rgba(13, 185, 129, 0.1);
+    background-color: rgba(0, 98, 102, 0.1);
 }
 </style>
