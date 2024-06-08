@@ -1,6 +1,6 @@
 <template>
     <div class="flex h-full">
-        <div class="flex flex-none bg-gradient-to-tr from-[#d3fcef] to-white-500">
+        <div class="flex flex-none bg-gradient-to-tr from-[#c6fdff] to-white-500">
             <!-- The sidebar with the main navigation -->
             <MenuSidebar />
         </div>
@@ -15,11 +15,6 @@
                 <div class="flex flex-grow pl-3 px-3 overflow-auto">
                     <slot />
                 </div>
-
-                <!-- Application Log and Footer -->
-                <!-- <div class="flex flex-none"> -->
-                <!--   <Footer /> -->
-                <!-- </div> -->
             </div>
         </div>
     </div>

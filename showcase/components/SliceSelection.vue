@@ -2,7 +2,7 @@
     <div>
         <ClientOnly>
             <div v-if="isPresent() && getSummary().slicingProperties.length > 0">
-                <table class="text-gray-600">
+                <table class="text-gray-500">
                     <tr v-if="isPresent()">
                         <th class="font-bold text-left" style="padding-right: 2rem">{{
                             $t('slices.property').toUpperCase()
@@ -19,12 +19,8 @@
                     </tr>
                 </table>
             </div>
-            <div v-else-if="isPresent()" class="text-gray-600 text">
-                {{ $t('slices.no_props') }}
-            </div>
-            <div v-else class="text-gray-600 text">
-                {{ $t('slices.no_file') }}
-            </div>
+            <div v-else-if="isPresent()" class="text-gray-500 text"> {{ $t('slices.no_props') }} </div>
+            <div v-else class="text-gray-500 text"> {{ $t('slices.no_file') }} </div>
         </ClientOnly>
     </div>
 </template>

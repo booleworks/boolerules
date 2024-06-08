@@ -1,7 +1,7 @@
 <template>
     <div class="flex">
         <div class="flex">
-            <table class="text-gray-600">
+            <table class="text-gray-500">
                 <tr>
                     <th class="font-bold text-left">{{ $t('comp_stat.time') }}</th>
                     <th class="font-bold text-left">{{ $t('comp_stat.slices') }}</th>

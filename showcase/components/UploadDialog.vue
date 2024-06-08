@@ -1,17 +1,17 @@
 <template>
     <div>
-        <div class="text-red-500" v-if="!summary.fileName">
+        <div class="text-red-700" v-if="!summary.fileName">
             {{ $t('upload.error') }}
         </div>
         <div v-else>
             <div class="grid grid-cols-12 gap-4">
                 <div class="col-span-2"><b>{{ $t('upload.status') }}</b></div>
                 <div class="col-span-10" :class="{
-                    'text-green-600':
+                    'text-green-700':
                         summary.errors.length == 0 && summary.warnings.length == 0,
-                    'text-orange-600':
+                    'text-orange-700':
                         summary.errors.length == 0 && summary.warnings.length > 0,
-                    'text-red-600': summary.errors.length > 0,
+                    'text-red-700': summary.errors.length > 0,
                 }">
                     <i class="pi" :class="{
                         'pi-check-circle':
@@ -44,14 +44,14 @@
                 <div class="col-span-10">{{ summary.numberOfRules }}</div>
             </div>
             <div v-if="summary.errors?.length > 0">
-                <div class="font-bold text-red-500 mt-2 mb-1">{{ $t('upload.errors') }}</div>
-                <div class="text-red-500" v-for="error in summary.errors">
+                <div class="font-bold text-red-700 mt-2 mb-1">{{ $t('upload.errors') }}</div>
+                <div class="text-red-700" v-for="error in summary.errors">
                     {{ error }}
                 </div>
             </div>
             <div v-if="summary.warnings?.length > 0">
-                <div class="font-bold text-orange-500 mt-2 mb-1">{{ $t('upload.warnings') }}</div>
-                <div class="text-orange-500" v-for="warning in summary.warnings">
+                <div class="font-bold text-orange-700 mt-2 mb-1">{{ $t('upload.warnings') }}</div>
+                <div class="text-orange-700" v-for="warning in summary.warnings">
                     {{ warning }}
                 </div>
             </div>

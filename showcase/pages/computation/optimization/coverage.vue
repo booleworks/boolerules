@@ -67,7 +67,7 @@
                         </Column>
                     </DataTable>
                 </div>
-                <div v-else class="text-gray-600 text">{{ $t('algo.nothing_computed') }}</div>
+                <div v-else class="text-gray-500 text">{{ $t('algo.nothing_computed') }}</div>
             </AccordionTab>
         </Accordion>
     </div>

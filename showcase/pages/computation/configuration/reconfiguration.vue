@@ -58,9 +58,9 @@
             <AccordionTab :header="$t('result.header')">
                 <div v-if="status.success">
                     <div>
-                        <span class="font-bold text-green-600 mr-1">{{ result.featuresToAdd.length }} </span>
+                        <span class="font-bold text-green-700 mr-1">{{ result.featuresToAdd.length }} </span>
                         <span class="mr-3">{{ $t('algo.reconfiguration.features_to_add') }}</span>
-                        <span class="font-bold text-red-600 mr-1">{{ result.featuresToRemove.length }} </span>
+                        <span class="font-bold text-red-700 mr-1">{{ result.featuresToRemove.length }} </span>
                         <span>{{ $t('algo.reconfiguration.features_to_remove') }}</span>
                     </div>
                     <div class="flex mt-2">
@@ -68,7 +68,7 @@
                             sortField="result" :sortOrder="1">
                             <Column sortable :header="$t('algo.reconfiguration.features_to_add')" style="width: 20rem">
                                 <template #body="slotProps">
-                                    <div class="font-mono text-green-600"> {{ slotProps.data }} </div>
+                                    <div class="font-mono text-green-700"> {{ slotProps.data }} </div>
                                 </template>
                             </Column>
                         </DataTable>
@@ -77,14 +77,14 @@
                             <Column sortable :header="$t('algo.reconfiguration.features_to_remove')"
                                 style="width: 20rem">
                                 <template #body="slotProps">
-                                    <div class="font-mono text-red-600"> {{ slotProps.data }}
+                                    <div class="font-mono text-red-700"> {{ slotProps.data }}
                                     </div>
                                 </template>
                             </Column>
                         </DataTable>
                     </div>
                 </div>
-                <div v-else class="text-gray-600 text">{{ $t('algo.nothing_computed') }}</div>
+                <div v-else class="text-gray-500 text">{{ $t('algo.nothing_computed') }}</div>
             </AccordionTab>
         </Accordion>
     </div>

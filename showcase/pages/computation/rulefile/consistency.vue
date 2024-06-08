@@ -40,10 +40,10 @@
                         <Column field="result" sortable :header="$t('result.header')" class="font-bold"
                             style="width: 15rem">
                             <template #body="bdy">
-                                <div v-if="bdy.data.result" class="text-green-600">
+                                <div v-if="bdy.data.result" class="text-green-700">
                                     {{ $t('algo.consistency.consistent') }}
                                 </div>
-                                <div v-else class="text-red-600">
+                                <div v-else class="text-red-700">
                                     {{ $t('algo.consistency.inconsistent') }}
                                 </div>
                             </template>
@@ -56,7 +56,7 @@
                         </Column>
                     </DataTable>
                 </div>
-                <div v-else class="text-gray-600 text">{{ $t('algo.nothing_computed') }}</div>
+                <div v-else class="text-gray-500 text">{{ $t('algo.nothing_computed') }}</div>
             </AccordionTab>
         </Accordion>
     </div>

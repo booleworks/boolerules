@@ -17,7 +17,7 @@
                 {{ warning }}
             </div>
         </div>
-        <div v-if="!status.jobId" class="text-gray-600 text">{{ $t('algo.nothing_computed') }}</div>
+        <div v-if="!status.jobId" class="text-gray-500 text">{{ $t('algo.nothing_computed') }}</div>
     </div>
 </template>
 

@@ -52,13 +52,13 @@
             <AccordionTab :header="$t('result.header')">
                 <div v-if="status.success">
                     <div>
-                        <span class="font-bold text-green-600 mr-1">{{ result.newFeatures.length }} </span>
+                        <span class="font-bold text-green-700 mr-1">{{ result.newFeatures.length }} </span>
                         <span class="mr-4">{{ $t('algo.packagesolving.add') }}</span>
-                        <span class="font-bold text-blue-600 mr-1">{{ upgraded() }} </span>
+                        <span class="font-bold text-blue-700 mr-1">{{ upgraded() }} </span>
                         <span class="mr-4">{{ $t('algo.packagesolving.upgraded') }}</span>
-                        <span class="font-bold text-orange-600 mr-1">{{ downgraded() }} </span>
+                        <span class="font-bold text-orange-700 mr-1">{{ downgraded() }} </span>
                         <span class="mr-3">{{ $t('algo.packagesolving.downgraded') }}</span>
-                        <span class="font-bold text-red-600 mr-1">{{ result.removedFeatures.length }} </span>
+                        <span class="font-bold text-red-700 mr-1">{{ result.removedFeatures.length }} </span>
                         <span class="mr-3">{{ $t('algo.packagesolving.remove') }}</span>
                     </div>
                     <div class="flex mt-2">
@@ -66,14 +66,14 @@
                             size="small" class="mt-3 pb-3 mr-3" sortField="result" :sortOrder="1">
                             <Column sortable :header="$t('algo.packagesolving.add')" style="width: 15rem">
                                 <template #body="slotProps">
-                                    <div class="font-mono text-green-600">
+                                    <div class="font-mono text-green-700">
                                         {{ slotProps.data.feature }}
                                     </div>
                                 </template>
                             </Column>
                             <Column sortable :header="$t('algo.packagesolving.version')" style="width: 5rem">
                                 <template #body="slotProps">
-                                    <div class="text-green-600">
+                                    <div class="text-green-700">
                                         {{ slotProps.data.versionNew }}
                                     </div>
                                 </template>
@@ -84,8 +84,8 @@
                             <Column sortable :header="$t('algo.packagesolving.changed')" style="width: 15rem">
                                 <template #body="slotProps">
                                     <div :class="{
-                                        'font-mono text-blue-600': slotProps.data.versionNew > slotProps.data.versionOld,
-                                        'font-mono text-orange-600': slotProps.data.versionNew < slotProps.data.versionOld,
+                                        'font-mono text-blue-700': slotProps.data.versionNew > slotProps.data.versionOld,
+                                        'font-mono text-orange-700': slotProps.data.versionNew < slotProps.data.versionOld,
                                     }">
                                         {{ slotProps.data.feature }}
                                     </div>
@@ -94,8 +94,8 @@
                             <Column sortable :header="$t('algo.packagesolving.old')" style="width: 5rem">
                                 <template #body="slotProps">
                                     <div :class="{
-                                        'text-blue-600': slotProps.data.versionNew > slotProps.data.versionOld,
-                                        'text-orange-600': slotProps.data.versionNew < slotProps.data.versionOld,
+                                        'text-blue-700': slotProps.data.versionNew > slotProps.data.versionOld,
+                                        'text-orange-700': slotProps.data.versionNew < slotProps.data.versionOld,
                                     }">
                                         {{ slotProps.data.versionOld }}
                                     </div>
@@ -104,8 +104,8 @@
                             <Column sortable :header="$t('algo.packagesolving.new')" style="width: 5rem">
                                 <template #body="slotProps">
                                     <div :class="{
-                                        'text-blue-600': slotProps.data.versionNew > slotProps.data.versionOld,
-                                        'text-orange-600': slotProps.data.versionNew < slotProps.data.versionOld,
+                                        'text-blue-700': slotProps.data.versionNew > slotProps.data.versionOld,
+                                        'text-orange-700': slotProps.data.versionNew < slotProps.data.versionOld,
                                     }">
                                         {{ slotProps.data.versionNew }}
                                     </div>
@@ -131,7 +131,7 @@
                         </DataTable>
                     </div>
                 </div>
-                <div v-else class="text-600 text">{{ $t('algo.nothing_computed') }}</div>
+                <div v-else class="text-gray-500 text">{{ $t('algo.nothing_computed') }}</div>
             </AccordionTab>
         </Accordion>
     </div>

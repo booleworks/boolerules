@@ -12,20 +12,20 @@
             <Column field="numberOfRules" :header="$t('rulefilemgmt.rules')" sortable />
             <Column field="hasBooleanFeatures" :header="$t('rulefilemgmt.bool_features')" sortable style="width: 8rem">
                 <template #body="bdy">
-                    <span v-if="bdy.data.hasBooleanFeatures" class="pi pi-check text-green-600"></span>
-                    <span v-else class="pi pi-times text-red-600"></span>
+                    <span v-if="bdy.data.hasBooleanFeatures" class="pi pi-check text-green-700"></span>
+                    <span v-else class="pi pi-times text-red-700"></span>
                 </template>
             </Column>
             <Column field="hasEnumFeatures" :header="$t('rulefilemgmt.enum_features')" sortable style="width: 8rem">
                 <template #body="bdy">
-                    <span v-if="bdy.data.hasEnumFeatures" class="pi pi-check text-green-600"></span>
-                    <span v-else class="pi pi-times text-red-600"></span>
+                    <span v-if="bdy.data.hasEnumFeatures" class="pi pi-check text-green-700"></span>
+                    <span v-else class="pi pi-times text-red-700"></span>
                 </template>
             </Column>
             <Column field="hasIntFeatures" :header="$t('rulefilemgmt.int_features')" sortable style="width: 8rem">
                 <template #body="bdy">
-                    <span v-if="bdy.data.hasIntFeatures" class="pi pi-check text-green-600"></span>
-                    <span v-else class="pi pi-times text-red-600"></span>
+                    <span v-if="bdy.data.hasIntFeatures" class="pi pi-check text-green-700"></span>
+                    <span v-else class="pi pi-times text-red-700"></span>
                 </template>
             </Column>
             <Column field="id" :header="$t('rulefilemgmt.id')" sortable />

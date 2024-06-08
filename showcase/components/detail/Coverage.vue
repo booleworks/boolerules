@@ -18,15 +18,15 @@
                                 <span class="font-mono font-bold feature-item">{{ feature.code }}</span>
                             </span>
                             <span v-if="feature.enumValue" class="mr-1">
-                                <span class="font-mono text-gray-600 feature-item">{{ feature.code }}=</span>
+                                <span class="font-mono text-gray-500 feature-item">{{ feature.code }}=</span>
                                 <span class="font-mono font-bold feature-item">{{ feature.enumValue }}</span>
                             </span>
                             <span v-if="feature.intValue" class="mr-1">
-                                <span class="font-mono text-gray-600 feature-item">{{ feature.code }}=</span>
+                                <span class="font-mono text-gray-500 feature-item">{{ feature.code }}=</span>
                                 <span class="font-mono font-bold feature-item">{{ feature.intValue }}</span>
                             </span>
                             <span v-if="feature.version" class="mr-1">
-                                <span class="font-mono text-gray-600 feature-item">{{ feature.code }}=</span>
+                                <span class="font-mono text-gray-500 feature-item">{{ feature.code }}=</span>
                                 <span class="font-mono font-bold feature-item">{{ feature.version }}</span>
                             </span>
                         </span>
