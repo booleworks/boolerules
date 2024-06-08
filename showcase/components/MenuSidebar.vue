@@ -38,21 +38,21 @@ const { t } = useI18n()
 const { currentLogo } = useTheme()
 
 const insightAlgos = ref([
-    { label: t('computation.counting'), to: '/computation/rulefile/counting' },
-    { label: t('computation.constraint_graph'), to: '/computation/visualization/constraintgraph' },
+    { label: t('computation.counting'), to: '/insights/counting' },
+    { label: t('computation.constraint_graph'), to: '/insights/constraintgraph' },
 ])
 
 const configurationAlgos = ref([
-    { label: t('computation.consistency'), to: '/computation/rulefile/consistency' },
-    { label: t('computation.reconfiguration'), to: '/computation/configuration/reconfiguration' },
-    { label: t('computation.backbone'), to: '/computation/rulefile/backbone' },
-    { label: t('computation.enumeration'), to: '/computation/rulefile/enumeration' },
+    { label: t('computation.consistency'), to: '/configuration/consistency' },
+    { label: t('computation.reconfiguration'), to: '/configuration/reconfiguration' },
+    { label: t('computation.backbone'), to: '/configuration/backbone' },
+    { label: t('computation.enumeration'), to: '/configuration/enumeration' },
 ])
 
 const optimizationAlgos = ref([
-    { label: t('computation.minmax'), to: '/computation/configuration/minmax' },
-    { label: t('computation.coverage'), to: '/computation/optimization/coverage' },
-    { label: t('computation.weights'), to: '/computation/optimization/optimization' },
+    { label: t('computation.minmax'), to: '/optimization/minmax' },
+    { label: t('computation.coverage'), to: '/optimization/coverage' },
+    { label: t('computation.weights'), to: '/optimization/optimization' },
 ])
 
 const bomAlgos = ref([
@@ -60,7 +60,7 @@ const bomAlgos = ref([
 ])
 
 const softwareAlgos = ref([
-    { label: t('computation.packagesolving'), to: '/computation/software/packagesolving' },
+    { label: t('computation.packagesolving'), to: '/software/packagesolving' },
 ])
 </script>
 
