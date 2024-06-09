@@ -42,7 +42,7 @@
         <!--        </DataTable>-->
         <Chart type="bar" :data="graphData" :options="chartOptions()" />
     </div>
-    <div class="text-gray-600 mt-5 text-sm">
+    <div v-if="graphData.labels" class="text-gray-600 mt-5 text-sm">
         {{ $t('details.constraint_cover_desc') }}
     </div>
 </template>
