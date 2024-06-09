@@ -42,7 +42,11 @@ internal fun extractModel(variables: Collection<Variable>, info: TranspilationIn
     FeatureModelDO(variables.filter { info.knownVariables.contains(it) }
         .map { variable -> extractFeature(variable, info) }.sorted())
 
-internal fun extractModel(variables: Collection<Variable>, integerAssignment: CspAssignment, info: TranspilationInfo): FeatureModelDO =
+internal fun extractModel(
+    variables: Collection<Variable>,
+    integerAssignment: CspAssignment,
+    info: TranspilationInfo
+): FeatureModelDO =
     FeatureModelDO(variables.filter { info.knownVariables.contains(it) }
         .map { variable -> extractFeature(variable, info) }.sorted() + extractIntFeatures(integerAssignment, info))
 
@@ -54,9 +58,12 @@ internal fun extractIntFeatures(integerAssignment: CspAssignment, info: Transpil
     }
 
 internal fun extractFeature(variable: Variable, info: TranspilationInfo) =
-    if (info.booleanVariables.contains(variable)) {
+    if (variable in info.booleanVariables) {
         FeatureDO.boolean(variable.name(), true)
-    } else if (info.enumVariables.contains(variable)) {
+    } else if (variable in info.versionVariables) {
+        val (feature, version) = info.getFeatureAndVersion(variable)!!
+        FeatureDO.boolean(feature, version)
+    } else if (variable in info.enumVariables) {
         val (feature, value) = info.getFeatureAndValue(variable)!!
         FeatureDO.enum(feature, value)
     } else {

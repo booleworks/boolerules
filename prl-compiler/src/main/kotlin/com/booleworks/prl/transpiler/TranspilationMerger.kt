@@ -19,11 +19,11 @@ fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTran
     //TODO version/int merging
     val f = cf.formulaFactory()
     val theoryMap = slices[0].info.theoryMap
-    val knownVariables = slices.flatMap { it.knownVariables }.toSortedSet()
+    val knownVariables = slices.flatMap { it.info.knownVariables }.toSortedSet()
     val sliceSelectors = mutableMapOf<String, SliceTranslation>()
     val propositions = mutableListOf<PrlProposition>()
     val enumMapping = mutableMapOf<String, MutableMap<String, Variable>>()
-    val unknownFeatures = slices[0].unknownFeatures.toMutableSet()
+    val unknownFeatures = slices[0].info.unknownFeatures.toMutableSet()
     val booleanVariables = mutableSetOf<Variable>()
     val intPredicateMapping = mutableMapOf<IntPredicate, Variable>()
     val encodingContext = CspEncodingContext(slices[0].info.encodingContext)
@@ -52,7 +52,7 @@ fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTran
                     f.equivalence(kVar, sVar)
                 )
             )
-            if (kVar in slice.knownVariables) {
+            if (kVar in slice.info.knownVariables) {
                 substitution.addMapping(kVar, sVar)
             } else {
                 propositions.add(
@@ -63,7 +63,7 @@ fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTran
                 )
             }
         }
-        propositions += slice.integerVariables.map {
+        propositions += slice.info.integerVariables.map {
             createIntVariableEquivalence(
                 it.variable,
                 mergedVarMap[it.feature]!!.variable,
@@ -80,11 +80,11 @@ fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTran
             }
         }
         booleanVariables.addAll(slice.info.booleanVariables)
-        unknownFeatures.retainAll(slice.unknownFeatures)
-        slice.enumMapping.forEach { (feature, varMap) ->
+        unknownFeatures.retainAll(slice.info.unknownFeatures)
+        slice.info.enumMapping.forEach { (feature, varMap) ->
             enumMapping.computeIfAbsent(feature) { mutableMapOf() }.putAll(varMap)
         }
-        slice.propositions.forEach { propositions.add(it.substitute(f, substitution)) }
+        slice.info.propositions.forEach { propositions.add(it.substitute(f, substitution)) }
     }
 
     val info = TranspilationInfo(

@@ -23,29 +23,32 @@ class LogicNGTranspilerEnumNoSlicesTest {
     @Test
     fun testModelTranslation() {
         assertThat(modelTranslation.numberOfComputations).isEqualTo(1)
-        assertThat(modelTranslation[0].propositions).hasSize(9)
+        assertThat(modelTranslation[0].info.propositions).hasSize(9)
 
         for (i in 0..3) {
-            assertThat(modelTranslation[0].propositions[i].backpack().ruleType).isEqualTo(RuleType.ORIGINAL_RULE)
-            assertThat(modelTranslation[0].propositions[i].backpack().rule).isEqualTo(model.rules[i])
+            assertThat(modelTranslation[0].info.propositions[i].backpack().ruleType).isEqualTo(RuleType.ORIGINAL_RULE)
+            assertThat(modelTranslation[0].info.propositions[i].backpack().rule).isEqualTo(model.rules[i])
         }
         for (i in 4..8) {
-            assertThat(modelTranslation[0].propositions[i].backpack().ruleType).isEqualTo(RuleType.ENUM_FEATURE_CONSTRAINT)
+            assertThat(modelTranslation[0].info.propositions[i].backpack().ruleType).isEqualTo(
+                RuleType
+                    .ENUM_FEATURE_CONSTRAINT
+            )
         }
 
-        assertThat(modelTranslation[0].propositions[0].formula()).isEqualTo(f.parse("@ENUM_a_a2"))
-        assertThat(modelTranslation[0].propositions[1].formula()).isEqualTo(f.parse("@ENUM_a_a2 => @ENUM_b_b1"))
-        assertThat(modelTranslation[0].propositions[2].formula()).isEqualTo(f.parse("@ENUM_p_p1 | @ENUM_p_p2"))
-        assertThat(modelTranslation[0].propositions[3].formula()).isEqualTo(f.parse("@ENUM_q_r_q1 => @ENUM_p_p1"))
+        assertThat(modelTranslation[0].info.propositions[0].formula()).isEqualTo(f.parse("@ENUM_a_a2"))
+        assertThat(modelTranslation[0].info.propositions[1].formula()).isEqualTo(f.parse("@ENUM_a_a2 => @ENUM_b_b1"))
+        assertThat(modelTranslation[0].info.propositions[2].formula()).isEqualTo(f.parse("@ENUM_p_p1 | @ENUM_p_p2"))
+        assertThat(modelTranslation[0].info.propositions[3].formula()).isEqualTo(f.parse("@ENUM_q_r_q1 => @ENUM_p_p1"))
 
-        assertThat(modelTranslation[0].propositions[4].formula()).isEqualTo(f.parse("@ENUM_a_a1 + @ENUM_a_a2 = 1"))
-        assertThat(modelTranslation[0].propositions[5].formula()).isEqualTo(f.parse("@ENUM_b_b1 + @ENUM_b_b2 + @ENUM_b_b3 = 1"))
-        assertThat(modelTranslation[0].propositions[6].formula()).isEqualTo(f.parse("@ENUM_c_c1 + @ENUM_c_c2 = 1"))
-        assertThat(modelTranslation[0].propositions[7].formula()).isEqualTo(f.parse("@ENUM_p_p1 + @ENUM_p_p2 + @ENUM_p_p3 = 1"))
-        assertThat(modelTranslation[0].propositions[8].formula()).isEqualTo(f.parse("@ENUM_q_r_q1 + @ENUM_q_r_q2 = 1"))
+        assertThat(modelTranslation[0].info.propositions[4].formula()).isEqualTo(f.parse("@ENUM_a_a1 + @ENUM_a_a2 = 1"))
+        assertThat(modelTranslation[0].info.propositions[5].formula()).isEqualTo(f.parse("@ENUM_b_b1 + @ENUM_b_b2 + @ENUM_b_b3 = 1"))
+        assertThat(modelTranslation[0].info.propositions[6].formula()).isEqualTo(f.parse("@ENUM_c_c1 + @ENUM_c_c2 = 1"))
+        assertThat(modelTranslation[0].info.propositions[7].formula()).isEqualTo(f.parse("@ENUM_p_p1 + @ENUM_p_p2 + @ENUM_p_p3 = 1"))
+        assertThat(modelTranslation[0].info.propositions[8].formula()).isEqualTo(f.parse("@ENUM_q_r_q1 + @ENUM_q_r_q2 = 1"))
 
-        assertThat(modelTranslation[0].unknownFeatures).isEmpty()
-        assertThat(modelTranslation[0].knownVariables).containsExactlyInAnyOrderElementsOf(
+        assertThat(modelTranslation[0].info.unknownFeatures).isEmpty()
+        assertThat(modelTranslation[0].info.knownVariables).containsExactlyInAnyOrderElementsOf(
             f.variables(
                 "@ENUM_a_a1", "@ENUM_a_a2",
                 "@ENUM_b_b1", "@ENUM_b_b2", "@ENUM_b_b3",
@@ -54,7 +57,7 @@ class LogicNGTranspilerEnumNoSlicesTest {
                 "@ENUM_q_r_q1", "@ENUM_q_r_q2",
             )
         )
-        assertThat(modelTranslation[0].enumMapping).hasSize(5)
+        assertThat(modelTranslation[0].info.enumMapping).hasSize(5)
         assertThat(modelTranslation[0].info.getFeatureAndValue(f.variable("@ENUM_p_p3"))).isEqualTo(Pair("p", "p3"))
     }
 }

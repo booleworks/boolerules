@@ -16,6 +16,7 @@ import com.booleworks.boolerules.computations.generic.SliceTypeDO
 import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.boolerules.computations.modelcount.ModelCountComputation.ModelCountInternalResult
 import com.booleworks.logicng.csp.CspFactory
+import com.booleworks.logicng.formulas.Variable
 import com.booleworks.logicng.modelcounting.ModelCounter
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
@@ -63,15 +64,19 @@ internal object ModelCountComputation :
         cf: CspFactory,
         status: ComputationStatusBuilder,
     ): ModelCountInternalResult {
-        // currently no projected model counting
+        // currently no projected model counting is supported
         // val variables = computeRelevantVars(f, info, listOf())
-        val intSatVariables = info.integerVariables.flatMap { info.encodingContext.variableMap[it.variable]?.values ?: emptySet() }
-        val variables = (info.knownVariables + info.intPredicateMapping.values + intSatVariables).toSortedSet()
-        val formulas = info.propositions.map { it.formula() }
+        val f = cf.formulaFactory()
+        val allVariables = sortedSetOf<Variable>()
+        val formulas = info.propositions.map {
+            allVariables.addAll(it.formula().variables(f))
+            it.formula()
+        }
+        allVariables.addAll(info.knownVariables)
         if (!status.successful()) {
             return ModelCountInternalResult(slice, BigInteger.ZERO)
         }
-        return ModelCountInternalResult(slice, ModelCounter.count(cf.formulaFactory(), formulas, variables))
+        return ModelCountInternalResult(slice, ModelCounter.count(cf.formulaFactory(), formulas, allVariables))
     }
 
     override fun computeDetailForSlice(

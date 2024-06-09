@@ -108,13 +108,13 @@ private fun handleAddRemove(
 ): PackageSolvingInternalResult {
     req.hardInstallation.forEach { solver.addHardFormula(it) }
     req.install.forEach { (fea, ver) -> solver.addHardFormula(vv(info, fea, ver)) }
-    req.remove.forEach { solver.addHardFormula(f.literal(it.key, false)) }
+    req.remove.forEach { solver.addHardFormula(it.key.negate(f)) }
     val currentInstall = req.softInstallation.size
     info.versionMapping.forEach { (fea, vers) ->
         if (fea in req.softInstallation) {
-            solver.addSoftFormula(f.variable(fea), currentInstall * 3)
+            solver.addSoftFormula(fea, currentInstall * 3)
         } else {
-            solver.addSoftFormula(f.variable(fea).negate(f), currentInstall)
+            solver.addSoftFormula(fea.negate(f), currentInstall)
         }
 
         val aux = f.variable("@VER_AUX_$fea")
@@ -128,7 +128,7 @@ private fun handleAddRemove(
         solver.addSoftFormula(aux, 1)
     }
     when (solver.solve()) {
-        MaxSAT.MaxSATResult.OPTIMUM -> return extractResult(slice, req, info, solver.model())
+        MaxSAT.MaxSATResult.OPTIMUM -> return extractResult(f, slice, req, info, solver.model())
         MaxSAT.MaxSATResult.UNDEF -> error("cannot happen, not called with handler")
         MaxSAT.MaxSATResult.UNSATISFIABLE -> {
             status.addWarning("installation request for slice $slice is not satisfiable -> skipping")
@@ -148,16 +148,16 @@ private fun handleUpgrade(
     val currentInstall = req.softInstallation.size
     req.softInstallation.forEach { (fea, _) ->
         if (fea in req.softInstallation) {
-            solver.addSoftFormula(f.variable(fea), currentInstall)
+            solver.addSoftFormula(fea, currentInstall)
         } else {
-            solver.addSoftFormula(f.variable(fea).negate(f), currentInstall)
+            solver.addSoftFormula(fea.negate(f), currentInstall)
         }
 
         val maxVer = info.versionMapping[fea]!!.lastKey()
         solver.addSoftFormula(vv(info, fea, maxVer), 1) // AUX => x in max version
     }
     when (solver.solve()) {
-        MaxSAT.MaxSATResult.OPTIMUM -> return extractResult(slice, req, info, solver.model())
+        MaxSAT.MaxSATResult.OPTIMUM -> return extractResult(f, slice, req, info, solver.model())
         MaxSAT.MaxSATResult.UNDEF -> error("cannot happen, not called with handler")
         MaxSAT.MaxSATResult.UNSATISFIABLE -> {
             status.addWarning("installation request for slice $slice is not satisfiable -> skipping")
@@ -167,6 +167,7 @@ private fun handleUpgrade(
 }
 
 private fun extractResult(
+    f: FormulaFactory,
     slice: Slice,
     req: InternalRequest,
     info: TranspilationInfo,
@@ -175,24 +176,24 @@ private fun extractResult(
     val removed = mutableListOf<VersionedFeature>()
     val new = mutableListOf<VersionedFeature>()
     val changed = mutableListOf<VersionedFeature>()
-    val allInstalled = mutableSetOf<String>()
+    val allInstalled = mutableSetOf<Variable>()
     model.positiveVariables().filter { it in info.versionVariables }.forEach { verVar ->
         val feaVer = info.getFeatureAndVersion(verVar)!!
-        val feature = feaVer.first
+        val feature = f.variable(feaVer.first)
         val version = feaVer.second
         val found = req.softInstallation[feature]
         if (found == null) {
-            new.add(VersionedFeature(feature, 0, version))
+            new.add(VersionedFeature(feature.name(), 0, version))
         } else {
             if (found != version) {
-                changed.add(VersionedFeature(feature, found, version))
+                changed.add(VersionedFeature(feature.name(), found, version))
             }
         }
         allInstalled.add(feature)
     }
     req.softInstallation.keys
         .filter { it !in allInstalled }
-        .forEach { removed.add(VersionedFeature(it, req.softInstallation[it]!!, 0)) }
+        .forEach { removed.add(VersionedFeature(it.name(), req.softInstallation[it]!!, 0)) }
     return PackageSolvingInternalResult(slice, removed, new, changed)
 }
 
@@ -208,7 +209,7 @@ private fun initialize(
         if (c != null) {
             if (c.first is VersionPredicate && (c.first as VersionPredicate).comparison == ComparisonOperator.EQ) {
                 val p = c.first as VersionPredicate
-                res.softInstallation[p.feature.featureCode] = p.version
+                res.softInstallation[cf.formulaFactory().variable(p.feature.featureCode)] = p.version
             } else {
                 res.hardInstallation.add(c.second)
             }
@@ -228,7 +229,7 @@ private fun initialize(
 
 private fun parseVersionPredicates(
     input: List<String>,
-    result: MutableMap<String, Int>,
+    result: MutableMap<Variable, Int>,
     info: TranspilationInfo,
     cf: CspFactory,
     status: ComputationStatusBuilder
@@ -243,13 +244,13 @@ private fun parseVersionPredicates(
             return false
         } else {
             val p = vf.first as VersionPredicate
-            result[p.feature.featureCode] = p.version
+            result[cf.formulaFactory().variable(p.feature.featureCode)] = p.version
         }
     }
     return true
 }
 
-private fun vv(info: TranspilationInfo, p: String, v: Int): Variable = info.versionMapping[p]!![v]!!
+private fun vv(info: TranspilationInfo, p: Variable, v: Int): Variable = info.versionMapping[p]!![v]!!
 
 data class PackageSolvingInternalResult(
     override val slice: Slice,
@@ -262,9 +263,9 @@ data class PackageSolvingInternalResult(
 }
 
 data class InternalRequest(
-    val softInstallation: MutableMap<String, Int> = mutableMapOf(),
+    val softInstallation: MutableMap<Variable, Int> = mutableMapOf(),
     val hardInstallation: MutableList<Formula> = mutableListOf(),
-    val install: MutableMap<String, Int> = mutableMapOf(),
-    val remove: MutableMap<String, Int> = mutableMapOf(),
-    val update: MutableMap<String, Int> = mutableMapOf(),
+    val install: MutableMap<Variable, Int> = mutableMapOf(),
+    val remove: MutableMap<Variable, Int> = mutableMapOf(),
+    val update: MutableMap<Variable, Int> = mutableMapOf(),
 )

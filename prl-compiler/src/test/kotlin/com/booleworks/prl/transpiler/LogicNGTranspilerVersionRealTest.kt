@@ -21,11 +21,11 @@ class LogicNGTranspilerVersionTest {
         assertThat(compiler.errors()).isEmpty()
         assertThat(model.rules).hasSize(21213)
         assertThat(modelTranslation.numberOfComputations).isEqualTo(1)
-        assertThat(modelTranslation[0].versionVariables).hasSize(19595)
+        assertThat(modelTranslation[0].info.versionVariables).hasSize(19595)
 
         val trans = modelTranslation[0]
         val solver = SATSolver.newSolver(cf.formulaFactory())
-        trans.propositions.forEach {
+        trans.info.propositions.forEach {
             solver.add(it.formula().cnf(cf.formulaFactory()))
         }
         assertThat(solver.sat()).isTrue()
@@ -41,11 +41,11 @@ class LogicNGTranspilerVersionTest {
         assertThat(compiler.errors()).isEmpty()
         assertThat(model.rules).hasSize(100)
         assertThat(modelTranslation.numberOfComputations).isEqualTo(1)
-        assertThat(modelTranslation[0].versionVariables).hasSize(101)
+        assertThat(modelTranslation[0].info.versionVariables).hasSize(101)
 
         val trans = modelTranslation[0]
         val solver = SATSolver.newSolver(cf.formulaFactory())
-        trans.propositions.forEach {
+        trans.info.propositions.forEach {
             solver.add(it.formula().cnf(cf.formulaFactory()))
         }
         assertThat(solver.sat()).isTrue()
@@ -61,16 +61,16 @@ class LogicNGTranspilerVersionTest {
         assertThat(compiler.errors()).isEmpty()
         assertThat(model.rules).hasSize(9)
         assertThat(modelTranslation.numberOfComputations).isEqualTo(1)
-        assertThat(modelTranslation[0].versionVariables).hasSize(10)
+        assertThat(modelTranslation[0].info.versionVariables).hasSize(10)
 
         val trans = modelTranslation[0]
         val solver = SATSolver.newSolver(cf.formulaFactory(), SATSolverConfig.builder().proofGeneration(true).build())
-        trans.propositions.forEach {
+        trans.info.propositions.forEach {
             solver.add(it.formula().cnf(cf.formulaFactory()))
         }
         val musicPlus = cf.formulaFactory().variable("@VER_MusicPlus_2")
         solver.add(musicPlus)
-        val models = solver.enumerateAllModels(trans.versionVariables)
+        val models = solver.enumerateAllModels(trans.info.versionVariables)
         models.forEach { assertThat(it.positiveVariables().contains(musicPlus)).isTrue() }
         assertThat(models).hasSize(12)
     }

@@ -57,27 +57,9 @@ data class RuleInformation(val ruleType: RuleType, val rule: AnyRule?, val slice
 fun PrlProposition.substitute(f: FormulaFactory, substitution: Substitution) =
     PrlProposition(backpack(), formula().substitute(f, substitution))
 
-data class SliceTranslation(val sliceSet: SliceSet, val info: TranspilationInfo) {
-    val propositions = info.propositions
-    val knownVariables = info.knownVariables
-    val booleanVariables = info.booleanVariables
-    val enumVariables = info.enumVariables
-    val integerVariables = info.integerVariables
-    val versionVariables = info.versionVariables
-    val versionMapping = info.versionMapping
-    val enumMapping = info.enumMapping
-    val unknownFeatures = info.unknownFeatures
-}
+data class SliceTranslation(val sliceSet: SliceSet, val info: TranspilationInfo)
 
-data class MergedSliceTranslation(val sliceSelectors: Map<String, SliceTranslation>, val info: TranspilationInfo) {
-    val propositions = info.propositions
-    val knownVariables = info.knownVariables
-    val booleanVariables = info.booleanVariables
-    val enumVariables = info.enumVariables
-    val integerVariables = info.integerVariables
-    val enumMapping = info.enumMapping
-    val unknownFeatures = info.unknownFeatures
-}
+data class MergedSliceTranslation(val sliceSelectors: Map<String, SliceTranslation>, val info: TranspilationInfo)
 
 data class ModelTranslation(
     val computations: List<SliceTranslation>,
@@ -128,7 +110,7 @@ data class TranspilationInfo(
     val encodingContext: CspEncodingContext, // The context for CSP encodings (model)
     val integerStore: IntegerStore, // The store for integer variables (model)
     val intPredicateMapping: Map<IntPredicate, Variable>, // A mapping for all integer predicates (slice)
-    val versionMapping: Map<String, SortedMap<Int, Variable>>, // All known enum variables and their values (slice)
+    val versionMapping: Map<Variable, SortedMap<Int, Variable>>, // All known enum variables and their values (slice)
     val booleanVariables: Set<Variable>, // All known boolean variables (slice)
     val enumMapping: Map<String, Map<String, Variable>>, // All known enum variables and their values (slice)
     val knownVariables: Set<Variable>, // All known problem variables (slice)
@@ -138,6 +120,7 @@ data class TranspilationInfo(
 ) {
     val enumVariables: Set<Variable>
     val versionVariables: Set<Variable>
+    val versionMetaVariables: Set<Variable>
     val integerVariables: Set<LngIntVariable>
 
     private val var2enum = mutableMapOf<Variable, Pair<String, String>>()
@@ -152,10 +135,11 @@ data class TranspilationInfo(
             }
         }
         versionVariables = mutableSetOf()
+        versionMetaVariables = versionMapping.keys
         versionMapping.forEach { (feature, vs) ->
             vs.forEach { (ver, variable) ->
                 versionVariables.add(variable)
-                var2version[variable] = Pair(feature, ver)
+                var2version[variable] = Pair(feature.name(), ver)
             }
         }
         integerVariables = featureInstantiations.integerFeatures.values

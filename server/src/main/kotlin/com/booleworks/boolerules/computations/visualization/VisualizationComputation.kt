@@ -6,7 +6,14 @@ package com.booleworks.boolerules.computations.visualization
 import com.booleworks.boolerules.computations.ComputationType
 import com.booleworks.boolerules.computations.NoComputationDetail
 import com.booleworks.boolerules.computations.NoElement
-import com.booleworks.boolerules.computations.generic.*
+import com.booleworks.boolerules.computations.generic.ApiDocs
+import com.booleworks.boolerules.computations.generic.ComputationStatusBuilder
+import com.booleworks.boolerules.computations.generic.InternalResult
+import com.booleworks.boolerules.computations.generic.NON_CACHING_USE_FF
+import com.booleworks.boolerules.computations.generic.SingleComputation
+import com.booleworks.boolerules.computations.generic.SingleComputationRunner
+import com.booleworks.boolerules.computations.generic.SliceTypeDO
+import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.Variable
 import com.booleworks.logicng.graphs.datastructures.Graph
@@ -73,7 +80,11 @@ object VisualizationComputation :
     ): VisualizationInternalResult {
         val f = cf.formulaFactory()
         return ConstraintGraphGenerator.generateFromFormulas(f, info.propositions.map { it.formula() }).let { graph ->
-            VisualizationInternalResult(slice, graph.nodes().map { Node(it.content().variable().name(), it.content().variable().name()) }, graph.edges())
+            VisualizationInternalResult(
+                slice,
+                graph.nodes().map { Node(it.content().variable().name(), it.content().variable().name()) },
+                graph.edges()
+            )
         }
     }
 }
@@ -92,7 +103,8 @@ fun Graph<Variable>.edges(): List<Edge> {
     val edges = mutableSetOf<Set<String>>()
     nodes().forEach { node ->
         val nodeName = node.content().name()
-        node.neighbours().asSequence().map { it.content().name() }.filterNot { it == nodeName }.forEach { edges.add(setOf(nodeName, it)) }
+        node.neighbours().asSequence().map { it.content().name() }.filterNot { it == nodeName }
+            .forEach { edges.add(setOf(nodeName, it)) }
     }
     return edges.map {
         it.toList().let { nodes -> Edge(nodes[0], nodes[1]) }

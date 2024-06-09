@@ -176,7 +176,7 @@ private fun initState(
 ): TranspilationInfo {
     val f = cf.formulaFactory()
     val insts = getFeatureInstantiations(sliceSet)
-    val versionMapping = if (sliceSet.hasVersionFeatures()) initVersionStore(f, sliceSet.allRules) else mapOf()
+    val versionMapping = if (sliceSet.hasVersionFeatures()) initVersionMapping(f, sliceSet.allRules) else mapOf()
     val intPredicateMapping = getAllIntPredicates(f, sliceSet)
     val booleanVariables = insts.booleanFeatures.values.map { f.variable(it.feature.featureCode) }.toSortedSet()
 

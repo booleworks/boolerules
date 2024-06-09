@@ -1,0 +1,47 @@
+header {
+  prl_version 1.0
+}
+
+bool feature b1
+bool feature b2
+
+versioned bool feature v1
+versioned bool feature v2
+versioned bool feature v3
+
+int feature i1 [0 - 100]
+int feature i2 [0 - 20]
+int feature i3 [-20 - 20]
+int feature i4 [-100 - 100]
+
+enum feature a ["a1", "a2"]
+enum feature b ["b1", "b2", "b3"]
+enum feature c ["c1", "c2"]
+enum feature p ["p1", "p2", "p3"]
+enum feature `q r` ["q1", "q2"]
+
+rule [i1 < 50]
+rule if [i1 = 20] then [i2 = 0]
+rule if [i1 = 10] then [i2 = 10]
+rule if [i2 = 10] then [i2 = 30]
+
+rule b1 is [i3 >= 0] & [i4 >= 0]
+rule b2 is [i3 < 0] / [i4 < 0]
+rule if b1 thenNot [i3 in [0, 10, 20]]
+rule if b2 then [i4 in [20, 40]] else [i4 in [-40 - -20]]
+rule [i3 > i4] => b1
+
+rule forbidden feature i1 = 20
+
+rule v1[ < 5]
+rule if v1[ = 1] then v2[ = 3]
+rule if v1[ = 2] then v2[ > 1]
+rule if v1[ = 3] then v2
+rule if v2 then -v3
+rule b1 is v1[ >= 2] & v3[ > 2]
+rule forbidden feature v1 = 2
+
+rule [a = "a2"]
+rule if [a = "a2"]  then [b = "b1"]
+rule [p in ["p1", "p2"]]
+rule if [`q r` in ["q1"]] then [p = "p1"]

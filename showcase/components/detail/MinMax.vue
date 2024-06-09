@@ -1,6 +1,7 @@
 <template>
     <DetailHeader />
-    <Button class="mt-3" :label="$t('details.btn_compute')" icon="pi pi-info-circle" @click="computeDetails()" />
+    <Button v-if="getDetailSelection().length > 0" class="mt-5" :label="$t('details.btn_compute')"
+        icon="pi pi-info-circle" @click="computeDetails()" />
     <div v-if="details.mainResult" class="mt-5">
         <div class="mt-5 mb-3 text-2xl font-bold">{{ $t('details.optimum') }}</div>
         <div> {{ details.mainResult.result }} </div>
@@ -12,7 +13,7 @@
 import { type Slice, type FeatureModel, type DetailRequest } from '~/types/computations'
 
 const appConfig = useAppConfig()
-const { getDetailRequest, getJobId } = useComputation()
+const { getDetailRequest, getJobId, getDetailSelection } = useComputation()
 const details = ref({} as MinMaxDetail)
 
 type MinMaxDetail = {
@@ -24,6 +25,12 @@ type MinMaxDetail = {
         }
     }
 }
+
+onMounted(() => {
+    if (getDetailSelection().length == 0) {
+        computeDetails()
+    }
+})
 
 async function computeDetails() {
     const request: DetailRequest = {

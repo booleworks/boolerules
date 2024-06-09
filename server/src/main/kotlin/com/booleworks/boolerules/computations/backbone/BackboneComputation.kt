@@ -115,7 +115,11 @@ internal object BackboneComputation : ListComputation<
         return result
     }
 
-    private fun computeTranslatedIntVars(variables: Set<LngIntVariable>, f: FormulaFactory, info: TranspilationInfo): Pair<Formula, Map<Variable, Pair<LngIntVariable, Int>>> {
+    private fun computeTranslatedIntVars(
+        variables: Set<LngIntVariable>,
+        f: FormulaFactory,
+        info: TranspilationInfo
+    ): Pair<Formula, Map<Variable, Pair<LngIntVariable, Int>>> {
         val clauses = mutableListOf<Formula>()
         val map = mutableMapOf<Variable, Pair<LngIntVariable, Int>>()
         variables.forEach { intVar ->

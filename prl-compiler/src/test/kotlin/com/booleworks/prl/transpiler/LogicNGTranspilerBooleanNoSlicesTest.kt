@@ -19,7 +19,7 @@ class LogicNGTranspilerBooleanNoSlicesTest {
         val modelTranslation = transpileModel(cf, model, listOf())
         assertThat(model.rules).hasSize(339)
         assertThat(modelTranslation.numberOfComputations).isEqualTo(1)
-        assertThat(modelTranslation[0].propositions).hasSize(model.rules.size)
+        assertThat(modelTranslation[0].info.propositions).hasSize(model.rules.size)
     }
 
     @Test
@@ -27,8 +27,8 @@ class LogicNGTranspilerBooleanNoSlicesTest {
         val modelTranslation = transpileModel(cf, model, listOf(), additionalConstraints = listOf("abq => bad", "bci"))
         assertThat(modelTranslation.skippedConstraints).isEmpty()
         assertThat(modelTranslation.numberOfComputations).isEqualTo(1)
-        assertThat(modelTranslation[0].propositions).hasSize(model.rules.size + 2)
-        assertThat(modelTranslation[0].propositions.filter {
+        assertThat(modelTranslation[0].info.propositions).hasSize(model.rules.size + 2)
+        assertThat(modelTranslation[0].info.propositions.filter {
             it.backpack().ruleType == RuleType.ADDITIONAL_RESTRICTION
         }).hasSize(2)
     }

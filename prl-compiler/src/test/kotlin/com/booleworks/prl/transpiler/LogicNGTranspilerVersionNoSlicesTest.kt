@@ -25,27 +25,27 @@ class LogicNGTranspilerVersionNoSlicesTest {
     @Test
     fun testVersionMapping() {
         val trans = modelTranslation[0]
-        assertThat(trans.versionMapping.keys).containsExactlyInAnyOrder("i1", "i2", "i3")
+        assertThat(trans.info.versionMapping.keys).containsExactlyInAnyOrderElementsOf(f.variables("i1", "i2", "i3"))
 
-        assertThat(trans.versionMapping["i1"]).containsExactly(
+        assertThat(trans.info.versionMapping[f.variable("i1")]).containsExactly(
             entry(1, f.variable("@VER_i1_1")),
             entry(2, f.variable("@VER_i1_2")),
             entry(3, f.variable("@VER_i1_3")),
             entry(4, f.variable("@VER_i1_4")),
         )
 
-        assertThat(trans.versionMapping["i2"]).containsExactly(
+        assertThat(trans.info.versionMapping[f.variable("i2")]).containsExactly(
             entry(1, f.variable("@VER_i2_1")),
             entry(2, f.variable("@VER_i2_2")),
             entry(3, f.variable("@VER_i2_3")),
         )
-        assertThat(trans.versionMapping["i3"]).containsExactly(
+        assertThat(trans.info.versionMapping[f.variable("i3")]).containsExactly(
             entry(1, f.variable("@VER_i3_1")),
             entry(2, f.variable("@VER_i3_2")),
             entry(3, f.variable("@VER_i3_3")),
         )
 
-        assertThat(trans.versionVariables).containsExactlyInAnyOrderElementsOf(
+        assertThat(trans.info.versionVariables).containsExactlyInAnyOrderElementsOf(
             f.variables(
                 "@VER_i1_1", "@VER_i1_2", "@VER_i1_3", "@VER_i1_4",
                 "@VER_i2_1", "@VER_i2_2", "@VER_i2_3",
@@ -57,7 +57,7 @@ class LogicNGTranspilerVersionNoSlicesTest {
     @Test
     fun testVersionConstraints() {
         val trans = modelTranslation[0]
-        val props = trans.propositions
+        val props = trans.info.propositions
         assertThat(props).hasSize(7 + 3 + 3)
     }
 
@@ -66,7 +66,7 @@ class LogicNGTranspilerVersionNoSlicesTest {
         val rules = model.rules
         val trans = modelTranslation[0]
         val sliceSet = trans.sliceSet
-        val props = trans.propositions
+        val props = trans.info.propositions
 
         val original = props.filter { it.backpack().ruleType == RuleType.ORIGINAL_RULE }
         assertThat(original).hasSize(7)
@@ -126,7 +126,7 @@ class LogicNGTranspilerVersionNoSlicesTest {
     fun testVersionAmoConstraints() {
         val trans = modelTranslation[0]
         val sliceSet = trans.sliceSet
-        val props = trans.propositions
+        val props = trans.info.propositions
 
         val amo = props.filter { it.backpack().ruleType == RuleType.VERSION_AMO_CONSTRAINT }
         assertThat(amo).hasSize(3)
@@ -155,7 +155,7 @@ class LogicNGTranspilerVersionNoSlicesTest {
     fun testVersionEquivConstraints() {
         val trans = modelTranslation[0]
         val sliceSet = trans.sliceSet
-        val props = trans.propositions
+        val props = trans.info.propositions
 
         val equiv = props.filter { it.backpack().ruleType == RuleType.VERSION_EQUIVALENCE }
         assertThat(equiv).hasSize(3)
@@ -184,7 +184,7 @@ class LogicNGTranspilerVersionNoSlicesTest {
     fun testVersionSolvingUnversionedVars() {
         val trans = modelTranslation[0]
         val solver = SATSolver.newSolver(f)
-        solver.addPropositions(trans.propositions)
+        solver.addPropositions(trans.info.propositions)
         assertThat(solver.sat()).isTrue()
         var models = solver.enumerateAllModels(f.variables("i1", "i2", "i3"))
         models.forEach { assertThat(it.positiveVariables().contains(f.variable("i1"))) }
@@ -199,9 +199,9 @@ class LogicNGTranspilerVersionNoSlicesTest {
     fun testVersionSolvingVersionedVars() {
         val trans = modelTranslation[0]
         val solver = SATSolver.newSolver(f)
-        solver.addPropositions(trans.propositions)
+        solver.addPropositions(trans.info.propositions)
         assertThat(solver.sat()).isTrue()
-        val models = solver.enumerateAllModels(trans.versionVariables)
+        val models = solver.enumerateAllModels(trans.info.versionVariables)
         assertThat(models).hasSize(11)
         assertThat(models.map { it.positiveVariables() }).containsExactlyInAnyOrder(
             TreeSet(f.variables("@VER_i1_1", "@VER_i2_3")),
@@ -222,9 +222,9 @@ class LogicNGTranspilerVersionNoSlicesTest {
     fun testVersionSolvingVersionedVarsWithBoolen() {
         val trans = modelTranslation[0]
         val solver = SATSolver.newSolver(f)
-        solver.addPropositions(trans.propositions)
+        solver.addPropositions(trans.info.propositions)
         assertThat(solver.sat()).isTrue()
-        val models = solver.enumerateAllModels(trans.versionVariables + f.variables("b1"))
+        val models = solver.enumerateAllModels(trans.info.versionVariables + f.variables("b1"))
         assertThat(models).hasSize(11)
         assertThat(models.map { it.positiveVariables() }).contains(
             TreeSet(f.variables("@VER_i1_1", "@VER_i2_3")),

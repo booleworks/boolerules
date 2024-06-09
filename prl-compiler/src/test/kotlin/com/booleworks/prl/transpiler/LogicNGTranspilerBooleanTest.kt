@@ -51,9 +51,9 @@ class LogicNGTranspilerBooleanTest {
     fun testSlice() {
         assertThat(sliceSets).hasSize(2)
         assertThat(translation1.sliceSet).isEqualTo(ss1)
-        assertThat(translation1.propositions).hasSize(8)
+        assertThat(translation1.info.propositions).hasSize(8)
         assertThat(translation2.sliceSet).isEqualTo(ss2)
-        assertThat(translation2.propositions).hasSize(8)
+        assertThat(translation2.info.propositions).hasSize(8)
     }
 
     @Test
@@ -68,33 +68,38 @@ class LogicNGTranspilerBooleanTest {
 
     @Test
     fun testVariables() {
-        assertThat(translation1.knownVariables).containsExactlyInAnyOrder(f1, f3, f4, f5, f6, g1)
-        assertThat(translation1.unknownFeatures).containsExactlyInAnyOrder(model.getFeature("f2"))
-        assertThat(translation2.knownVariables).containsExactlyInAnyOrder(f1, f2, f3, f4, f5, f6, g1)
-        assertThat(translation2.unknownFeatures).isEmpty()
+        assertThat(translation1.info.knownVariables).containsExactlyInAnyOrder(f1, f3, f4, f5, f6, g1)
+        assertThat(translation1.info.unknownFeatures).containsExactlyInAnyOrder(model.getFeature("f2"))
+        assertThat(translation2.info.knownVariables).containsExactlyInAnyOrder(f1, f2, f3, f4, f5, f6, g1)
+        assertThat(translation2.info.unknownFeatures).isEmpty()
     }
 
     @Test
     fun testInclusionRule() {
-        assertThat(translation1.propositions[0]).isEqualTo(PrlProposition(RuleInformation(rules[0], ss1), f.verum()))
+        assertThat(translation1.info.propositions[0]).isEqualTo(
+            PrlProposition(
+                RuleInformation(rules[0], ss1),
+                f.verum()
+            )
+        )
     }
 
     @Test
     fun testExclusionRule() {
-        assertThat(translation2.propositions[0]).isEqualTo(
+        assertThat(translation2.info.propositions[0]).isEqualTo(
             PrlProposition(RuleInformation(rules[1], ss2), f.implication(f.and(f1, f2), f.not(f.equivalence(f3, f4))))
         )
     }
 
     @Test
     fun testConstraintRule() {
-        assertThat(translation1.propositions[1]).isEqualTo(
+        assertThat(translation1.info.propositions[1]).isEqualTo(
             PrlProposition(
                 RuleInformation(rules[2], ss1),
                 f.exo(f4, f5)
             )
         )
-        assertThat(translation2.propositions[1]).isEqualTo(
+        assertThat(translation2.info.propositions[1]).isEqualTo(
             PrlProposition(
                 RuleInformation(rules[2], ss2),
                 f.exo(f4, f5)
@@ -104,13 +109,13 @@ class LogicNGTranspilerBooleanTest {
 
     @Test
     fun testGroupRule() {
-        assertThat(translation1.propositions[2]).isEqualTo(
+        assertThat(translation1.info.propositions[2]).isEqualTo(
             PrlProposition(
                 RuleInformation(rules[3], ss1),
                 f.and(f.amo(f4, f5, f6), f.equivalence(g1, f.or(f4, f5, f6)))
             )
         )
-        assertThat(translation2.propositions[2]).isEqualTo(
+        assertThat(translation2.info.propositions[2]).isEqualTo(
             PrlProposition(
                 RuleInformation(rules[3], ss2),
                 f.and(f.amo(f4, f5, f6), f.equivalence(g1, f.or(f4, f5, f6)))
@@ -120,23 +125,23 @@ class LogicNGTranspilerBooleanTest {
 
     @Test
     fun testIfThenElseRule() {
-        assertThat(translation1.propositions[3]).isEqualTo(
+        assertThat(translation1.info.propositions[3]).isEqualTo(
             PrlProposition(RuleInformation(rules[4], ss1), f.or(f.and(f3, f.or(f4, f5)), f.and(f3.negate(f), f5)))
         )
-        assertThat(translation2.propositions[3]).isEqualTo(
+        assertThat(translation2.info.propositions[3]).isEqualTo(
             PrlProposition(RuleInformation(rules[4], ss2), f.or(f.and(f3, f.or(f4, f5)), f.and(f3.negate(f), f5)))
         )
     }
 
     @Test
     fun testDefinitionRule() {
-        assertThat(translation1.propositions[4]).isEqualTo(
+        assertThat(translation1.info.propositions[4]).isEqualTo(
             PrlProposition(
                 RuleInformation(rules[5], ss1),
                 f.equivalence(f1, f3)
             )
         )
-        assertThat(translation2.propositions[4]).isEqualTo(
+        assertThat(translation2.info.propositions[4]).isEqualTo(
             PrlProposition(
                 RuleInformation(rules[5], ss2),
                 f.equivalence(f1, f.or(f2, f3))
@@ -146,19 +151,39 @@ class LogicNGTranspilerBooleanTest {
 
     @Test
     fun testSimplificationFormula() {
-        assertThat(translation1.propositions[5]).isEqualTo(PrlProposition(RuleInformation(rules[6], ss1), f.verum()))
-        assertThat(translation2.propositions[5]).isEqualTo(PrlProposition(RuleInformation(rules[6], ss2), f.verum()))
+        assertThat(translation1.info.propositions[5]).isEqualTo(
+            PrlProposition(
+                RuleInformation(rules[6], ss1),
+                f.verum()
+            )
+        )
+        assertThat(translation2.info.propositions[5]).isEqualTo(
+            PrlProposition(
+                RuleInformation(rules[6], ss2),
+                f.verum()
+            )
+        )
     }
 
     @Test
     fun testMandatoryFeature() {
-        assertThat(translation1.propositions[6]).isEqualTo(PrlProposition(RuleInformation(rules[7], ss1), f5))
-        assertThat(translation2.propositions[6]).isEqualTo(PrlProposition(RuleInformation(rules[7], ss2), f5))
+        assertThat(translation1.info.propositions[6]).isEqualTo(PrlProposition(RuleInformation(rules[7], ss1), f5))
+        assertThat(translation2.info.propositions[6]).isEqualTo(PrlProposition(RuleInformation(rules[7], ss2), f5))
     }
 
     @Test
     fun testForbiddenFeature() {
-        assertThat(translation1.propositions[7]).isEqualTo(PrlProposition(RuleInformation(rules[8], ss1), f5.negate(f)))
-        assertThat(translation2.propositions[7]).isEqualTo(PrlProposition(RuleInformation(rules[8], ss2), f5.negate(f)))
+        assertThat(translation1.info.propositions[7]).isEqualTo(
+            PrlProposition(
+                RuleInformation(rules[8], ss1),
+                f5.negate(f)
+            )
+        )
+        assertThat(translation2.info.propositions[7]).isEqualTo(
+            PrlProposition(
+                RuleInformation(rules[8], ss2),
+                f5.negate(f)
+            )
+        )
     }
 }

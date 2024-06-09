@@ -34,13 +34,17 @@ import java.util.SortedMap
 
 const val VERSION_PREFIX = "@VER"
 
-internal fun initVersionStore(f: FormulaFactory, rules: List<AnyRule>): Map<String, SortedMap<Int, Variable>> {
-    val vs = mutableMapOf<String, SortedMap<Int, Variable>>()
+internal fun initVersionMapping(f: FormulaFactory, rules: List<AnyRule>): Map<Variable, SortedMap<Int, Variable>> {
+    val vs = mutableMapOf<Variable, SortedMap<Int, Variable>>()
     rules.forEach { addRuleToVersionStore(f, it, vs) }
     return vs
 }
 
-private fun addRuleToVersionStore(f: FormulaFactory, rule: AnyRule, vs: MutableMap<String, SortedMap<Int, Variable>>) {
+private fun addRuleToVersionStore(
+    f: FormulaFactory,
+    rule: AnyRule,
+    vs: MutableMap<Variable, SortedMap<Int, Variable>>
+) {
     when (rule) {
         is ConstraintRule -> addContraintsToVersionStore(f, vs, rule.constraint)
         is DefinitionRule -> addContraintsToVersionStore(f, vs, rule.definition)
@@ -57,7 +61,7 @@ private fun addRuleToVersionStore(f: FormulaFactory, rule: AnyRule, vs: MutableM
 
 private fun addContraintsToVersionStore(
     f: FormulaFactory,
-    vs: MutableMap<String, SortedMap<Int, Variable>>,
+    vs: MutableMap<Variable, SortedMap<Int, Variable>>,
     vararg constraints: Constraint
 ) {
     constraints.forEach {
@@ -76,21 +80,22 @@ private fun addContraintsToVersionStore(
 fun versionPropositions(
     f: FormulaFactory,
     sliceSet: SliceSet,
-    vs: Map<String, SortedMap<Int, Variable>>
+    vs: Map<Variable, SortedMap<Int, Variable>>
 ): List<PrlProposition> = generateVersionConstraints(f, sliceSet, vs)
 
 fun translateVersionComparison(
     f: FormulaFactory,
     constraint: VersionPredicate,
-    vs: Map<String, SortedMap<Int, Variable>>
+    vs: Map<Variable, SortedMap<Int, Variable>>
 ): Formula {
     val fea = constraint.feature
     val ver = constraint.version
-    val versionMapping = vs[fea.featureCode]
+    val codeVar = f.variable(fea.featureCode)
+    val versionMapping = vs[codeVar]
     if (versionMapping == null) {
         return f.literal(fea.featureCode, false)
     } else {
-        val maxValue = vs[fea.featureCode]!!.lastKey()
+        val maxValue = vs[codeVar]!!.lastKey()
         return when (constraint.comparison) {
             EQ -> versionVar(f, fea, ver)
             NE -> versionVar(f, fea, ver).negate(f)
@@ -109,13 +114,13 @@ fun translateVersionComparison(
 private fun generateVersionConstraints(
     f: FormulaFactory,
     sliceSet: SliceSet,
-    vs: Map<String, SortedMap<Int, Variable>>
+    vs: Map<Variable, SortedMap<Int, Variable>>
 ): List<PrlProposition> {
     val propositions = mutableListOf<PrlProposition>()
     vs.forEach { (fea, vers) ->
         val vars = vers.values
         val amo = f.amo(vars)
-        val euqiv = f.equivalence(f.variable(fea), f.or(vars))
+        val euqiv = f.equivalence(fea, f.or(vars))
         propositions.add(PrlProposition(RuleInformation(RuleType.VERSION_AMO_CONSTRAINT, sliceSet), amo))
         propositions.add(PrlProposition(RuleInformation(RuleType.VERSION_EQUIVALENCE, sliceSet), euqiv))
     }
@@ -126,25 +131,25 @@ internal fun versionVar(f: FormulaFactory, fea: VersionedBooleanFeature, ver: In
     f.variable("${VERSION_PREFIX}_${fea.featureCode}_$ver")
 
 
-fun addUsage(f: FormulaFactory, vs: MutableMap<String, SortedMap<Int, Variable>>, predicate: VersionPredicate) {
+fun addUsage(f: FormulaFactory, vs: MutableMap<Variable, SortedMap<Int, Variable>>, predicate: VersionPredicate) {
     val feature = predicate.feature
-    val code = predicate.feature.featureCode
+    val codeVar = f.variable(predicate.feature.featureCode)
     val ver = when (predicate.comparison) {
         in setOf(EQ, NE, GE, LE) -> predicate.version
         GT -> predicate.version + 1
         else -> predicate.version - 1
     }
-    if (vs[code] == null) {
+    if (vs[codeVar] == null) {
         if (ver >= 1) {
-            vs[code] = sortedMapOf()
+            vs[codeVar] = sortedMapOf()
             for (it in 1..ver) {
-                vs[code]!![it] = versionVar(f, feature, it)
+                vs[codeVar]!![it] = versionVar(f, feature, it)
             }
         }
-    } else if (vs[code]!![ver] == null) {
-        val currentMax = vs[code]!!.lastKey()
+    } else if (vs[codeVar]!![ver] == null) {
+        val currentMax = vs[codeVar]!!.lastKey()
         for (it in currentMax + 1..ver) {
-            vs[code]!![it] = versionVar(f, feature, it)
+            vs[codeVar]!![it] = versionVar(f, feature, it)
         }
     }
 }
