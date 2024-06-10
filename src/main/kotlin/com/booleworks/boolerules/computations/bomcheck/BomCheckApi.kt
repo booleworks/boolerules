@@ -3,7 +3,9 @@
 
 package com.booleworks.boolerules.computations.bomcheck
 
+import com.booleworks.boolerules.computations.generic.ComputationDetail
 import com.booleworks.boolerules.computations.generic.ComputationRequest
+import com.booleworks.boolerules.computations.generic.FeatureModelDO
 import com.booleworks.boolerules.computations.generic.ListComputationResponse
 import com.booleworks.boolerules.computations.generic.PropertySelectionDO
 import com.fasterxml.jackson.annotation.JsonInclude
@@ -86,4 +88,35 @@ data class PositionElementDO(
 data class BomCheckAlgorithmsResult(val isComplete: Boolean, val hasNonUniquePVs: Boolean, val hasDeadPvs: Boolean) : Comparable<BomCheckAlgorithmsResult> {
     override fun compareTo(other: BomCheckAlgorithmsResult) = this.toString().compareTo(other.toString())
 }
+
+@JsonInclude(Include.NON_NULL)
+@Schema(description = "The details for a bom check computation")
+data class BomCheckDetail(
+    val deadPVs: List<DeadPvDetail>,
+    val nonUniquePvs: List<NonUniquePvsDetail>
+
+) : ComputationDetail
+
+@JsonInclude(Include.NON_NULL)
+@Schema(description = "The details for a dead position variant with example configuration")
+data class DeadPvDetail(
+    @field:Schema(description = "An example configuration for the dead position variant")
+    val positionVariant: PositionVariant,
+
+    @field:Schema(description = "An example configuration for the dead position variant")
+    val exampleConfiguration: FeatureModelDO?,
+)
+
+@JsonInclude(Include.NON_NULL)
+@Schema(description = "The details for a combination of two non unique position variants with example configuration")
+data class NonUniquePvsDetail(
+    @field:Schema(description = "First of the non unique position variants")
+    val firstPositionVariant: PositionVariant?,
+
+    @field:Schema(description = "Second of the non unique position variants")
+    val secondPositionVariant: PositionVariant?,
+
+    @field:Schema(description = "An example configuration for duplicate position variants")
+    val exampleConfiguration: FeatureModelDO?,
+)
 

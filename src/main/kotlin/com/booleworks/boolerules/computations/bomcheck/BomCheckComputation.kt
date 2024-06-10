@@ -4,7 +4,6 @@
 package com.booleworks.boolerules.computations.bomcheck
 
 import com.booleworks.boolerules.computations.ComputationType
-import com.booleworks.boolerules.computations.NoComputationDetail
 import com.booleworks.boolerules.computations.bomcheck.BomCheckComputation.BomCheckInternalResult
 import com.booleworks.boolerules.computations.generic.ApiDocs
 import com.booleworks.boolerules.computations.generic.ComputationStatusBuilder
@@ -15,6 +14,7 @@ import com.booleworks.boolerules.computations.generic.ListComputationRunner
 import com.booleworks.boolerules.computations.generic.NON_CACHING_USE_FF
 import com.booleworks.boolerules.computations.generic.NON_PT_CONFIG
 import com.booleworks.boolerules.computations.generic.computationDoc
+import com.booleworks.boolerules.computations.generic.extractModel
 import com.booleworks.logicng.datastructures.Tristate
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.prl.model.PrlModel
@@ -26,7 +26,7 @@ val BOMCHECK = object : ComputationType<
         BomCheckRequest,
         BomCheckResponse,
         BomCheckAlgorithmsResult,
-        NoComputationDetail,
+        BomCheckDetail,
         PositionElementDO> {
     override val path: String = "bomcheck"
     override val docs: ApiDocs = computationDoc<BomCheckRequest, BomCheckResponse>(
@@ -40,7 +40,7 @@ val BOMCHECK = object : ComputationType<
 
     override val request = BomCheckRequest::class.java
     override val main = BomCheckAlgorithmsResult::class.java
-    override val detail = NoComputationDetail::class.java
+    override val detail = BomCheckDetail::class.java
     override val element = PositionElementDO::class.java
 
     override val runner = ListComputationRunner(BomCheckComputation)
@@ -50,9 +50,9 @@ val BOMCHECK = object : ComputationType<
 internal object BomCheckComputation :
     ListComputation<BomCheckRequest,
             Map<PositionElementDO, Slice>,
-            NoComputationDetail,
+            BomCheckDetail,
             BomCheckAlgorithmsResult,
-            NoComputationDetail,
+            BomCheckDetail,
             BomCheckInternalResult,
             BomCheckComputation.PositionElementResult,
             PositionElementDO>(NON_CACHING_USE_FF) {
@@ -79,11 +79,11 @@ internal object BomCheckComputation :
         val solver = miniSat(NON_PT_CONFIG, request, f, model, info, slice, status).also {
             if (!status.successful()) return BomCheckInternalResult(slice, mutableMapOf())
         }
-        val positionElements: MutableList<PositionElementDO> = mutableListOf()
+        val positionElements: MutableMap<PositionElementDO, Triple<Slice, List<DeadPvDetail>, List<NonUniquePvsDetail>>> = mutableMapOf()
         // check if solver is sat with the rules from rule file
         request.positions.forEach { position ->
-            val deadPVs: MutableList<PositionVariant> = mutableListOf()  // inconstructable pv = dead pv
-            val nonUniquePVs: MutableList<Pair<PositionVariant, PositionVariant>> = mutableListOf()
+            val deadPVs: MutableList<DeadPvDetail> = mutableListOf()  // inconstructable pv = dead pv
+            val nonUniquePVs: MutableList<NonUniquePvsDetail> = mutableListOf()
             var isComplete = true
 
             val pvConstraintMap =
@@ -93,8 +93,10 @@ internal object BomCheckComputation :
             pvConstraintMap.forEach { (pv, pvConstraint) ->
                 solver.satCall().addPropositions(pvConstraint).solve().use { satCall ->
                     if (satCall.satResult != Tristate.TRUE) {
-                        deadPVs.add(pv)
+                        val deadPvModel = extractModel(satCall.model(info.knownVariables).positiveVariables(), info)
+                        deadPVs.add(DeadPvDetail(pv, deadPvModel))
                     }
+
                 }
             }
 
@@ -103,6 +105,7 @@ internal object BomCheckComputation :
             val allPvConstraintsNegatedConjunction = f.and(pvConstraintMap.values.map { f.not(it.formula()) })
             solver.satCall().addFormulas(positionConstraint?.formula(), allPvConstraintsNegatedConjunction).solve().use { satCall ->
                 if (satCall.satResult != Tristate.TRUE) {
+                    // no model for empty hits
                     isComplete = false
                 }
             }
@@ -114,14 +117,15 @@ internal object BomCheckComputation :
                 pvConstraintIiterator.forEachRemaining {
                     solver.satCall().addPropositions(currentPv.value, it.value).solve().use { satCall ->
                         if (satCall.satResult == Tristate.TRUE) {
-                            nonUniquePVs.add(Pair(currentPv.key, it.key))
+                            val nonUniquePvsModel = extractModel(satCall.model(info.knownVariables).positiveVariables(), info)
+                            nonUniquePVs.add(NonUniquePvsDetail(currentPv.key, it.key, nonUniquePvsModel))
                         }
                     }
                 }
             }
 
             // build result
-            positionElements.add(
+            positionElements.put(
                 PositionElementDO(
                     position.positionId,
                     position.description,
@@ -129,11 +133,12 @@ internal object BomCheckComputation :
                     isComplete,
                     nonUniquePVs.isNotEmpty(),
                     deadPVs.isNotEmpty()
-                )
+                ),
+                Triple(slice, deadPVs, nonUniquePVs)
             )
         }
 
-        return BomCheckInternalResult(slice, positionElements.associateWith { slice }.toMutableMap())
+        return BomCheckInternalResult(slice, positionElements)
     }
 
     override fun extractElements(internalResult: BomCheckInternalResult): Set<PositionElementDO> = internalResult.positions.keys
@@ -142,22 +147,33 @@ internal object BomCheckComputation :
         element: PositionElementDO,
         internalResult: BomCheckInternalResult
     ): PositionElementResult =
-        internalResult.positions[element].let { slice ->
-            if (slice == null) {
-                PositionElementResult(internalResult.slice, BomCheckAlgorithmsResult(element.isComplete, element.hasNonUniquePVs, element.hasDeadPvs))
+        internalResult.positions[element].let { triple ->
+            if (triple == null) {
+                PositionElementResult(
+                    internalResult.slice,
+                    BomCheckAlgorithmsResult(element.isComplete, element.hasNonUniquePVs, element.hasDeadPvs),
+                    listOf(),
+                    listOf()
+                )
             } else {
-                PositionElementResult(slice, BomCheckAlgorithmsResult(element.isComplete, element.hasNonUniquePVs, element.hasDeadPvs))
+                val (slice: Slice, deadPVs: List<DeadPvDetail>, nonUniquePvs: List<NonUniquePvsDetail>) = triple
+                PositionElementResult(slice, BomCheckAlgorithmsResult(element.isComplete, element.hasNonUniquePVs, element.hasDeadPvs), deadPVs, nonUniquePvs)
             }
         }
 
     data class BomCheckInternalResult(
         override val slice: Slice,
-        val positions: MutableMap<PositionElementDO, Slice>
-    ) : InternalListResult<Map<PositionElementDO, Slice>, NoComputationDetail>(slice)
+        val positions: MutableMap<PositionElementDO, Triple<Slice, List<DeadPvDetail>, List<NonUniquePvsDetail>>>
+    ) : InternalListResult<Map<PositionElementDO, Slice>, BomCheckDetail>(slice)
 
-    data class PositionElementResult(override val slice: Slice, val result: BomCheckAlgorithmsResult) :
-        InternalResult<BomCheckAlgorithmsResult, NoComputationDetail>(slice) {
+    data class PositionElementResult(
+        override val slice: Slice,
+        val result: BomCheckAlgorithmsResult,
+        val deadPVs: List<DeadPvDetail>,
+        val nonUniquePvs: List<NonUniquePvsDetail>
+    ) :
+        InternalResult<BomCheckAlgorithmsResult, BomCheckDetail>(slice) {
         override fun extractMainResult() = result
-        override fun extractDetails() = NoComputationDetail
+        override fun extractDetails() = BomCheckDetail(deadPVs, nonUniquePvs)
     }
 }

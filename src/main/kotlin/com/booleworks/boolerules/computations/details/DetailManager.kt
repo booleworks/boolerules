@@ -5,6 +5,10 @@ package com.booleworks.boolerules.computations.details
 
 import com.booleworks.boolerules.computations.ComputationType
 import com.booleworks.boolerules.computations.NoElement
+import com.booleworks.boolerules.computations.bomcheck.BOMCHECK
+import com.booleworks.boolerules.computations.bomcheck.BomCheckAlgorithmsResult
+import com.booleworks.boolerules.computations.bomcheck.BomCheckDetail
+import com.booleworks.boolerules.computations.bomcheck.PositionElementDO
 import com.booleworks.boolerules.computations.consistency.CONSISTENCY
 import com.booleworks.boolerules.computations.consistency.ConsistencyComputation
 import com.booleworks.boolerules.computations.consistency.ConsistencyDetail
@@ -31,11 +35,12 @@ fun computeDetailResponse(
     computationType: ComputationType<*, *, *, *, *>
 ): DetailResponse<*, *, *> =
     when (computationType) {
-        CONSISTENCY -> computeConsistencyDetail(request)
+        CONSISTENCY  -> computeConsistencyDetail(request)
         MINMAXCONFIG -> computeMinMaxDetail(request)
         OPTIMIZATION -> computeOptimizationDetail(request)
-        COVERAGE -> computeCoverageDetail(request)
-        else -> error("Cannot compute details for computation without details")
+        COVERAGE     -> computeCoverageDetail(request)
+        BOMCHECK     -> computeBomCheckDetail(request)
+        else         -> error("Cannot compute details for computation without details")
     }
 
 private fun computeConsistencyDetail(request: DetailRequest): DetailResponse<NoElement, Boolean, ConsistencyDetail> {
@@ -99,6 +104,20 @@ private fun computeCoverageDetail(request: DetailRequest): DetailResponse<NoElem
     val mainResult =
         Persistence.computation.fetchMainResult(request.jobId, computationDetail.resultId, COVERAGE).getOrThrow()
     return DetailResponse(null, mainResult, computationDetail)
+}
+
+private fun computeBomCheckDetail(request: DetailRequest): DetailResponse<PositionElementDO, BomCheckAlgorithmsResult, BomCheckDetail> {
+    val computationDetail =
+        Persistence.computation.fetchDetail(
+            request.jobId,
+            SliceDO.fromSelection(request.sliceSelection),
+            request.elementId,
+            BOMCHECK
+        ).getOrThrow()
+    val mainResult =
+        Persistence.computation.fetchMainResult(request.jobId, computationDetail.resultId, BOMCHECK).getOrThrow()
+    val positionElement = Persistence.computation.fetchElement(request.jobId, request.elementId!!, BOMCHECK).getOrThrow()
+    return DetailResponse(positionElement, mainResult, computationDetail)
 }
 
 private fun fetchModel(jobId: String): PrlModel {
