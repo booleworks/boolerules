@@ -38,16 +38,23 @@ data class FeatureModelDO(
  * Extracts a model of a given set of variables (which are the positive
  * variables of the model) and returns a list of typed features.
  */
-internal fun extractModel(variables: Collection<Variable>, info: TranspilationInfo): FeatureModelDO =
-    FeatureModelDO(variables.filter { info.knownVariables.contains(it) }
-        .map { variable -> extractFeature(variable, info) }.sorted())
+internal fun extractModel(
+    variables: Collection<Variable>,
+    info: TranspilationInfo,
+    relevant: Collection<Variable>? = null
+): FeatureModelDO =
+    FeatureModelDO(variables
+        .filter { it in info.knownVariables }
+        .filter { relevant == null || it in relevant }
+        .map { variable -> extractFeature(variable, info) }.sorted()
+    )
 
 internal fun extractModel(
     variables: Collection<Variable>,
     integerAssignment: CspAssignment,
     info: TranspilationInfo
 ): FeatureModelDO =
-    FeatureModelDO(variables.filter { info.knownVariables.contains(it) }
+    FeatureModelDO(variables.filter { it in info.knownVariables }
         .map { variable -> extractFeature(variable, info) }.sorted() + extractIntFeatures(integerAssignment, info))
 
 
@@ -58,15 +65,16 @@ internal fun extractIntFeatures(integerAssignment: CspAssignment, info: Transpil
     }
 
 internal fun extractFeature(variable: Variable, info: TranspilationInfo) =
-    if (variable in info.booleanVariables) {
-        FeatureDO.boolean(variable.name(), true)
-    } else if (variable in info.versionVariables) {
-        val (feature, version) = info.getFeatureAndVersion(variable)!!
-        FeatureDO.boolean(feature, version)
-    } else if (variable in info.enumVariables) {
-        val (feature, value) = info.getFeatureAndValue(variable)!!
-        FeatureDO.enum(feature, value)
-    } else {
-        error("Cannot extract unknown variable.")
+    when (variable) {
+        in info.booleanVariables -> FeatureDO.boolean(variable.name(), true)
+        in info.versionVariables -> {
+            val (feature, version) = info.getFeatureAndVersion(variable)!!
+            FeatureDO.boolean(feature, version)
+        }
+        in info.enumVariables -> {
+            val (feature, value) = info.getFeatureAndValue(variable)!!
+            FeatureDO.enum(feature, value)
+        }
+        else -> error("Cannot extract unknown variable.")
     }
 

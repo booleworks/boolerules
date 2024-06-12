@@ -13,7 +13,8 @@ import org.antlr.v4.runtime.CharStreams
 /**
  * Parses the given string to a PRL constraint and casts it to the given type [C].
  */
-fun <C : PrlConstraint> parseConstraint(string: String): C {
+fun <C : PrlConstraint> parseConstraint(input: String): C {
+    val string = input.ifBlank { PragmaticRuleLanguage.KEYWORD_TRUE }
     val parser = prepareParser(CharStreams.fromString(string));
     return parser.constraint as C;
 }

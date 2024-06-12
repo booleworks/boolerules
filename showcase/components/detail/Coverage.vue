@@ -112,8 +112,8 @@ async function computeGraph() {
                 {
                     label: t('algo.coverage.graph_coverable_constraints'),
                     data: graph.coverableConstraints.map(c => c.maxCoverableConstraints),
-                    backgroundColor: ['rgba(255, 195, 18, 0.6)'],
-                    borderColor: ['rgb(255, 195, 18)'],
+                    backgroundColor: ['rgba(181, 52, 113, 0.8)'],
+                    borderColor: ['rgba(181, 52, 113)'],
                     borderWidth: 1
                 }
             ]

@@ -5,6 +5,9 @@ package com.booleworks.boolerules.computations.details
 
 import com.booleworks.boolerules.computations.ComputationType
 import com.booleworks.boolerules.computations.NoElement
+import com.booleworks.boolerules.computations.bomcheck.POSITION_VALIDATION
+import com.booleworks.boolerules.computations.bomcheck.PositionValidationDetail
+import com.booleworks.boolerules.computations.bomcheck.PositionValidationResult
 import com.booleworks.boolerules.computations.consistency.CONSISTENCY
 import com.booleworks.boolerules.computations.consistency.ConsistencyComputation
 import com.booleworks.boolerules.computations.consistency.ConsistencyDetail
@@ -36,6 +39,7 @@ fun computeDetailResponse(
         MINMAXCONFIG -> computeMinMaxDetail(request)
         OPTIMIZATION -> computeOptimizationDetail(request)
         COVERAGE -> computeCoverageDetail(request)
+        POSITION_VALIDATION -> computePositionValidationDetail(request)
         else -> error("Cannot compute details for computation without details")
     }
 
@@ -104,11 +108,29 @@ private fun computeCoverageDetail(request: DetailRequest): DetailResponse<NoElem
     return DetailResponse(null, mainResult, computationDetail)
 }
 
+private fun computePositionValidationDetail(
+    request: DetailRequest
+): DetailResponse<NoElement, PositionValidationResult, PositionValidationDetail> {
+    val computationDetail =
+        Persistence.computation.fetchDetail(
+            request.jobId,
+            SliceDO.fromSelection(request.sliceSelection),
+            request.elementId,
+            POSITION_VALIDATION
+        ).getOrThrow()
+    val mainResult = Persistence.computation.fetchMainResult(
+        request.jobId, computationDetail.resultId, POSITION_VALIDATION
+    ).getOrThrow()
+    return DetailResponse(null, mainResult, computationDetail)
+}
+
+
 internal fun fetchModel(jobId: String): PrlModel {
     val status = Persistence.computation.fetchStatus(jobId).getOrThrow()
     val binZipped = Persistence.rulefile.getBinaryRuleFile(status.ruleFileId)
     return deserialize(
-        ProtoBufModel.PbModel.newBuilder().mergeFrom(GZIPInputStream(ByteArrayInputStream(binZipped.getOrThrow())))
+        ProtoBufModel.PbModel.newBuilder()
+            .mergeFrom(GZIPInputStream(ByteArrayInputStream(binZipped.getOrThrow())))
             .build()
     )
 }

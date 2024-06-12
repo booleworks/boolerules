@@ -1,6 +1,6 @@
 <template>
     <div class="flex h-full">
-        <div class="flex flex-none bg-gradient-to-tr from-[#c6fdff] to-white-500">
+        <div class="flex flex-none bg-gradient-to-t from-[#c6fdff] to-[#ecffff]">
             <!-- The sidebar with the main navigation -->
             <MenuSidebar />
         </div>

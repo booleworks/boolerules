@@ -87,6 +87,10 @@ export default () => {
         return currentSliceSelection.value
     }
 
+    const resetDetailSelection = () => {
+        currentSliceSelection.value = [] as DetailSliceSelection[]
+    }
+
     function firstValue(possibleValues: PropertyRange | undefined): SingleRange {
         if (possibleValues === undefined) {
             return {}
@@ -113,5 +117,5 @@ export default () => {
     }
 
 
-    return { setJobId, getJobId, initDetailSelection, getDetailSelection, getDetailRequest, containsAnyOrAllSplits };
+    return { setJobId, getJobId, initDetailSelection, getDetailSelection, resetDetailSelection, getDetailRequest, containsAnyOrAllSplits };
 };

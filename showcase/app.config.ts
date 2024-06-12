@@ -19,4 +19,6 @@ export default defineAppConfig({
     reconfiguration: hostname + "/computation/reconfiguration/synchronous",
     packagesolving: hostname + "/computation/packagesolving/synchronous",
     constraintgraph: hostname + "/computation/visualization/synchronous",
+    posval: hostname + "/computation/posval/synchronous",
+    posval_detail: hostname + "/computation/posval/details"
 })

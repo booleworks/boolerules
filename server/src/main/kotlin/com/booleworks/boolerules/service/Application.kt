@@ -4,6 +4,7 @@
 package com.booleworks.boolerules.service
 
 import com.booleworks.boolerules.computations.backbone.BACKBONE
+import com.booleworks.boolerules.computations.bomcheck.POSITION_VALIDATION
 import com.booleworks.boolerules.computations.computationManagementRoute
 import com.booleworks.boolerules.computations.consistency.CONSISTENCY
 import com.booleworks.boolerules.computations.coverage.COVERAGE
@@ -122,6 +123,9 @@ fun Application.module() {
             route(PATH_COMPUTATION) { addComputationApi(PACKAGESOLVING, this@route) }
 
             route(PATH_COMPUTATION) { addComputationApi(VISUALIZATION, this@route) }
+
+            route(PATH_COMPUTATION) { addComputationApi(POSITION_VALIDATION, this@route) }
+            route(PATH_COMPUTATION) { detailsRoute(POSITION_VALIDATION) }
 
             // Rule file management
             route(PATH_RULEFILE) { rulefileRoute() }

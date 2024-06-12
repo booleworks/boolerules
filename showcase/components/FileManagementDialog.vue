@@ -60,6 +60,7 @@ const appConfig = useAppConfig()
 const { setSummary, isPresent, getSummary } = useCurrentRuleFile()
 const { initSliceSelection } = useCurrentSliceSelection()
 const { clearSelectedFeatures } = useFeatureSelection()
+const { resetDetailSelection } = useComputation()
 
 const props = defineProps<{ initialFiles: UploadSummary[] }>()
 
@@ -75,6 +76,7 @@ function selectFile() {
     initSliceSelection(selectedFile.value)
     setSummary(selectedFile.value)
     clearSelectedFeatures()
+    resetDetailSelection()
 }
 
 async function fetchRuleFiles() {
@@ -111,6 +113,7 @@ const onUpload = (event: FileUploadUploadEvent) => {
     initSliceSelection(summary)
     setSummary(summary)
     clearSelectedFeatures()
+    resetDetailSelection()
     fetchRuleFiles()
     showDialog.value = true
 }

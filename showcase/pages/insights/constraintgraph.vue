@@ -18,7 +18,7 @@
             <div class="flex-column">
                 <div class="flex">
                     <Button class="mt-2" :label="$t('algo.constraintgraph.btn_compute')" @click="compute()"
-                            icon="pi pi-desktop" :disabled="!buttonActive" />
+                        icon="pi pi-desktop" :disabled="!buttonActive" />
                 </div>
             </div>
         </ClientOnly>
@@ -30,7 +30,8 @@
             </AccordionTab>
         </Accordion>
 
-        <Dialog id="GraphDialog" v-model:visible="showGraph" modal :dismissable-mask=true :show-header="false" :style="{ width: '80vw', height: '80vh' }">
+        <Dialog id="GraphDialog" v-model:visible="showGraph" modal :dismissable-mask=true :show-header="false"
+            :style="{ width: '80vw', height: '80vh' }">
             <ForceGraph :graph="resultGraph" :relWidth=.8 :relHeight=.8 />
         </Dialog>
     </div>

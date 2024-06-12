@@ -56,7 +56,7 @@ const optimizationAlgos = ref([
 ])
 
 const bomAlgos = ref([
-    { label: t('computation.pos_validity'), to: '' },
+    { label: t('computation.pos_validity'), to: '/bom/bomcheck' },
 ])
 
 const softwareAlgos = ref([

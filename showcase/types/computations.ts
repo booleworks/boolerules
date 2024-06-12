@@ -37,6 +37,19 @@ export type Graph = {
     }[]
 }
 
+export type Position = {
+    positionId: string,
+    description: string,
+    constraint: string,
+    positionVariants: PositionVariant[]
+}
+
+export type PositionVariant = {
+    positionVariantId: string,
+    description: string,
+    constraint: string
+}
+
 // Generic computation datatypes
 export type SingleComputationResponse<MAIN> = {
     status: ComputationStatus
