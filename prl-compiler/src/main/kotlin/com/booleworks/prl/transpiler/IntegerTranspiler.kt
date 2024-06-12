@@ -5,8 +5,6 @@ package com.booleworks.prl.transpiler
 
 import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.csp.IntegerDomain
-import com.booleworks.logicng.csp.IntegerRangeDomain
-import com.booleworks.logicng.csp.IntegerSetDomain
 import com.booleworks.logicng.csp.encodings.CspEncodingContext
 import com.booleworks.logicng.csp.predicates.ComparisonPredicate
 import com.booleworks.logicng.csp.terms.IntegerVariable
@@ -224,12 +222,12 @@ fun transpileIntTerm(
     is IntFeature -> transpileIntFeature(integerEncodings, instantiation, term)
     is IntMul -> transpileIntFeature(integerEncodings, instantiation, term.feature)?.let { cf.mul(term.coefficient, it) }
     is IntSum -> {
-       val ops = term.operands.mapNotNull { transpileIntMul(cf, integerEncodings, instantiation, it) }
-       if (ops.size == term.operands.size) {
-           cf.add(cf.add(ops), cf.constant(term.offset))
-       } else {
-           null
-       }
+        val ops = term.operands.mapNotNull { transpileIntMul(cf, integerEncodings, instantiation, it) }
+        if (ops.size == term.operands.size) {
+            cf.add(cf.add(ops), cf.constant(term.offset))
+        } else {
+            null
+        }
     }
 }
 
@@ -247,8 +245,8 @@ fun transpileIntFeature(
 ) = instantiation[feature]?.let { integerEncodings.getVariable(it)!!.variable }
 
 fun transpileIntDomain(domain: PropertyRange<Int>): IntegerDomain = when (domain) {
-    is IntList, EmptyIntRange -> IntegerSetDomain(domain.allValues())
-    is IntInterval -> IntegerRangeDomain(domain.first(), domain.last())
+    is IntList, EmptyIntRange -> IntegerDomain.of(domain.allValues())
+    is IntInterval -> IntegerDomain.of(domain.first(), domain.last())
     else -> throw IllegalArgumentException("Invalid integer domain ${domain.javaClass}")
 }
 
