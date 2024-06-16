@@ -17,8 +17,18 @@
         <!-- Computation paramters & button -->
         <ClientOnly>
             <div class="flex-col">
-                <Button :label="$t('algo.bom.btn_edit_bom')" icon="pi pi-table" severity="secondary" class="mb-3"
-                    @click="showBomDialog()" />
+                <div class="flex">
+                    <Button :label="$t('algo.bom.btn_edit_bom')" icon="pi pi-table" severity="secondary"
+                        class="mb-3 mr-3" @click="showBomDialog()" />
+                    <div v-if="getPositions().value.length > 0" class="mb-3 content-center">
+                        {{ $t('algo.bom.loaded_pvs') + ": " + getPositions().value[0].positionVariants.length }}
+                    </div>
+                    <div v-else class="mb-3 content-center">
+                        {{ $t('algo.bom.no_position') }}
+                    </div>
+                </div>
+
+
                 <ComputationParams additionalConstraints />
                 <div class="flex">
                     <Button :label="$t('algo.bom.btn_compute_bom')" @click="compute()" icon="pi pi-desktop"
@@ -27,7 +37,7 @@
             </div>
         </ClientOnly>
 
-        <Dialog v-model:visible="showBom" modal :header="$t('algo.bom.bom')" :style="{ width: '80vw' }"
+        <Dialog v-model:visible="showBom" modal :header="$t('algo.bom.bom_position')" :style="{ width: '80vw' }"
             :dismissable-mask=true>
             <BomDialog />
         </Dialog>

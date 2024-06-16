@@ -235,7 +235,9 @@ export default defineI18nConfig(() => ({
                 bom: {
                     desc: 'You can provide a bill of material (BOM) an compute three types of anomalies: \
                     dead position variants, non-unique position variants and positions that are not complete.',
-                    bom: 'BOM (Bill Of Material)',
+                    bom_position: 'BOM Position',
+                    no_position: 'No loaded position',
+                    loaded_pvs: 'Loaded position variants',
                     constraint: 'Constraint',
                     btn_edit_bom: 'Edit BOM',
                     id: 'ID',
@@ -487,7 +489,9 @@ export default defineI18nConfig(() => ({
                 bom: {
                     desc: 'Sie können eine Stückliste hochladen und drei Arten von Anomalien darauf berechnen: \
                     nicht-baubare Positionvarianten, nicht-eindeutige Positionsvarianten (Doppeltreffer) und positionen die nicht vollständig definiert sind (Leertreffer beinhalten).',
-                    bom: 'Stückliste',
+                    bom_position: 'Stücklisten Position',
+                    no_position: 'Noch keine Position geladen',
+                    loaded_pvs: 'Geladene Positionsvarianten',
                     constraint: 'Constraint',
                     btn_edit_bom: 'BOM Bearbeiten',
                     id: 'ID',
