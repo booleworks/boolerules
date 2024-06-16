@@ -1,15 +1,20 @@
 <template>
     <div>
-        <DataTable :value="getCustomSoftware().value" size="small" showGridlines class="mb-3" scrollable
-            scrollHeight="600px">
-            <Column field="package" :header="$t('algo.packagesolving.package')" sortable>
-                <template #body="slotProps">
-                    <div class="font-mono"> {{ slotProps.data.package }} </div>
-                </template>
-            </Column>
-            <Column field="version" :header="$t('algo.packagesolving.version')" sortable />
-            <Column field="action" :header="$t('algo.packagesolving.action')" sortable />
-        </DataTable>
+        <div v-if="getCustomSoftware().value.length > 0">
+            <DataTable :value="getCustomSoftware().value" size="small" showGridlines class="mb-3" scrollable
+                scrollHeight="600px">
+                <Column field="package" :header="$t('algo.packagesolving.package')" sortable>
+                    <template #body="slotProps">
+                        <div class="font-mono"> {{ slotProps.data.package }} </div>
+                    </template>
+                </Column>
+                <Column field="version" :header="$t('algo.packagesolving.version')" sortable />
+                <Column field="action" :header="$t('algo.packagesolving.action')" sortable />
+            </DataTable>
+        </div>
+        <div v-else>
+            {{ $t('algo.packagesolving.no_packages') }}
+        </div>
         <div class="flex flex-grow items-center">
             <div class="flex flex-grow"></div>
             <FileUpload mode="basic" uploadIcon="pi pi-cloud-upload" :auto="true" :multiple="false" name="weights[]"

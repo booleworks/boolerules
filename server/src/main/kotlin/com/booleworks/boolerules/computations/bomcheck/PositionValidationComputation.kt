@@ -78,7 +78,7 @@ internal object PositionValidationComputation : SingleComputation<
     ): PositionInternalResult {
         val f = cf.formulaFactory()
         val solver = satSolver(NON_PT_CONFIG, f, info, slice, status).also {
-            if (!status.successful()) return PositionInternalResult(slice, request.position, listOf(), listOf(), null)
+            if (!it.sat()) return PositionInternalResult(slice, request.position, listOf(), listOf(), null)
         }
         val pvConstraintMap = mutableMapOf<PositionVariant, Formula>()
         request.position.positionVariants.forEach {
@@ -136,7 +136,7 @@ internal object PositionValidationComputation : SingleComputation<
                 .use { satCall ->
                     if (satCall.satResult == Tristate.TRUE) {
                         val relevantVars = allPvConstraintsNegatedConjunction.variables(f)
-                        return extractModel(satCall.model(info.knownVariables).positiveVariables(), info, relevantVars)
+                        return extractModel(satCall.model(info.knownVariables).positiveVariables(), info) //TODO
                     }
                 }
         }

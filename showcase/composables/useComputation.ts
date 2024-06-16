@@ -67,7 +67,6 @@ export default () => {
 
     function transformRange(range: SingleRange): PropertyRange {
         let prop = {} as PropertyRange
-        console.log(prop)
         if (range.booleanValue != null) {
             prop.booleanValues = [range.booleanValue]
         }

@@ -87,7 +87,7 @@
         </Accordion>
     </div>
 
-    <Sidebar v-model:visible="detailView" position="right" style="width: 50rem;">
+    <Sidebar v-model:visible="detailView" position="right" style="width: 70rem;">
         <DetailPosVal />
     </Sidebar>
 </template>
@@ -102,7 +102,7 @@ const { currentSliceSelection } = useCurrentSliceSelection()
 const { flattenResult, splitPropsSingleResult } = useResult()
 const { getConstraintList } = useAdditionalConstraints()
 const { getPositions } = useBom()
-const { setJobId } = useComputation()
+const { setJobId, initDetailSelection } = useComputation()
 
 const buttonActive = computed(() => isPresent() && getPositions().value.length > 0)
 const openTopTabs = ref([1])
@@ -136,7 +136,7 @@ type PosValResult = {
     hasDeadPvs: boolean
 }
 
-function compute() {
+async function compute() {
     const request: PosValRequest = {
         ruleFileId: getId(),
         sliceSelection: currentSliceSelection(),
@@ -144,10 +144,7 @@ function compute() {
         computationTypes: ['UNIQUENESS', 'COMPLETENESS', 'DEAD_PV'],
         position: getPositions().value[0]
     }
-    performComputation(request)
-}
-
-async function performComputation(request: PosValRequest) {
+    initDetailSelection(request.sliceSelection)
     $fetch(appConfig.posval, {
         method: 'POST',
         body: request,

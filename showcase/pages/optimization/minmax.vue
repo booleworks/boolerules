@@ -41,7 +41,7 @@
                         <Button :label="$t('details.btn_show')" icon="pi pi-info-circle" @click="showDetails()" />
                     </div>
                     <DataTable :value="result" resizableColumns showGridlines size="small" class="mt-3 pb-3"
-                        sortField="result" :sortOrder="1">
+                        sortField="result" :sortOrder="lastCompMax ? -1 : 1">
                         <Column sortable field="result" :header="$t('result.header')" class="font-bold"
                             style="width: 15rem" />
                         <Column v-for="(col, index) in splitPropsSingleResult(result)" :key="col"
@@ -82,6 +82,7 @@ const buttonActive = computed(() => isPresent())
 const openTopTabs = ref([1])
 const openResultTabs = ref([] as number[])
 const detailView = ref(false)
+const lastCompMax = ref(false)
 
 const result = ref({} as MinMaxResultModel[])
 const status = ref({} as ComputationStatus)
@@ -119,6 +120,7 @@ async function compute(max: boolean) {
         setJobId(mmRes.status.jobId)
         openTopTabs.value = []
         openResultTabs.value = mmRes.status.success ? [1] : [0]
+        lastCompMax.value = max
         status.value = mmRes.status
         result.value = flattenResult(mmRes.results, [-1]) as MinMaxResultModel[]
     })

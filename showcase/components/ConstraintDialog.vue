@@ -1,13 +1,18 @@
 <template>
     <div>
-        <DataTable :value="getCustomConstraints()" size="small" showGridlines class="mb-3" scrollable
-            scrollHeight="600px">
-            <Column field="constraint" :header="$t('common.constraint')">
-                <template #body="slotProps">
-                    <div class="font-mono"> {{ slotProps.data.constraint }} </div>
-                </template>
-            </Column>
-        </DataTable>
+        <div v-if="getCustomConstraints().length > 0">
+            <DataTable :value="getCustomConstraints()" size="small" showGridlines class="mb-3" scrollable
+                scrollHeight="600px">
+                <Column field="constraint" :header="$t('common.constraint')">
+                    <template #body="slotProps">
+                        <div class="font-mono"> {{ slotProps.data.constraint }} </div>
+                    </template>
+                </Column>
+            </DataTable>
+        </div>
+        <div v-else>
+            {{ $t('algo.coverage.no_constraints') }}
+        </div>
         <div class="flex flex-grow items-center">
             <div class="flex flex-grow"></div>
             <FileUpload mode="basic" uploadIcon="pi pi-cloud-upload" :auto="true" :multiple="false" name="weights[]"

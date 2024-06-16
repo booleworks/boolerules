@@ -33,7 +33,8 @@
 
             <AccordionTab :header="$t('result.header')">
                 <div v-if="status.success">
-                    <DataTable :value="result" resizableColumns showGridlines size="small" class="mt-3 pb-3">
+                    <DataTable :value="result" resizableColumns showGridlines size="small" class="mt-3 pb-3"
+                        sortField="result" :sortOrder="-1">
                         <Column sortable field="result" :header="$t('result.header')" class="font-bold"
                             style="max-width: 8rem">
                             <template #body="bdy">

@@ -19,7 +19,7 @@
                 <div class="flex">
                     <Button :label="$t('algo.reconfiguration.btn_edit_configuration')" icon="pi pi-table"
                         severity="secondary" class="mb-3 mr-3" @click="showConfigurationDialog()" />
-                    <div v-if="getConfiguration().features" class="mb-3 content-center">
+                    <div v-if="getConfiguration().features.length > 0" class="mb-3 content-center">
                         {{
                             $t('algo.reconfiguration.loaded_configuration') + ": " + getConfiguration().features.length
                         }}

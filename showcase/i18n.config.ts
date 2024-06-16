@@ -493,7 +493,7 @@ export default defineI18nConfig(() => ({
                     no_position: 'Noch keine Position geladen',
                     loaded_pvs: 'Geladene Positionsvarianten',
                     constraint: 'Constraint',
-                    btn_edit_bom: 'BOM Bearbeiten',
+                    btn_edit_bom: 'Position Bearbeiten',
                     id: 'ID',
                     description: 'Beschreibung',
                     position: 'Position',
