@@ -13,19 +13,26 @@
         <div v-else>
             {{ $t('algo.reconfiguration.no_configuration') }}
         </div>
-        <div class="flex flex-grow items-center">
-            <div class="flex flex-grow"></div>
+        <div class="flex flex-grow items-center mt-5">
             <FileUpload mode="basic" uploadIcon="pi pi-cloud-upload" :auto="true" :multiple="false" name="weights[]"
                 accept=".csv" customUpload @uploader="uploadConfiguration"
                 :chooseLabel="$t('algo.reconfiguration.btn_upload_configuration')" />
+            <div class="flex flex-grow"></div>
+            <Button :label="$t('common.use_data')" icon="pi pi-check-circle" class="mr-2"
+                :disabled="getConfiguration().features.length == 0" @click="closeDialog" severity="secondary" />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 const { getConfiguration, uploadCsv } = useConfiguration()
+const emit = defineEmits()
 
-const uploadConfiguration = async (event: any) => {
+function closeDialog() {
+    emit('close-dialog')
+}
+
+async function uploadConfiguration(event: any) {
     uploadCsv(event.files[0] as File)
 }
 </script>

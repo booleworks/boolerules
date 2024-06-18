@@ -29,16 +29,24 @@
         <div v-else>
             {{ $t('algo.bom.no_position') }}
         </div>
-        <div class="flex flex-grow items-center">
-            <div class="flex flex-grow"></div>
+        <div class="flex flex-grow items-center mt-5">
             <FileUpload mode="basic" uploadIcon="pi pi-cloud-upload" :auto="true" :multiple="false" name="positions[]"
                 accept=".csv" customUpload @uploader="uploadBom" :chooseLabel="$t('algo.bom.btn_upload_bom')" />
+            <div class="flex flex-grow"></div>
+            <Button :label="$t('common.use_data')" icon="pi pi-check-circle" class="mr-2"
+                :disabled="getPositions().value.length == 0" @click="closeDialog" severity="secondary" />
+
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 const { getPositions, uploadBomCsv } = useBom()
+const emit = defineEmits()
+
+function closeDialog() {
+    emit('close-dialog')
+}
 
 const uploadBom = async (event: any) => {
     uploadBomCsv(event.files[0] as File)

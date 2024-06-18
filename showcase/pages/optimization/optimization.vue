@@ -41,7 +41,7 @@
 
         <Dialog v-model:visible="showWeights" modal :header="$t('algo.optimization.weightings')"
             :style="{ width: '80vw' }" :dismissable-mask=true>
-            <WeightsDialog />
+            <WeightsDialog v-on:close-dialog="closeDialog" />
         </Dialog>
 
         <!-- Result panels -->
@@ -121,6 +121,10 @@ type MinMaxRequest = {
 
 async function showWeightsDialog() {
     showWeights.value = true
+}
+
+async function closeDialog() {
+    showWeights.value = false
 }
 
 async function compute(max: boolean) {

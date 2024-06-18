@@ -36,7 +36,7 @@
 
         <Dialog v-model:visible="showConstraints" modal :header="$t('algo.coverage.constraints')"
             :style="{ width: '80vw' }" :dismissableMask="true">
-            <ConstraintDialog />
+            <ConstraintDialog v-on:close-dialog="closeDialog" />
         </Dialog>
 
 
@@ -118,6 +118,11 @@ type CoverageResultModel = ResultModel<CoverageMainResult>
 async function showConstraintDialog() {
     showConstraints.value = true
 }
+
+async function closeDialog() {
+    showConstraints.value = false
+}
+
 
 async function compute() {
     const request: CoverageRequest = {

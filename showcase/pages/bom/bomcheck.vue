@@ -39,7 +39,7 @@
 
         <Dialog v-model:visible="showBom" modal :header="$t('algo.bom.bom_position')" :style="{ width: '80vw' }"
             :dismissable-mask=true>
-            <BomDialog />
+            <BomDialog v-on:close-dialog="closeDialog" />
         </Dialog>
 
         <!-- Result panels -->
@@ -160,6 +160,10 @@ async function compute() {
 
 async function showBomDialog() {
     showBom.value = true
+}
+
+async function closeDialog() {
+    showBom.value = false
 }
 
 function showDetails() {

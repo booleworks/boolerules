@@ -40,7 +40,7 @@
 
         <Dialog v-model:visible="showSoftware" modal :header="$t('algo.packagesolving.packages')"
             :style="{ width: '50vw' }" :dismissableMask="true">
-            <SoftwareDialog />
+            <SoftwareDialog v-on:close-dialog="closeDialog" />
         </Dialog>
 
         <!-- Result panels -->
@@ -183,6 +183,10 @@ type PackageSolvingResponse = SingleComputationResponse<PackageSolvingResult>
 
 async function showSoftwareDialog() {
     showSoftware.value = true
+}
+
+async function closeDialog() {
+    showSoftware.value = false
 }
 
 async function compute(update: boolean) {

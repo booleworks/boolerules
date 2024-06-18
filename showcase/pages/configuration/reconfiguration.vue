@@ -46,7 +46,7 @@
 
         <Dialog v-model:visible="showConfiguration" modal :header="$t('algo.reconfiguration.configuration')"
             :style="{ width: '50vw' }" :dismissableMask="true">
-            <ConfigurationDialog />
+            <ConfigurationDialog v-on:close-dialog="closeDialog" />
         </Dialog>
 
         <!-- Result panels -->
@@ -99,7 +99,7 @@ const { isPresent, getId } = useCurrentRuleFile()
 const { currentSliceSelection, allSlicesSelected } = useCurrentSliceSelection()
 const { getConstraintList } = useAdditionalConstraints()
 const { setJobId, initDetailSelection, } = useComputation()
-const { getConfiguration, uploadCsv } = useConfiguration()
+const { getConfiguration } = useConfiguration()
 
 const buttonActive = computed(() => isPresent() && getConfiguration().features && allSlicesSelected())
 const openTopTabs = ref([1])
@@ -130,6 +130,10 @@ type ReconfigurationResponse = SingleComputationResponse<ReconfigurationResult>
 
 async function showConfigurationDialog() {
     showConfiguration.value = true
+}
+
+async function closeDialog() {
+    showConfiguration.value = false
 }
 
 async function compute() {

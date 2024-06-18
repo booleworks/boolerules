@@ -21,7 +21,7 @@
             </div>
             <Dialog v-model:visible="showFileManagement" modal :header="$t('rulefilebar.management')"
                 :style="{ width: '80vw' }" :dismissableMask="true">
-                <FileManagementDialog :initial-files="ruleFiles" />
+                <FileManagementDialog :initial-files="ruleFiles" v-on:close-dialog="closeDialog" />
             </Dialog>
         </ClientOnly>
     </div>
@@ -36,6 +36,8 @@ const { switchTheme, currentIcon } = useTheme()
 
 const showFileManagement = ref(false)
 const ruleFiles = ref([] as UploadSummary[])
+
+function closeDialog() { showFileManagement.value = false }
 
 async function fetchRuleFiles() {
     $fetch(appConfig.rulefile, { method: 'GET' }).then((res) => {

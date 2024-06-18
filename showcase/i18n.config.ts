@@ -59,6 +59,7 @@ export default defineI18nConfig(() => ({
                 constraint: 'Constraint',
                 result_status: 'Computation Status and Download',
                 desc: 'Description',
+                use_data: 'Use Data',
             },
             comp_stat: {
                 time: 'Computation Time',
@@ -315,6 +316,7 @@ export default defineI18nConfig(() => ({
                 features: 'Features',
                 result_status: 'Berechnungs-Status und Download',
                 desc: 'Beschreibung',
+                use_data: 'Benutze Daten',
             },
             comp_stat: {
                 time: 'Berechnungs Zeit',
