@@ -37,7 +37,7 @@
                 :multiple="false" accept=".prl" @upload="onUpload" @error="onError"
                 :chooseLabel="!isPresent() ? $t('rulefilebar.btn_upload') : $t('rulefilebar.btn_upload_new')" />
             <div class="flex flex-grow"></div>
-            <Button :label="$t('rulefilemgmt.btn_load')" icon="pi pi-cloud-download" class="mr-2" severity="secondary"
+            <Button :label="$t('rulefilemgmt.btn_load')" icon="pi pi-check-circle" class="mr-2" severity="secondary"
                 :disabled="!selectedFile.id" @click="selectFile" />
             <Button :label="$t('rulefilemgmt.btn_delete')" icon="pi pi-trash" severity="danger"
                 :disabled="!selectedFile.id" @click="deleteRuleFile" />
