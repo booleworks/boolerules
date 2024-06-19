@@ -1,0 +1,295 @@
+{
+  parserClass="com.boolerules.prl.plugin.parser.PrlParser"
+
+  extends="com.boolerules.prl.plugin.psi.PrlASTWrapperPsiElement"
+
+  psiClassPrefix=""
+  psiImplClassSuffix="Impl"
+  psiPackage="com.boolerules.prl.plugin.psi"
+  psiImplPackage="com.boolerules.prl.plugin.psi.impl"
+
+  elementTypeHolderClass="com.boolerules.prl.plugin.psi.PrlTypes"
+  elementTypeClass="com.boolerules.prl.plugin.psi.PrlElementType"
+  tokenTypeClass="com.boolerules.prl.plugin.psi.PrlTokenType"
+
+  psiImplUtilClass="com.boolerules.prl.plugin.psi.impl.PrlPsiImplUtil"
+}
+
+root ::= ruleFile
+
+ruleFile ::= headerDef slicingProperties? modules {
+//  recoverWhile = recoverRuleFile
+}
+
+headerDef ::= HEADER LBRA headerContent RBRA {
+  pin = 1
+}
+
+headerContent ::= prlVersion headerProperties {
+  recoverWhile = recoverHeaderContent
+}
+
+private prlVersion ::= PRL_VERSION version {
+  pin = 1
+}
+
+version ::= VERSION_VAL
+
+private headerProperties ::= headerProperty* {
+  recoverWhile = recoverHeaderProperties
+}
+
+headerProperty ::= headerPropertyName propertyValue {
+  pin = 1
+}
+
+headerPropertyName ::= identifier
+
+slicingProperties ::= SLICING PROPERTIES LBRA slicingPropertyDefinitions RBRA {
+  pin = 1
+}
+
+private slicingPropertyDefinitions ::= slicingPropertyDefinition* {
+  recoverWhile = recoverSlicingPropertyDefinitions
+}
+
+slicingPropertyDefinition ::= slicingPropertyType slicingPropertyDef {
+  recoverWhile = recoverSlicingPropertyDefinition
+  pin = 1
+}
+
+slicingPropertyType ::= BOOL | INT | DATE | ENUM
+
+slicingPropertyDef ::= identifier {
+  implements = [ "com.boolerules.prl.plugin.language.PrlNamedElement"]
+  methods = [ getName setName getNameIdentifier ]
+}
+
+private modules ::= moduleDefinition*
+
+moduleDefinition ::= MODULE moduleDef? LBRA moduleContent RBRA {
+  recoverWhile = recoverModuleDefinition
+  pin = 1
+}
+
+moduleDef ::= (identifier DOT)* identifier {
+  implements = [ "com.boolerules.prl.plugin.language.PrlNamedElement"]
+  methods = [ getName setName getNameIdentifier ]
+}
+
+private moduleContent ::= rulesetElement*
+
+private rulesetElement ::= importDef | featureDefinition | ruleDef | groupDefinition {
+  recoverWhile = recoverRuleSetElement
+}
+
+importDef ::= IMPORT moduleRef {
+  pin = 1
+}
+
+moduleRef ::= identifier {
+  mixin = "com.boolerules.prl.plugin.psi.impl.ModuleRefMixin"
+  implements = [ "com.boolerules.prl.plugin.language.PrlReference" ]
+  methods = [ getReferencedName getReference getVariants ]
+}
+
+featureDefinition ::= vis? (versionedBoolFeatureRange | boolFeatureRange | enumFeatureRange | intFeatureRange) (LBRA featureBody RBRA)? {
+  implements = [ "com.boolerules.prl.plugin.language.FeatureOrGroupDefinition" ]
+  methods = [ getFeatureDef ]
+  pin(".*Range") = 1
+  pin(".*") = "LBRA"
+}
+
+versionedBoolFeatureRange ::= VERSIONED BOOL? FEAT featureDef {
+  pin = 1
+}
+
+boolFeatureRange ::= BOOL? FEAT featureDef {
+  pin = 2
+}
+
+enumFeatureRange ::= ENUM FEAT featureDef stringList {
+  pin = 1
+}
+
+intFeatureRange ::= INT FEAT featureDef intRange {
+  pin = 1
+}
+
+featureDef ::= identifier {
+  implements = [ "com.boolerules.prl.plugin.language.PrlNamedElement"]
+  methods = [ getName getFullName setName getNameIdentifier ]
+}
+
+featureBody ::= featureBodyContent* {
+  recoverWhile = recoverFeatureBody
+}
+
+featureBodyContent ::= DESCRIPTION elementDescription | property {
+  pin(".*") = 1
+}
+
+elementDescription ::= quotedString
+
+groupDefinition ::= (OPTIONAL | MANDATORY) vis? GROUP featureDef CONTAINS featureList (LBRA ruleBody RBRA)? {
+  implements = [ "com.boolerules.prl.plugin.language.FeatureOrGroupDefinition" ]
+  pin(".*") = 1
+//  recoverWhile = recoverRuleSetContentElement
+}
+
+ruleDef ::= RULE (ifRule | forbiddenOrMandatoryFeatureRule | isDefRule | constraintRule) (LBRA ruleBody RBRA)? {
+  pin = 1
+}
+
+private ifRule ::= IF constraint (thenElsePart | thenOrThenNotPart) {
+  pin(".*") = 1
+//  recoverWhile = recoverRuleSetContentElement
+}
+
+private thenElsePart ::= THEN constraint ELSE constraint {
+  pin = 3
+}
+
+private thenOrThenNotPart ::= (THEN | THEN_NOT) constraint {
+  pin = 1
+}
+
+private constraintRule ::= constraint {
+  pin = 1
+}
+
+private isDefRule ::= featureRef IS constraint {
+  pin = 2
+}
+
+private forbiddenOrMandatoryFeatureRule ::= forbiddenFeatureRule | mandatoryFeatureRule
+
+forbiddenFeatureRule ::= FORBIDDEN FEAT featureRef (featureRestriction | featureVersionRestriction)? {
+  pin = 1
+}
+
+mandatoryFeatureRule ::= MANDATORY FEAT featureRef (featureRestriction | featureVersionRestriction)? {
+  pin = 1
+}
+
+featureRestriction ::= EQ (posNegNumber | quotedString) {
+  pin = 1
+}
+
+featureVersionRestriction ::= LSQB EQ num RSQB {
+  pin = 1
+}
+
+ruleBody ::= ruleBodyContent* {
+  recoverWhile = recoverRuleBody
+}
+
+ruleBodyContent ::= ID ruleId | DESCRIPTION elementDescription | property {
+  pin(".*") = 1
+}
+
+ruleId ::= quotedString
+
+property ::= propertyRef propertyValue {
+  pin = 1
+}
+
+private propertyValue ::= TRUE | FALSE | posNegNumber | intRange | quotedString | enumRange | DATE_VAL | dateRange
+
+propertyRef ::= identifier {
+  mixin = "com.boolerules.prl.plugin.psi.impl.SlicingPropertyRefMixin"
+  implements = [ "com.boolerules.prl.plugin.language.PrlReference" ]
+  methods = [ getReference getVariants ]
+}
+
+constraint ::= equivalence {
+//  recoverWhile = recoverConstraint
+}
+
+constant ::= TRUE | FALSE
+
+simp ::= atomicConstraint | constant | cc | LPAR equivalence RPAR
+
+lit ::= NOT_MINUS lit | simp
+
+conj ::= lit (AND lit)*
+
+disj ::= conj (OR conj)*
+
+implication ::= disj (IMPL implication)?
+
+equivalence ::= implication (EQUIV equivalence)?
+
+cc ::= AMO featureList | EXO featureList
+
+atomicConstraint ::= versionPredicate | featureRef | comparisonPredicate | inEnumPredicate | inIntPredicate
+
+featureRef ::= identifier {
+  mixin = "com.boolerules.prl.plugin.psi.impl.FeatureRefMixin"
+  implements = [ "com.boolerules.prl.plugin.language.PrlReference" ]
+  methods = [ getReferencedName getReference getVariants ]
+}
+
+versionPredicate ::= featureRef LSQB comparator num RSQB
+
+featureList ::= LSQB featureRef? (COMMA featureRef)* RSQB {
+  pin = 1
+}
+
+comparisonPredicate ::= LSQB term comparator term RSQB
+
+inEnumPredicate ::= LSQB featureRef IN stringList RSQB
+
+inIntPredicate ::= LSQB term IN intRange RSQB
+
+term ::= intSum | quotedString | posNegNumber | featureRef
+
+intMul ::= NOT_MINUS featureRef | posNegNumber MUL featureRef | featureRef MUL posNegNumber | posNegNumber | featureRef
+
+intSum ::= intMul (ADD intMul)*
+
+private identifier ::= IDENT | BTCK_IDENTIFIER
+
+stringList ::= LSQB quotedString (COMMA quotedString)* RSQB
+
+quotedString ::= QUOTED
+
+enumRange ::= stringList
+
+intRange ::= intList | LSQB posNegNumber NOT_MINUS posNegNumber RSQB
+
+intList ::= LSQB posNegNumber (COMMA posNegNumber)* RSQB
+
+posNegNumber ::= NUMBER_VAL | NOT_MINUS NUMBER_VAL
+
+num ::= NUMBER_VAL
+
+dateRange ::= dateList | LSQB DATE_VAL NOT_MINUS DATE_VAL RSQB
+
+dateList ::= LSQB DATE_VAL (COMMA DATE_VAL)* RSQB
+
+vis ::= PUBLIC | INTERNAL | PRIVATE_
+
+comparator ::= EQ | NE | LT | LE | GT | GE
+
+private recoverRuleFile ::= !(<<eof>>)
+
+private recoverHeaderContent ::= !RBRA
+
+private recoverHeaderProperties ::= !(property | RBRA)
+
+private recoverSlicingPropertyDefinitions ::= !(RBRA)
+
+private recoverSlicingPropertyDefinition ::= !(BOOL | ENUM | DATE | INT | identifier | RBRA)
+
+private recoverModuleDefinition ::= !(MODULE)
+
+private recoverFeatureBody ::= !(RBRA)
+
+private recoverRuleBody ::= !(RBRA)
+
+private recoverRuleSetElement ::= !((VERSIONED BOOL | VERSIONED | BOOL | ENUM | INT)? FEAT | IMPORT | RULE | OPTIONAL | MANDATORY | vis | RBRA)
+
+private recoverConstraint ::= !(THEN | THEN_NOT | ELSE | (VERSIONED BOOL | VERSIONED | BOOL | ENUM | INT)? FEAT | IMPORT | RULE | OPTIONAL | MANDATORY | vis | LBRA)
+
+private comment_ ::= COMMENT

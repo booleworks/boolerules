@@ -1,0 +1,33 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+  <id>com.boolerules.prl.plugin</id>
+  <name>PRL</name>
+  <vendor>BooleWorks</vendor>
+
+  <description>Support for the Pragmatic Rule Language (PRL)</description>
+
+  <depends>com.intellij.modules.platform</depends>
+
+  <resource-bundle>messages.PrlMessages</resource-bundle>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <fileType name="PRL File" implementationClass="com.boolerules.prl.plugin.language.PrlFileType" fieldName="INSTANCE" language="PRL" extensions="prl"/>
+    <lang.parserDefinition language="PRL" implementationClass="com.boolerules.prl.plugin.PrlParserDefinition"/>
+    <lang.syntaxHighlighterFactory language="PRL" implementationClass="com.boolerules.prl.plugin.PrlSyntaxHighlighterFactory"/>
+    <colorSettingsPage implementation="com.boolerules.prl.plugin.PrlColorSettingPage"/>
+    <lang.braceMatcher language="PRL" implementationClass="com.boolerules.prl.plugin.PrlPairedBraceMatcher"/>
+    <lang.commenter language="PRL" implementationClass="com.boolerules.prl.plugin.PrlCommenter"/>
+    <lang.findUsagesProvider language="PRL" implementationClass="com.boolerules.prl.plugin.PrlFindUsagesProvider"/>
+    <platform.backend.documentation.psiTargetProvider implementation="com.boolerules.prl.plugin.PrlDocumentationTargetProvider"/>
+    <lang.formatter language="PRL" implementationClass="com.boolerules.prl.plugin.PrlFormattingModelBuilder"/>
+    <langCodeStyleSettingsProvider implementation="com.boolerules.prl.plugin.PrlCodeStyleSettingsProvider"/>
+    <lang.namesValidator language="PRL" implementationClass="com.boolerules.prl.plugin.PrlNamesValidator"/>
+    <renameInputValidator implementation="com.boolerules.prl.plugin.PrlRenameInputValidator"/>
+    <completion.contributor language="PRL" implementationClass="com.boolerules.prl.plugin.PrlCompletionContributor"/>
+    <annotator language="PRL" implementationClass="com.boolerules.prl.plugin.PrlInvalidReferenceAnnotator"/>
+    <annotator language="PRL" implementationClass="com.boolerules.prl.plugin.PrlDuplicatePropertyAnnotator"/>
+    <externalAnnotator language="PRL" implementationClass="com.boolerules.prl.plugin.PrlCompilerAnnotator"/>
+    <lang.quoteHandler language="PRL" implementationClass="com.boolerules.prl.plugin.PrlQuoteHandler"/>
+    <lineIndentProvider implementation="com.boolerules.prl.plugin.PrlLineIndentProvider"/>
+  </extensions>
+</idea-plugin>

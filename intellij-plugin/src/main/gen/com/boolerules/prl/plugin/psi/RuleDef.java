@@ -1,0 +1,25 @@
+// This is a generated file. Not intended for manual editing.
+package com.boolerules.prl.plugin.psi;
+
+import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.psi.PsiElement;
+
+public interface RuleDef extends PsiElement {
+
+  @NotNull
+  List<Constraint> getConstraintList();
+
+  @Nullable
+  FeatureRef getFeatureRef();
+
+  @Nullable
+  ForbiddenFeatureRule getForbiddenFeatureRule();
+
+  @Nullable
+  MandatoryFeatureRule getMandatoryFeatureRule();
+
+  @Nullable
+  RuleBody getRuleBody();
+
+}
