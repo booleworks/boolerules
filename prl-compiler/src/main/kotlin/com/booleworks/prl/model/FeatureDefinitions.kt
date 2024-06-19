@@ -143,8 +143,11 @@ class BooleanFeatureDefinition(
     override val feature = if (versioned) versionFt(code) else boolFt(code)
 
     companion object {
-        fun merge(definitions: Collection<BooleanFeatureDefinition>): BooleanFeatureDefinition {
-            assert(!definitions.isEmpty())
+        fun merge(definitions: Set<BooleanFeatureDefinition>): BooleanFeatureDefinition {
+            assert(definitions.isNotEmpty())
+            if (definitions.size == 1) {
+                return definitions.first()
+            }
             val code = definitions.first().code
             val version = definitions.first().versioned
             return BooleanFeatureDefinition(code, version)
@@ -194,8 +197,11 @@ class EnumFeatureDefinition(
     override val feature = enumFt(code)
 
     companion object {
-        fun merge(definitions: Collection<EnumFeatureDefinition>): EnumFeatureDefinition {
-            assert(!definitions.isEmpty())
+        fun merge(definitions: Set<EnumFeatureDefinition>): EnumFeatureDefinition {
+            assert(definitions.isNotEmpty())
+            if (definitions.size == 1) {
+                return definitions.first()
+            }
             val code = definitions.first().code
             val values = definitions.map { it.values }.reduce { acc, values -> acc.intersect(values) }
             return EnumFeatureDefinition(code, values)
@@ -244,8 +250,11 @@ class IntFeatureDefinition(
     override val feature = intFt(code)
 
     companion object {
-        fun merge(definitions: Collection<IntFeatureDefinition>): IntFeatureDefinition {
-            assert(!definitions.isEmpty())
+        fun merge(definitions: Set<IntFeatureDefinition>): IntFeatureDefinition {
+            assert(definitions.isNotEmpty())
+            if (definitions.size == 1) {
+                return definitions.first()
+            }
             val code = definitions.first().code
             val domain = definitions.map { it.domain }.reduce { acc, domain -> acc.intersection(domain) }
             return IntFeatureDefinition(code, domain)

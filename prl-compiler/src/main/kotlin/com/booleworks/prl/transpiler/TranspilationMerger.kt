@@ -108,18 +108,18 @@ fun mergeFeatureInstantiations(slices: List<SliceTranslation>): FeatureInstantia
     slices.flatMap { it.info.featureInstantiations.booleanFeatures.entries }
         .groupByTo(booleanFeatureDefs, { it.key }, { it.value })
     val booleanFeatureInstantiations =
-        booleanFeatureDefs.mapValues { (_, v) -> BooleanFeatureDefinition.merge(v) }.toMutableMap()
+        booleanFeatureDefs.mapValues { (_, v) -> BooleanFeatureDefinition.merge(v.toSet()) }.toMutableMap()
 
     val enumFeatureDefs = mutableMapOf<String, MutableList<EnumFeatureDefinition>>()
     slices.flatMap { it.info.featureInstantiations.enumFeatures.entries }
         .groupByTo(enumFeatureDefs, { it.key }, { it.value })
     val enumFeatureInstantiations =
-        enumFeatureDefs.mapValues { (_, v) -> EnumFeatureDefinition.merge(v) }.toMutableMap()
+        enumFeatureDefs.mapValues { (_, v) -> EnumFeatureDefinition.merge(v.toSet()) }.toMutableMap()
 
     val intFeatureDefs = mutableMapOf<String, MutableList<IntFeatureDefinition>>()
     slices.flatMap { it.info.featureInstantiations.integerFeatures.entries }
         .groupByTo(intFeatureDefs, { it.key }, { it.value })
-    val intFeatureInstantiations = intFeatureDefs.mapValues { (_, v) -> IntFeatureDefinition.merge(v) }.toMutableMap()
+    val intFeatureInstantiations = intFeatureDefs.mapValues { (_, v) -> IntFeatureDefinition.merge(v.toSet()) }.toMutableMap()
 
     return FeatureInstantiation(booleanFeatureInstantiations, enumFeatureInstantiations, intFeatureInstantiations)
 }

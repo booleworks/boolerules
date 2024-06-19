@@ -52,8 +52,9 @@ import com.booleworks.prl.model.rules.MandatoryFeatureRule
 import com.booleworks.prl.model.slices.SliceSet
 import com.booleworks.prl.transpiler.RuleType.FEATURE_EQUIVALENCE_OVER_SLICES
 
-const val PREDICATE_PREFIX = "@PREDICATE"
-const val FEATURE_DEF_PREFIX = "@DEF"
+const val PREDICATE_PREFIX = "PREDICATE"
+const val FEATURE_DEF_PREFIX = "DEF"
+const val INT_IN_PREDICATE_PREFIX = "IIP"
 
 fun initIntegerStore(
     context: CspEncodingContext,
@@ -67,8 +68,9 @@ fun initIntegerStore(
             def,
             LngIntVariable(
                 def.feature.featureCode,
-                cf.variable(
-                    "$FEATURE_DEF_PREFIX$index$S${def.feature.featureCode}",
+                cf.auxVariable(
+                    FEATURE_DEF_PREFIX,
+                    def.feature.featureCode,
                     transpileIntDomain(def.domain)
                 )
             )
@@ -208,7 +210,7 @@ fun transpileIntInPredicate(
     predicate: IntInPredicate
 ): ComparisonPredicate? {
     val term = transpileIntTerm(cf, integerEncodings, instantiation, predicate.term) ?: return null
-    val v = cf.auxVariable(transpileIntDomain(predicate.range))
+    val v = cf.auxVariable(INT_IN_PREDICATE_PREFIX, transpileIntDomain(predicate.range))
     return cf.eq(term, v)
 }
 
@@ -279,9 +281,8 @@ data class IntFeatureEncodingInfo(
 
     fun addDefinition(definition: IntFeatureDefinition, encodingContext: CspEncodingContext, cf: CspFactory) {
         if (!featureToVar.containsKey(definition)) {
-            val varName = "$FEATURE_DEF_PREFIX${featureToVar.size}$S${definition.code}"
             val domain = transpileIntDomain(definition.domain)
-            val variable = LngIntVariable(definition.code, cf.variable(varName, domain))
+            val variable = LngIntVariable(definition.code, cf.auxVariable(FEATURE_DEF_PREFIX, definition.code, domain))
             val clauses = cf.encodeVariable(variable.variable, encodingContext)
             val encoded = cf.formulaFactory().and(clauses)
             featureToVar[definition] = variable
