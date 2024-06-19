@@ -1,0 +1,35 @@
+header {
+  prl_version 1.0
+}
+
+slicing properties {
+  int version
+  enum series
+}
+
+# int features
+int feature a [1 - 5]
+int feature b [1 - 5] {
+  version 1
+}
+int feature b [3 - 7] {
+  version 2
+}
+int feature b [9 - 15] {
+  version 3
+}
+int feature c [0 - 10] {
+  series "S1"
+}
+int feature c [10 - 15] {
+  series "S2"
+}
+
+rule [c = a + b]
+rule if [a = 1] then [c = 16] {
+  version 3
+  series "S2"
+}
+rule if [a < b] then [b = 5] {
+  version 1
+}
