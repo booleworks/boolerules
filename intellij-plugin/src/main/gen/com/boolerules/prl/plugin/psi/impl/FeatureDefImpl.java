@@ -36,12 +36,6 @@ public class FeatureDefImpl extends PrlASTWrapperPsiElement implements FeatureDe
 
   @Override
   @NotNull
-  public String getFullName() {
-    return PrlPsiImplUtil.getFullName(this);
-  }
-
-  @Override
-  @NotNull
   public PsiElement setName(@NotNull String newName) {
     return PrlPsiImplUtil.setName(this, newName);
   }

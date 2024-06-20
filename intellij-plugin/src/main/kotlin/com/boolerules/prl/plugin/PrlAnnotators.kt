@@ -5,7 +5,6 @@ import com.boolerules.prl.plugin.psi.FeatureDefinition
 import com.boolerules.prl.plugin.psi.FeatureRef
 import com.boolerules.prl.plugin.psi.GroupDefinition
 import com.boolerules.prl.plugin.psi.HeaderContent
-import com.boolerules.prl.plugin.psi.ModuleRef
 import com.boolerules.prl.plugin.psi.RuleBody
 import com.boolerules.prl.plugin.psi.RuleDef
 import com.boolerules.prl.plugin.psi.SlicingProperties
@@ -20,8 +19,6 @@ class PrlInvalidReferenceAnnotator : Annotator {
         when (element) {
             is FeatureRef -> element.resolve() ?: holder.newAnnotation(HighlightSeverity.ERROR, "Unresolved feature reference").withFix(AddUnresolvedFeatureQuickFix(element.text))
                 .create()
-
-            is ModuleRef  -> element.resolve() ?: holder.newAnnotation(HighlightSeverity.ERROR, "Unresolved module reference").create()
         }
     }
 }

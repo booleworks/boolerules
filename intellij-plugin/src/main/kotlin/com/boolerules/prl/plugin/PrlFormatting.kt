@@ -8,8 +8,6 @@ import com.boolerules.prl.plugin.psi.PrlTypes.FEATURE_DEFINITION
 import com.boolerules.prl.plugin.psi.PrlTypes.GROUP_DEFINITION
 import com.boolerules.prl.plugin.psi.PrlTypes.HEADER_CONTENT
 import com.boolerules.prl.plugin.psi.PrlTypes.HEADER_DEF
-import com.boolerules.prl.plugin.psi.PrlTypes.IMPORT_DEF
-import com.boolerules.prl.plugin.psi.PrlTypes.MODULE_DEFINITION
 import com.boolerules.prl.plugin.psi.PrlTypes.RULE_BODY_CONTENT
 import com.boolerules.prl.plugin.psi.PrlTypes.RULE_DEF
 import com.boolerules.prl.plugin.psi.PrlTypes.RULE_FILE
@@ -63,10 +61,9 @@ class PrlBlock(
 
     private val _indent: Indent? by lazy {
         when (node.elementType) {
-            RULE_FILE, HEADER_DEF, SLICING_PROPERTIES, MODULE_DEFINITION -> Indent.getAbsoluteNoneIndent()
-            HEADER_CONTENT, SLICING_PROPERTY_DEFINITION, IMPORT_DEF,
-            FEATURE_DEFINITION, GROUP_DEFINITION,
-            RULE_DEF, FEATURE_BODY_CONTENT, RULE_BODY_CONTENT -> Indent.getNormalIndent()
+            RULE_FILE, HEADER_DEF, SLICING_PROPERTIES, FEATURE_DEFINITION, GROUP_DEFINITION, RULE_DEF -> Indent.getAbsoluteNoneIndent()
+            HEADER_CONTENT, SLICING_PROPERTY_DEFINITION,
+            FEATURE_BODY_CONTENT, RULE_BODY_CONTENT -> Indent.getNormalIndent()
 
             SIMP -> Indent.getContinuationIndent()
 
@@ -196,51 +193,66 @@ class PrlCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider() {
 
     override fun getIndentOptionsEditor() = SmartIndentOptionsEditor(this)
 
+    // TODO cleanup example
     override fun getCodeSample(settingsType: SettingsType) = """
         header {
           prl_version 1.0
+          test "abc"
         }
-
-        module top {
-          public feature f1
+        
+        slicing properties {
+          int p1
+          date p2
         }
-
-        module top.first {
-          private feature f10
-          public feature f11
-
-          rule f1 & f10
+        
+        int feature f1 [1 - 5]
+        versioned feature f2
+        int feature f4 [1, 2, 43]
+        feature c1
+        feature c2
+        
+        feature dd1
+        feature dd7 {
+          description "123"
         }
-
-        module top.second {
-          private feature f20
-          public feature f21
-          internal feature f22
-
-          rule f1 & f20 {
-           id "rule 2"
-          }
-
-          rule top.f1 & f20 {
-            id "rule 3"
-          }
+        
+        rule if dd1 then dd1 else dd7 & ([f1 = 4] / (dd1 & dd7) / dd7)
+        rule mandatory feature dd7 {
+          rul 1
+          prop 2
         }
-
-        module top.second.a {
-          private feature f20
-          internal feature f22
-          private feature f30
-
-          rule f1 & f21 & f22 & f30
-          rule f20
-          rule top.second.f22
-          rule f22 / top.second.f22 {
-            id "rule 7"
-          }
-          rule top.second.a.f22 / top.second.f22 {
-            id "rule 8"
-          }
+        
+        rule if dd1 then dd7
+        
+        rule mandatory feature dd1
+        
+        mandatory group gr contains [dd1, c1]
+        
+        rule mandatory feature c1 {
+          id "123"
+          description "Test"
         }
+        
+        mandatory group g1 contains [g1]
+        optional group g2 contains [g1]
+        rule if dd1 then dd1 else dd1
+        optional group g3 contains [dd1]
+        rule mandatory feature dd1 {
+          description "123"
+          id "123"
+        }
+        rule if dd1 thenNot dd1
+        rule if dd1 then dd1 {
+          description "123"
+        }
+        
+        enum feature d1 ["1"]
+        
+        rule forbidden feature dd1 {
+          dote 1
+          uint 2
+        }
+        rule if dd1 then dd1 else dd1
     """.trimIndent()
 }
 

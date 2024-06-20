@@ -8,10 +8,16 @@ import com.intellij.psi.PsiElement;
 public interface RuleFile extends PsiElement {
 
   @NotNull
+  List<FeatureDefinition> getFeatureDefinitionList();
+
+  @NotNull
+  List<GroupDefinition> getGroupDefinitionList();
+
+  @NotNull
   HeaderDef getHeaderDef();
 
   @NotNull
-  List<ModuleDefinition> getModuleDefinitionList();
+  List<RuleDef> getRuleDefList();
 
   @Nullable
   SlicingProperties getSlicingProperties();

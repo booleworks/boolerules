@@ -23,9 +23,6 @@ public interface FeatureDefinition extends FeatureOrGroupDefinition {
   @Nullable
   VersionedBoolFeatureRange getVersionedBoolFeatureRange();
 
-  @Nullable
-  Vis getVis();
-
   @NotNull
   FeatureDef getFeatureDef();
 

@@ -17,7 +17,7 @@
 
 root ::= ruleFile
 
-ruleFile ::= headerDef slicingProperties? modules {
+ruleFile ::= headerDef slicingProperties? rulesetElement* {
 //  recoverWhile = recoverRuleFile
 }
 
@@ -65,35 +65,37 @@ slicingPropertyDef ::= identifier {
   methods = [ getName setName getNameIdentifier ]
 }
 
-private modules ::= moduleDefinition*
+//private modules ::= moduleDefinition*
+//
+//moduleDefinition ::= MODULE moduleDef? LBRA moduleContent RBRA {
+//  recoverWhile = recoverModuleDefinition
+//  pin = 1
+//}
+//
+//moduleDef ::= (identifier DOT)* identifier {
+//  implements = [ "com.boolerules.prl.plugin.language.PrlNamedElement"]
+//  methods = [ getName setName getNameIdentifier ]
+//}
 
-moduleDefinition ::= MODULE moduleDef? LBRA moduleContent RBRA {
-  recoverWhile = recoverModuleDefinition
-  pin = 1
-}
+//private moduleContent ::= rulesetElement*
 
-moduleDef ::= (identifier DOT)* identifier {
-  implements = [ "com.boolerules.prl.plugin.language.PrlNamedElement"]
-  methods = [ getName setName getNameIdentifier ]
-}
+//private ruleset ::= rulesetElement*
 
-private moduleContent ::= rulesetElement*
-
-private rulesetElement ::= importDef | featureDefinition | ruleDef | groupDefinition {
+private rulesetElement ::= featureDefinition | ruleDef | groupDefinition {
   recoverWhile = recoverRuleSetElement
 }
 
-importDef ::= IMPORT moduleRef {
-  pin = 1
-}
+//importDef ::= IMPORT moduleRef {
+//  pin = 1
+//}
+//
+//moduleRef ::= identifier {
+//  mixin = "com.boolerules.prl.plugin.psi.impl.ModuleRefMixin"
+//  implements = [ "com.boolerules.prl.plugin.language.PrlReference" ]
+//  methods = [ getReferencedName getReference getVariants ]
+//}
 
-moduleRef ::= identifier {
-  mixin = "com.boolerules.prl.plugin.psi.impl.ModuleRefMixin"
-  implements = [ "com.boolerules.prl.plugin.language.PrlReference" ]
-  methods = [ getReferencedName getReference getVariants ]
-}
-
-featureDefinition ::= vis? (versionedBoolFeatureRange | boolFeatureRange | enumFeatureRange | intFeatureRange) (LBRA featureBody RBRA)? {
+featureDefinition ::= (versionedBoolFeatureRange | boolFeatureRange | enumFeatureRange | intFeatureRange) (LBRA featureBody RBRA)? {
   implements = [ "com.boolerules.prl.plugin.language.FeatureOrGroupDefinition" ]
   methods = [ getFeatureDef ]
   pin(".*Range") = 1
@@ -118,7 +120,7 @@ intFeatureRange ::= INT FEAT featureDef intRange {
 
 featureDef ::= identifier {
   implements = [ "com.boolerules.prl.plugin.language.PrlNamedElement"]
-  methods = [ getName getFullName setName getNameIdentifier ]
+  methods = [ getName setName getNameIdentifier ]
 }
 
 featureBody ::= featureBodyContent* {
@@ -131,7 +133,7 @@ featureBodyContent ::= DESCRIPTION elementDescription | property {
 
 elementDescription ::= quotedString
 
-groupDefinition ::= (OPTIONAL | MANDATORY) vis? GROUP featureDef CONTAINS featureList (LBRA ruleBody RBRA)? {
+groupDefinition ::= (OPTIONAL | MANDATORY) GROUP featureDef CONTAINS featureList (LBRA ruleBody RBRA)? {
   implements = [ "com.boolerules.prl.plugin.language.FeatureOrGroupDefinition" ]
   pin(".*") = 1
 //  recoverWhile = recoverRuleSetContentElement
@@ -268,8 +270,6 @@ dateRange ::= dateList | LSQB DATE_VAL NOT_MINUS DATE_VAL RSQB
 
 dateList ::= LSQB DATE_VAL (COMMA DATE_VAL)* RSQB
 
-vis ::= PUBLIC | INTERNAL | PRIVATE_
-
 comparator ::= EQ | NE | LT | LE | GT | GE
 
 private recoverRuleFile ::= !(<<eof>>)
@@ -282,14 +282,14 @@ private recoverSlicingPropertyDefinitions ::= !(RBRA)
 
 private recoverSlicingPropertyDefinition ::= !(BOOL | ENUM | DATE | INT | identifier | RBRA)
 
-private recoverModuleDefinition ::= !(MODULE)
+//private recoverModuleDefinition ::= !(MODULE)
 
 private recoverFeatureBody ::= !(RBRA)
 
 private recoverRuleBody ::= !(RBRA)
 
-private recoverRuleSetElement ::= !((VERSIONED BOOL | VERSIONED | BOOL | ENUM | INT)? FEAT | IMPORT | RULE | OPTIONAL | MANDATORY | vis | RBRA)
+private recoverRuleSetElement ::= !((VERSIONED BOOL | VERSIONED | BOOL | ENUM | INT)? FEAT | RULE | OPTIONAL | MANDATORY | RBRA)
 
-private recoverConstraint ::= !(THEN | THEN_NOT | ELSE | (VERSIONED BOOL | VERSIONED | BOOL | ENUM | INT)? FEAT | IMPORT | RULE | OPTIONAL | MANDATORY | vis | LBRA)
+private recoverConstraint ::= !(THEN | THEN_NOT | ELSE | (VERSIONED BOOL | VERSIONED | BOOL | ENUM | INT)? FEAT | RULE | OPTIONAL | MANDATORY | LBRA)
 
 private comment_ ::= COMMENT

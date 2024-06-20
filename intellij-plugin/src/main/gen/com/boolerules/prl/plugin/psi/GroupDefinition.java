@@ -17,7 +17,4 @@ public interface GroupDefinition extends FeatureOrGroupDefinition {
   @Nullable
   RuleBody getRuleBody();
 
-  @Nullable
-  Vis getVis();
-
 }

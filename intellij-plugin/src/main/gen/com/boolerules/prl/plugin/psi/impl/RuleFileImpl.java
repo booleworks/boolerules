@@ -30,14 +30,26 @@ public class RuleFileImpl extends PrlASTWrapperPsiElement implements RuleFile {
 
   @Override
   @NotNull
+  public List<FeatureDefinition> getFeatureDefinitionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, FeatureDefinition.class);
+  }
+
+  @Override
+  @NotNull
+  public List<GroupDefinition> getGroupDefinitionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, GroupDefinition.class);
+  }
+
+  @Override
+  @NotNull
   public HeaderDef getHeaderDef() {
     return findNotNullChildByClass(HeaderDef.class);
   }
 
   @Override
   @NotNull
-  public List<ModuleDefinition> getModuleDefinitionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ModuleDefinition.class);
+  public List<RuleDef> getRuleDefList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, RuleDef.class);
   }
 
   @Override

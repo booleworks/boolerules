@@ -13,11 +13,10 @@ class PrlPairedBraceMatcher : PairedBraceMatcher {
 
     override fun getCodeConstructStart(file: PsiFile?, openingBraceOffset: Int): Int = openingBraceOffset
 
-    companion object {
-        private val PAIRS = arrayOf(
-            BracePair(PrlTypes.LPAR, PrlTypes.RPAR, true),
-            BracePair(PrlTypes.LBRA, PrlTypes.RBRA, true),
-            BracePair(PrlTypes.LSQB, PrlTypes.RSQB, true),
-        )
-    }
 }
+
+private val PAIRS = arrayOf(
+    BracePair(PrlTypes.LPAR, PrlTypes.RPAR, true),
+    BracePair(PrlTypes.LBRA, PrlTypes.RBRA, true),
+    BracePair(PrlTypes.LSQB, PrlTypes.RSQB, true),
+)

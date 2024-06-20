@@ -46,10 +46,4 @@ public class GroupDefinitionImpl extends PrlASTWrapperPsiElement implements Grou
     return findChildByClass(RuleBody.class);
   }
 
-  @Override
-  @Nullable
-  public Vis getVis() {
-    return findChildByClass(Vis.class);
-  }
-
 }

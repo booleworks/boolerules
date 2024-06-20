@@ -21,12 +21,11 @@ class AddUnresolvedFeatureQuickFix(private val feature: String) : BaseIntentionA
 
     override fun isAvailable(project: Project, editor: Editor?, file: PsiFile) = true
 
-    // TODO just takes the first module of the file, which might not be the correct one
     override fun invoke(project: Project, editor: Editor?, file: PsiFile) {
         ApplicationManager.getApplication().invokeLater {
             val prlFile: PrlFile = (PsiManager.getInstance(project).findFile(file.virtualFile) as PrlFile?)!!
             WriteCommandAction.runWriteCommandAction(project) {
-                val moduleNode = prlFile.childrenOfType<RuleFile>().first().moduleDefinitionList.first()
+                val moduleNode = prlFile.childrenOfType<RuleFile>().first()
                 val newChildren = createPrlElements(project, "feature $feature\n    ")
                 val beforeNode = moduleNode.ruleDefList.first().node
                 newChildren.forEach { moduleNode.node.addChild(it.node, beforeNode) }

@@ -1,7 +1,6 @@
 package com.boolerules.prl.plugin
 
 import com.boolerules.prl.plugin.psi.FeatureDef
-import com.boolerules.prl.plugin.psi.ModuleDef
 import com.boolerules.prl.plugin.psi.PrlTokenSets
 import com.boolerules.prl.plugin.psi.SlicingPropertyDef
 import com.boolerules.prl.plugin.psi.impl.ResolveUtil
@@ -25,10 +24,9 @@ class PrlRenameInputValidator : RenameInputValidator {
     }
 
     override fun isInputValid(newName: String, element: PsiElement, context: ProcessingContext): Boolean = when (element) {
-        is ModuleDef          -> ResolveUtil.resolveModulesOfFile(element).none { it.moduleDef?.text == newName }
-        is FeatureDef         -> ResolveUtil.resolveFeaturesAndGroupsOfModule(element).none { it.getFeatureDef().text == newName }
+        is FeatureDef -> ResolveUtil.resolveFeaturesAndGroupsOfFile(element).none { it.getFeatureDef().text == newName }
         is SlicingPropertyDef -> ResolveUtil.resolveSlicingPropertiesOfFile(element).none { it.slicingPropertyDef?.text == newName }
-        else                  -> true
+        else -> true
     }
 }
 

@@ -30,10 +30,8 @@ import com.boolerules.prl.plugin.psi.PrlTypes.ID
 import com.boolerules.prl.plugin.psi.PrlTypes.IDENT
 import com.boolerules.prl.plugin.psi.PrlTypes.IF
 import com.boolerules.prl.plugin.psi.PrlTypes.IMPL
-import com.boolerules.prl.plugin.psi.PrlTypes.IMPORT
 import com.boolerules.prl.plugin.psi.PrlTypes.IN
 import com.boolerules.prl.plugin.psi.PrlTypes.INT
-import com.boolerules.prl.plugin.psi.PrlTypes.INTERNAL
 import com.boolerules.prl.plugin.psi.PrlTypes.IS
 import com.boolerules.prl.plugin.psi.PrlTypes.LBRA
 import com.boolerules.prl.plugin.psi.PrlTypes.LE
@@ -41,17 +39,14 @@ import com.boolerules.prl.plugin.psi.PrlTypes.LPAR
 import com.boolerules.prl.plugin.psi.PrlTypes.LSQB
 import com.boolerules.prl.plugin.psi.PrlTypes.LT
 import com.boolerules.prl.plugin.psi.PrlTypes.MANDATORY
-import com.boolerules.prl.plugin.psi.PrlTypes.MODULE
 import com.boolerules.prl.plugin.psi.PrlTypes.MUL
 import com.boolerules.prl.plugin.psi.PrlTypes.NE
 import com.boolerules.prl.plugin.psi.PrlTypes.NOT_MINUS
 import com.boolerules.prl.plugin.psi.PrlTypes.NUMBER_VAL
 import com.boolerules.prl.plugin.psi.PrlTypes.OPTIONAL
 import com.boolerules.prl.plugin.psi.PrlTypes.OR
-import com.boolerules.prl.plugin.psi.PrlTypes.PRIVATE_
 import com.boolerules.prl.plugin.psi.PrlTypes.PRL_VERSION
 import com.boolerules.prl.plugin.psi.PrlTypes.PROPERTIES
-import com.boolerules.prl.plugin.psi.PrlTypes.PUBLIC
 import com.boolerules.prl.plugin.psi.PrlTypes.QUOTED
 import com.boolerules.prl.plugin.psi.PrlTypes.RBRA
 import com.boolerules.prl.plugin.psi.PrlTypes.RPAR
@@ -91,22 +86,22 @@ class PrlSyntaxHighlighter : SyntaxHighlighterBase() {
 
     override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> {
         return when (tokenType) {
-            PUBLIC, INTERNAL, PRIVATE_, SLICING, PROPERTIES, HEADER, PRL_VERSION, MODULE, FEAT, IMPORT,
+            SLICING, PROPERTIES, HEADER, PRL_VERSION, FEAT,
             VERSIONED, RULE, IF, THEN, THEN_NOT, ELSE, OPTIONAL, GROUP, IS, IN, CONTAINS, FORBIDDEN, MANDATORY,
             BOOL, INT, DATE, ENUM, ID, DESCRIPTION -> arrayOf(PrlSyntaxGroup.KEYWORD.attributesKey)
 
             EQ, NOT_MINUS, AND, OR, IMPL, EQUIV, AMO, EXO,
-            COMMA, ADD, MUL, NE, LT, LE, GT, GE    -> arrayOf(PrlSyntaxGroup.OPERATORS.attributesKey)
+            COMMA, ADD, MUL, NE, LT, LE, GT, GE -> arrayOf(PrlSyntaxGroup.OPERATORS.attributesKey)
 
             IDENT, BTCK_IDENTIFIER -> arrayOf(PrlSyntaxGroup.ID.attributesKey)
-            LBRA, RBRA                             -> arrayOf(PrlSyntaxGroup.BRACES.attributesKey)
-            LSQB, RSQB                             -> arrayOf(PrlSyntaxGroup.BRACKETS.attributesKey)
-            LPAR, RPAR                             -> arrayOf(PrlSyntaxGroup.PARENTHESES.attributesKey)
-            QUOTED, DATE_VAL                       -> arrayOf(PrlSyntaxGroup.STRINGLIT.attributesKey)
-            NUMBER_VAL                             -> arrayOf(PrlSyntaxGroup.NUMBER.attributesKey)
-            TRUE, FALSE                            -> arrayOf(PrlSyntaxGroup.CONSTANT.attributesKey)
-            COMMENT                                -> arrayOf(PrlSyntaxGroup.COMMENT.attributesKey)
-            else                                   -> arrayOf()
+            LBRA, RBRA -> arrayOf(PrlSyntaxGroup.BRACES.attributesKey)
+            LSQB, RSQB -> arrayOf(PrlSyntaxGroup.BRACKETS.attributesKey)
+            LPAR, RPAR -> arrayOf(PrlSyntaxGroup.PARENTHESES.attributesKey)
+            QUOTED, DATE_VAL -> arrayOf(PrlSyntaxGroup.STRINGLIT.attributesKey)
+            NUMBER_VAL -> arrayOf(PrlSyntaxGroup.NUMBER.attributesKey)
+            TRUE, FALSE -> arrayOf(PrlSyntaxGroup.CONSTANT.attributesKey)
+            COMMENT -> arrayOf(PrlSyntaxGroup.COMMENT.attributesKey)
+            else -> arrayOf()
         }
     }
 

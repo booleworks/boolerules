@@ -421,28 +421,20 @@ public class PrlParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // vis? (versionedBoolFeatureRange | boolFeatureRange | enumFeatureRange | intFeatureRange) (LBRA featureBody RBRA)?
+  // (versionedBoolFeatureRange | boolFeatureRange | enumFeatureRange | intFeatureRange) (LBRA featureBody RBRA)?
   public static boolean featureDefinition(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "featureDefinition")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, FEATURE_DEFINITION, "<feature definition>");
     r = featureDefinition_0(b, l + 1);
     r = r && featureDefinition_1(b, l + 1);
-    r = r && featureDefinition_2(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // vis?
+  // versionedBoolFeatureRange | boolFeatureRange | enumFeatureRange | intFeatureRange
   private static boolean featureDefinition_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "featureDefinition_0")) return false;
-    vis(b, l + 1);
-    return true;
-  }
-
-  // versionedBoolFeatureRange | boolFeatureRange | enumFeatureRange | intFeatureRange
-  private static boolean featureDefinition_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "featureDefinition_1")) return false;
     boolean r;
     r = versionedBoolFeatureRange(b, l + 1);
     if (!r) r = boolFeatureRange(b, l + 1);
@@ -452,15 +444,15 @@ public class PrlParser implements PsiParser, LightPsiParser {
   }
 
   // (LBRA featureBody RBRA)?
-  private static boolean featureDefinition_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "featureDefinition_2")) return false;
-    featureDefinition_2_0(b, l + 1);
+  private static boolean featureDefinition_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "featureDefinition_1")) return false;
+    featureDefinition_1_0(b, l + 1);
     return true;
   }
 
   // LBRA featureBody RBRA
-  private static boolean featureDefinition_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "featureDefinition_2_0")) return false;
+  private static boolean featureDefinition_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "featureDefinition_1_0")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_);
     r = consumeToken(b, LBRA);
@@ -609,7 +601,7 @@ public class PrlParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (OPTIONAL | MANDATORY) vis? GROUP featureDef CONTAINS featureList (LBRA ruleBody RBRA)?
+  // (OPTIONAL | MANDATORY) GROUP featureDef CONTAINS featureList (LBRA ruleBody RBRA)?
   public static boolean groupDefinition(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "groupDefinition")) return false;
     if (!nextTokenIs(b, "<group definition>", MANDATORY, OPTIONAL)) return false;
@@ -617,12 +609,11 @@ public class PrlParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, GROUP_DEFINITION, "<group definition>");
     r = groupDefinition_0(b, l + 1);
     p = r; // pin = 1
-    r = r && report_error_(b, groupDefinition_1(b, l + 1));
-    r = p && report_error_(b, consumeToken(b, GROUP)) && r;
+    r = r && report_error_(b, consumeToken(b, GROUP));
     r = p && report_error_(b, featureDef(b, l + 1)) && r;
     r = p && report_error_(b, consumeToken(b, CONTAINS)) && r;
     r = p && report_error_(b, featureList(b, l + 1)) && r;
-    r = p && groupDefinition_6(b, l + 1) && r;
+    r = p && groupDefinition_5(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
@@ -636,23 +627,16 @@ public class PrlParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // vis?
-  private static boolean groupDefinition_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "groupDefinition_1")) return false;
-    vis(b, l + 1);
-    return true;
-  }
-
   // (LBRA ruleBody RBRA)?
-  private static boolean groupDefinition_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "groupDefinition_6")) return false;
-    groupDefinition_6_0(b, l + 1);
+  private static boolean groupDefinition_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "groupDefinition_5")) return false;
+    groupDefinition_5_0(b, l + 1);
     return true;
   }
 
   // LBRA ruleBody RBRA
-  private static boolean groupDefinition_6_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "groupDefinition_6_0")) return false;
+  private static boolean groupDefinition_5_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "groupDefinition_5_0")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_);
     r = consumeToken(b, LBRA);
@@ -793,20 +777,6 @@ public class PrlParser implements PsiParser, LightPsiParser {
     r = r && implication(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
-  }
-
-  /* ********************************************************** */
-  // IMPORT moduleRef
-  public static boolean importDef(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "importDef")) return false;
-    if (!nextTokenIs(b, IMPORT)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, IMPORT_DEF, null);
-    r = consumeToken(b, IMPORT);
-    p = r; // pin = 1
-    r = r && moduleRef(b, l + 1);
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
   }
 
   /* ********************************************************** */
@@ -1074,100 +1044,6 @@ public class PrlParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // rulesetElement*
-  static boolean moduleContent(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "moduleContent")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!rulesetElement(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "moduleContent", c)) break;
-    }
-    return true;
-  }
-
-  /* ********************************************************** */
-  // (identifier DOT)* identifier
-  public static boolean moduleDef(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "moduleDef")) return false;
-    if (!nextTokenIs(b, "<module def>", BTCK_IDENTIFIER, IDENT)) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, MODULE_DEF, "<module def>");
-    r = moduleDef_0(b, l + 1);
-    r = r && identifier(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // (identifier DOT)*
-  private static boolean moduleDef_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "moduleDef_0")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!moduleDef_0_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "moduleDef_0", c)) break;
-    }
-    return true;
-  }
-
-  // identifier DOT
-  private static boolean moduleDef_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "moduleDef_0_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = identifier(b, l + 1);
-    r = r && consumeToken(b, DOT);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // MODULE moduleDef? LBRA moduleContent RBRA
-  public static boolean moduleDefinition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "moduleDefinition")) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, MODULE_DEFINITION, "<module definition>");
-    r = consumeToken(b, MODULE);
-    p = r; // pin = 1
-    r = r && report_error_(b, moduleDefinition_1(b, l + 1));
-    r = p && report_error_(b, consumeToken(b, LBRA)) && r;
-    r = p && report_error_(b, moduleContent(b, l + 1)) && r;
-    r = p && consumeToken(b, RBRA) && r;
-    exit_section_(b, l, m, r, p, PrlParser::recoverModuleDefinition);
-    return r || p;
-  }
-
-  // moduleDef?
-  private static boolean moduleDefinition_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "moduleDefinition_1")) return false;
-    moduleDef(b, l + 1);
-    return true;
-  }
-
-  /* ********************************************************** */
-  // identifier
-  public static boolean moduleRef(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "moduleRef")) return false;
-    if (!nextTokenIs(b, "<module ref>", BTCK_IDENTIFIER, IDENT)) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, MODULE_REF, "<module ref>");
-    r = identifier(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // moduleDefinition*
-  static boolean modules(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "modules")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!moduleDefinition(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "modules", c)) break;
-    }
-    return true;
-  }
-
-  /* ********************************************************** */
   // NUMBER_VAL
   public static boolean num(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "num")) return false;
@@ -1261,7 +1137,7 @@ public class PrlParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !(THEN | THEN_NOT | ELSE | (VERSIONED BOOL | VERSIONED | BOOL | ENUM | INT)? FEAT | IMPORT | RULE | OPTIONAL | MANDATORY | vis | LBRA)
+  // !(THEN | THEN_NOT | ELSE | (VERSIONED BOOL | VERSIONED | BOOL | ENUM | INT)? FEAT | RULE | OPTIONAL | MANDATORY | LBRA)
   static boolean recoverConstraint(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "recoverConstraint")) return false;
     boolean r;
@@ -1271,7 +1147,7 @@ public class PrlParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // THEN | THEN_NOT | ELSE | (VERSIONED BOOL | VERSIONED | BOOL | ENUM | INT)? FEAT | IMPORT | RULE | OPTIONAL | MANDATORY | vis | LBRA
+  // THEN | THEN_NOT | ELSE | (VERSIONED BOOL | VERSIONED | BOOL | ENUM | INT)? FEAT | RULE | OPTIONAL | MANDATORY | LBRA
   private static boolean recoverConstraint_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "recoverConstraint_0")) return false;
     boolean r;
@@ -1280,11 +1156,9 @@ public class PrlParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, THEN_NOT);
     if (!r) r = consumeToken(b, ELSE);
     if (!r) r = recoverConstraint_0_3(b, l + 1);
-    if (!r) r = consumeToken(b, IMPORT);
     if (!r) r = consumeToken(b, RULE);
     if (!r) r = consumeToken(b, OPTIONAL);
     if (!r) r = consumeToken(b, MANDATORY);
-    if (!r) r = vis(b, l + 1);
     if (!r) r = consumeToken(b, LBRA);
     exit_section_(b, m, null, r);
     return r;
@@ -1365,17 +1239,6 @@ public class PrlParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !(MODULE)
-  static boolean recoverModuleDefinition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "recoverModuleDefinition")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_);
-    r = !consumeToken(b, MODULE);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
   // !(RBRA)
   static boolean recoverRuleBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "recoverRuleBody")) return false;
@@ -1403,7 +1266,7 @@ public class PrlParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !((VERSIONED BOOL | VERSIONED | BOOL | ENUM | INT)? FEAT | IMPORT | RULE | OPTIONAL | MANDATORY | vis | RBRA)
+  // !((VERSIONED BOOL | VERSIONED | BOOL | ENUM | INT)? FEAT | RULE | OPTIONAL | MANDATORY | RBRA)
   static boolean recoverRuleSetElement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "recoverRuleSetElement")) return false;
     boolean r;
@@ -1413,17 +1276,15 @@ public class PrlParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // (VERSIONED BOOL | VERSIONED | BOOL | ENUM | INT)? FEAT | IMPORT | RULE | OPTIONAL | MANDATORY | vis | RBRA
+  // (VERSIONED BOOL | VERSIONED | BOOL | ENUM | INT)? FEAT | RULE | OPTIONAL | MANDATORY | RBRA
   private static boolean recoverRuleSetElement_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "recoverRuleSetElement_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = recoverRuleSetElement_0_0(b, l + 1);
-    if (!r) r = consumeToken(b, IMPORT);
     if (!r) r = consumeToken(b, RULE);
     if (!r) r = consumeToken(b, OPTIONAL);
     if (!r) r = consumeToken(b, MANDATORY);
-    if (!r) r = vis(b, l + 1);
     if (!r) r = consumeToken(b, RBRA);
     exit_section_(b, m, null, r);
     return r;
@@ -1599,7 +1460,7 @@ public class PrlParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // headerDef slicingProperties? modules {
+  // headerDef slicingProperties? rulesetElement* {
   // //  recoverWhile = recoverRuleFile
   // }
   public static boolean ruleFile(PsiBuilder b, int l) {
@@ -1609,7 +1470,7 @@ public class PrlParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = headerDef(b, l + 1);
     r = r && ruleFile_1(b, l + 1);
-    r = r && modules(b, l + 1);
+    r = r && ruleFile_2(b, l + 1);
     r = r && ruleFile_3(b, l + 1);
     exit_section_(b, m, RULE_FILE, r);
     return r;
@@ -1619,6 +1480,17 @@ public class PrlParser implements PsiParser, LightPsiParser {
   private static boolean ruleFile_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ruleFile_1")) return false;
     slicingProperties(b, l + 1);
+    return true;
+  }
+
+  // rulesetElement*
+  private static boolean ruleFile_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ruleFile_2")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!rulesetElement(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "ruleFile_2", c)) break;
+    }
     return true;
   }
 
@@ -1642,13 +1514,12 @@ public class PrlParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // importDef | featureDefinition | ruleDef | groupDefinition
+  // featureDefinition | ruleDef | groupDefinition
   static boolean rulesetElement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "rulesetElement")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_);
-    r = importDef(b, l + 1);
-    if (!r) r = featureDefinition(b, l + 1);
+    r = featureDefinition(b, l + 1);
     if (!r) r = ruleDef(b, l + 1);
     if (!r) r = groupDefinition(b, l + 1);
     exit_section_(b, l, m, r, false, PrlParser::recoverRuleSetElement);
@@ -1888,19 +1759,6 @@ public class PrlParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "versionedBoolFeatureRange_1")) return false;
     consumeToken(b, BOOL);
     return true;
-  }
-
-  /* ********************************************************** */
-  // PUBLIC | INTERNAL | PRIVATE_
-  public static boolean vis(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "vis")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, VIS, "<vis>");
-    r = consumeToken(b, PUBLIC);
-    if (!r) r = consumeToken(b, INTERNAL);
-    if (!r) r = consumeToken(b, PRIVATE_);
-    exit_section_(b, l, m, r, false, null);
-    return r;
   }
 
 }

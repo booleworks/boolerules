@@ -4,9 +4,9 @@ package com.boolerules.prl.plugin.psi;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiElement;
-import com.boolerules.prl.plugin.language.PrlNamedElement;
 import com.boolerules.prl.plugin.language.PrlReference;
 import com.boolerules.prl.plugin.language.FeatureOrGroupDefinition;
+import com.boolerules.prl.plugin.language.PrlNamedElement;
 
 public class Visitor extends PsiElementVisitor {
 
@@ -130,10 +130,6 @@ public class Visitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitImportDef(@NotNull ImportDef o) {
-    visitPsiElement(o);
-  }
-
   public void visitInEnumPredicate(@NotNull InEnumPredicate o) {
     visitPsiElement(o);
   }
@@ -168,18 +164,6 @@ public class Visitor extends PsiElementVisitor {
 
   public void visitMandatoryFeatureRule(@NotNull MandatoryFeatureRule o) {
     visitPsiElement(o);
-  }
-
-  public void visitModuleDef(@NotNull ModuleDef o) {
-    visitPrlNamedElement(o);
-  }
-
-  public void visitModuleDefinition(@NotNull ModuleDefinition o) {
-    visitPsiElement(o);
-  }
-
-  public void visitModuleRef(@NotNull ModuleRef o) {
-    visitPrlReference(o);
   }
 
   public void visitNum(@NotNull Num o) {
@@ -259,10 +243,6 @@ public class Visitor extends PsiElementVisitor {
   }
 
   public void visitVersionedBoolFeatureRange(@NotNull VersionedBoolFeatureRange o) {
-    visitPsiElement(o);
-  }
-
-  public void visitVis(@NotNull Vis o) {
     visitPsiElement(o);
   }
 

@@ -12,9 +12,6 @@ public interface FeatureDef extends PrlNamedElement {
   String getName();
 
   @NotNull
-  String getFullName();
-
-  @NotNull
   PsiElement setName(@NotNull String newName);
 
   @NotNull

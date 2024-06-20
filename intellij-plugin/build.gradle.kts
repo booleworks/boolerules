@@ -17,6 +17,7 @@ version = properties("pluginVersion").get()
 repositories {
     mavenCentral()
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
+    mavenLocal()
 }
 
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog

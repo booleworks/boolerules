@@ -38,7 +38,6 @@ public interface PrlTypes {
   IElementType HEADER_PROPERTY = new PrlElementType("HEADER_PROPERTY");
   IElementType HEADER_PROPERTY_NAME = new PrlElementType("HEADER_PROPERTY_NAME");
   IElementType IMPLICATION = new PrlElementType("IMPLICATION");
-  IElementType IMPORT_DEF = new PrlElementType("IMPORT_DEF");
   IElementType INT_FEATURE_RANGE = new PrlElementType("INT_FEATURE_RANGE");
   IElementType INT_LIST = new PrlElementType("INT_LIST");
   IElementType INT_MUL = new PrlElementType("INT_MUL");
@@ -48,9 +47,6 @@ public interface PrlTypes {
   IElementType IN_INT_PREDICATE = new PrlElementType("IN_INT_PREDICATE");
   IElementType LIT = new PrlElementType("LIT");
   IElementType MANDATORY_FEATURE_RULE = new PrlElementType("MANDATORY_FEATURE_RULE");
-  IElementType MODULE_DEF = new PrlElementType("MODULE_DEF");
-  IElementType MODULE_DEFINITION = new PrlElementType("MODULE_DEFINITION");
-  IElementType MODULE_REF = new PrlElementType("MODULE_REF");
   IElementType NUM = new PrlElementType("NUM");
   IElementType POS_NEG_NUMBER = new PrlElementType("POS_NEG_NUMBER");
   IElementType PROPERTY = new PrlElementType("PROPERTY");
@@ -71,7 +67,6 @@ public interface PrlTypes {
   IElementType VERSION = new PrlElementType("VERSION");
   IElementType VERSIONED_BOOL_FEATURE_RANGE = new PrlElementType("VERSIONED_BOOL_FEATURE_RANGE");
   IElementType VERSION_PREDICATE = new PrlElementType("VERSION_PREDICATE");
-  IElementType VIS = new PrlElementType("VIS");
 
   IElementType ADD = new PrlTokenType("ADD");
   IElementType AMO = new PrlTokenType("AMO");
@@ -84,7 +79,6 @@ public interface PrlTypes {
   IElementType DATE = new PrlTokenType("DATE");
   IElementType DATE_VAL = new PrlTokenType("DATE_VAL");
   IElementType DESCRIPTION = new PrlTokenType("DESCRIPTION");
-  IElementType DOT = new PrlTokenType("DOT");
   IElementType ELSE = new PrlTokenType("ELSE");
   IElementType ENUM = new PrlTokenType("ENUM");
   IElementType EQ = new PrlTokenType("EQ");
@@ -101,10 +95,8 @@ public interface PrlTypes {
   IElementType IDENT = new PrlTokenType("IDENT");
   IElementType IF = new PrlTokenType("IF");
   IElementType IMPL = new PrlTokenType("IMPL");
-  IElementType IMPORT = new PrlTokenType("IMPORT");
   IElementType IN = new PrlTokenType("IN");
   IElementType INT = new PrlTokenType("INT");
-  IElementType INTERNAL = new PrlTokenType("INTERNAL");
   IElementType IS = new PrlTokenType("IS");
   IElementType LBRA = new PrlTokenType("LBRA");
   IElementType LE = new PrlTokenType("LE");
@@ -112,17 +104,14 @@ public interface PrlTypes {
   IElementType LSQB = new PrlTokenType("LSQB");
   IElementType LT = new PrlTokenType("LT");
   IElementType MANDATORY = new PrlTokenType("MANDATORY");
-  IElementType MODULE = new PrlTokenType("MODULE");
   IElementType MUL = new PrlTokenType("MUL");
   IElementType NE = new PrlTokenType("NE");
   IElementType NOT_MINUS = new PrlTokenType("NOT_MINUS");
   IElementType NUMBER_VAL = new PrlTokenType("NUMBER_VAL");
   IElementType OPTIONAL = new PrlTokenType("OPTIONAL");
   IElementType OR = new PrlTokenType("OR");
-  IElementType PRIVATE_ = new PrlTokenType("PRIVATE_");
   IElementType PRL_VERSION = new PrlTokenType("PRL_VERSION");
   IElementType PROPERTIES = new PrlTokenType("PROPERTIES");
-  IElementType PUBLIC = new PrlTokenType("PUBLIC");
   IElementType QUOTED = new PrlTokenType("QUOTED");
   IElementType RBRA = new PrlTokenType("RBRA");
   IElementType RPAR = new PrlTokenType("RPAR");
@@ -228,9 +217,6 @@ public interface PrlTypes {
       else if (type == IMPLICATION) {
         return new ImplicationImpl(node);
       }
-      else if (type == IMPORT_DEF) {
-        return new ImportDefImpl(node);
-      }
       else if (type == INT_FEATURE_RANGE) {
         return new IntFeatureRangeImpl(node);
       }
@@ -257,15 +243,6 @@ public interface PrlTypes {
       }
       else if (type == MANDATORY_FEATURE_RULE) {
         return new MandatoryFeatureRuleImpl(node);
-      }
-      else if (type == MODULE_DEF) {
-        return new ModuleDefImpl(node);
-      }
-      else if (type == MODULE_DEFINITION) {
-        return new ModuleDefinitionImpl(node);
-      }
-      else if (type == MODULE_REF) {
-        return new ModuleRefImpl(node);
       }
       else if (type == NUM) {
         return new NumImpl(node);
@@ -326,9 +303,6 @@ public interface PrlTypes {
       }
       else if (type == VERSION_PREDICATE) {
         return new VersionPredicateImpl(node);
-      }
-      else if (type == VIS) {
-        return new VisImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

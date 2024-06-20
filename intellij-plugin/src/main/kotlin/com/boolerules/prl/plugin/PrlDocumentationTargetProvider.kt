@@ -1,7 +1,6 @@
 package com.boolerules.prl.plugin
 
 import com.boolerules.prl.plugin.psi.FeatureDefinition
-import com.boolerules.prl.plugin.psi.ModuleRef
 import com.boolerules.prl.plugin.psi.PropertyRef
 import com.intellij.model.Pointer
 import com.intellij.platform.backend.documentation.DocumentationTarget
@@ -14,9 +13,8 @@ class PrlDocumentationTargetProvider : PsiDocumentationTargetProvider {
     override fun documentationTarget(element: PsiElement, originalElement: PsiElement?): DocumentationTarget? {
         return when (element) {
             is FeatureDefinition -> FeatureDefinitionDocumentationTarget(element)
-            is PropertyRef       -> null//element.resolve()?.let { PrlDocumentationTarget(it) }
-            is ModuleRef         -> null//element.resolve()?.let { PrlDocumentationTarget(it) }
-            else                 -> null
+            is PropertyRef -> null//element.resolve()?.let { PrlDocumentationTarget(it) }
+            else -> null
         }
     }
 

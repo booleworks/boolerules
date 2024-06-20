@@ -59,12 +59,6 @@ public class FeatureDefinitionImpl extends PrlASTWrapperPsiElement implements Fe
   }
 
   @Override
-  @Nullable
-  public Vis getVis() {
-    return findChildByClass(Vis.class);
-  }
-
-  @Override
   @NotNull
   public FeatureDef getFeatureDef() {
     return PrlPsiImplUtil.getFeatureDef(this);

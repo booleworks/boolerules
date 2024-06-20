@@ -1,8 +1,8 @@
 package com.boolerules.prl.plugin.psi.impl
 
 import com.boolerules.prl.plugin.language.FeatureOrGroupDefinition
-import com.boolerules.prl.plugin.psi.ModuleDefinition
 import com.boolerules.prl.plugin.psi.PrlASTWrapperPsiElement
+import com.boolerules.prl.plugin.psi.RuleFile
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
@@ -10,8 +10,6 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.util.findParentOfType
 
 abstract class FeatureRefMixin(node: ASTNode) : PrlASTWrapperPsiElement(node), PsiReference, PsiElement {
-
-    private fun myModule(): String? = text.substringBeforeLast(".", "").takeIf { it.isNotBlank() }
 
     private fun myName(): String = text.substringAfterLast(".")
 
@@ -22,11 +20,9 @@ abstract class FeatureRefMixin(node: ASTNode) : PrlASTWrapperPsiElement(node), P
     }
 
     override fun resolve(): FeatureOrGroupDefinition? {
-        val thisModule = element.findParentOfType<ModuleDefinition>() ?: return null
-        val requiredModule = myModule()
+        val root = element.findParentOfType<RuleFile>() ?: return null
         val name = myName()
-        val modulesToSearch = ResolveUtil.resolveModules(requiredModule, thisModule) + ResolveUtil.resolveImports(thisModule)
-        val declarations = modulesToSearch.flatMap { it.featureDefinitionList + it.groupDefinitionList }.filter { it.getFeatureDef().text == name }
+        val declarations = (root.featureDefinitionList + root.groupDefinitionList).filter { it.getFeatureDef().text == name }
         return declarations.firstOrNull()
     }
 
