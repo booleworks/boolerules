@@ -97,6 +97,7 @@ async function computeDetails() {
 
 async function computeGraph() {
     details.value = {} as CoverageDetail
+    graphData.value = {} as CoverageGraph
     const request: DetailRequest = {
         jobId: getJobId(),
         sliceSelection: getDetailRequest()
