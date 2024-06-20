@@ -39,13 +39,13 @@ int feature ift3 [0] {
   description "description of ift3"
 }
 int feature ift4 [1 - 7]
-int feature ift5 [1-142]
+int feature ift5 [1 - 142]
 
-int feature ift6 [1-5] {
+int feature ift6 [1 - 5] {
   description "description of ift6"
   `important version` 4
   validFrom 2010-01-01
-  validTo   2022-12-31
+  validTo 2022-12-31
   text "text text text"
   releases ["R1", "R2", "R3"]
   active false

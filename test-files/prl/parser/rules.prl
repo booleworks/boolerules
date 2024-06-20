@@ -8,14 +8,14 @@ header {
 feature hitch2
 feature rim1
 enum feature name ["text"]
-int feature version_1 [1-10]
+int feature version_1 [1 - 10]
 
-rule hitch2 & (rim1/rim3) & parking_sensors
-rule hitch2 & (rim1/rim3) & parking_sensors [=3]
-rule if hitch2 then (rim1/rim3) & parking_sensors
-rule if hitch2 thenNot (rim1/rim3) & parking_sensors [>=2]
-rule if hitch2 then (rim1/rim3) else parking_sensors
-rule hitch2 is (rim1/rim3) & parking_sensors
+rule hitch2 & (rim1 / rim3) & parking_sensors
+rule hitch2 & (rim1 / rim3) & parking_sensors[ = 3]
+rule if hitch2 then (rim1 / rim3) & parking_sensors
+rule if hitch2 thenNot (rim1 / rim3) & parking_sensors[ >= 2]
+rule if hitch2 then (rim1 / rim3) else parking_sensors
+rule hitch2 is (rim1 / rim3) & parking_sensors
 
 optional group hitches contains [h1, h2, h3, h4]
 mandatory group hitches contains [h1, h2, h3, h4]
@@ -24,15 +24,15 @@ rule [name = "text"] => [version > 3]
 rule [name != "not text"]
 rule [version_1 > version_2]
 rule [name in ["a", "b", "c"]]
-rule [version in [1-7]]
+rule [version in [1 - 7]]
 rule [version in [1, 2, 3, 4, 5]]
 
-rule a <=> (b => -(c/d)) {
+rule a <=> (b => -(c / d)) {
   id "4711"
   description "text description"
   version 4
   validFrom 2010-01-01
-  validTo   2022-12-31
+  validTo 2022-12-31
 
   text "text text text"
   releases ["R1", "R2", "R3"]

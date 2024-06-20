@@ -16,7 +16,7 @@ feature f3
 feature f4
 feature f5
 feature f6 {
-  version [3-5]
+  version [3 - 5]
 }
 
 rule if f1 then (f2 => -f3) {
@@ -24,27 +24,27 @@ rule if f1 then (f2 => -f3) {
   series ["S1", "S2"]
 }
 
-rule if f1 & f2 thenNot f3 <=> f4  {
+rule if f1 & f2 thenNot f3 <=> f4 {
   active true
 }
 
-rule exo[f4, f5]  {
-  version [1-2]
+rule exo[f4, f5] {
+  version [1 - 2]
   series ["S1", "S2", "S3"]
 }
 
-optional group g1 contains [f4, f5, f6]  {
-  version [3-5]
+optional group g1 contains [f4, f5, f6] {
+  version [3 - 5]
   series ["S1", "S2", "S3"]
 }
 
 rule if f3 then f4 / f5 else f5 {
-  version [1-4]
+  version [1 - 4]
   series ["S1"]
 }
 
-rule f1 is f2/f3 {
-  version [1-6]
+rule f1 is f2 / f3 {
+  version [1 - 6]
   series ["S2"]
 }
 

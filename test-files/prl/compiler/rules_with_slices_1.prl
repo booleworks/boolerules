@@ -7,7 +7,7 @@ slicing properties {
 }
 
 feature f1 {
-  i1 [1-22]
+  i1 [1 - 22]
 }
 
 feature f2
@@ -18,7 +18,7 @@ feature f5 {
 }
 
 rule f1 => f2 {
-  i1 [1-10]
+  i1 [1 - 10]
 }
 
 rule f2 => f3 {
@@ -30,9 +30,9 @@ rule f3 => f4 {
 }
 
 rule f4 => f5 {
-  i1 [3-12]
+  i1 [3 - 12]
 }
 
 rule f5 => f1 {
-  i1 [3-12]
+  i1 [3 - 12]
 }

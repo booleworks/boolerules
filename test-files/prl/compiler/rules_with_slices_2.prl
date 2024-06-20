@@ -8,7 +8,7 @@ slicing properties {
 }
 
 feature f1 {
-  version [1-20]
+  version [1 - 20]
   release ["R1"]
 }
 
@@ -26,12 +26,12 @@ feature f4 {
 }
 
 rule f1 => f2 {
-  version [1-20]
+  version [1 - 20]
   release ["R1"]
 }
 
 rule f2 => f3 {
-  version [1-20]
+  version [1 - 20]
 }
 
 rule f3 => f4 {

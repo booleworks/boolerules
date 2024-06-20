@@ -37,8 +37,8 @@ feature f3 {
 
 feature f4 {
   active true
-  version [1-5]
+  version [1 - 5]
   model "M10"
   validity [2024-01-12, 2025-01-12, 2026-01-12]
-  release["R1", "R3"]
+  release ["R1", "R3"]
 }

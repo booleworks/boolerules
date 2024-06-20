@@ -29,10 +29,10 @@ enum feature q ["q1", "q2"] {
 }
 
 rule [a = "a2"]
-rule if [a = "a2"]  then [b = "b1"] {
+rule if [a = "a2"] then [b = "b1"] {
   version 1
 }
-rule if [a = "a2"]  then [b = "b2"] {
+rule if [a = "a2"] then [b = "b2"] {
   version 2
 }
 

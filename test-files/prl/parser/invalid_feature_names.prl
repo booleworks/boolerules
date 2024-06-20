@@ -3,7 +3,7 @@ header {
 }
 
 feature f1
-int feature i1 [1,2,3]
+int feature i1 [1, 2, 3]
 feature com.x1
 enum feature s1 ["a"]
 
