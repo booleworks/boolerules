@@ -212,7 +212,7 @@
                 <goal>check</goal>
               </goals>
               <configuration>
-                <config>detekt.yml</config>
+                <config>../detekt.yml</config>
                 <excludes>**/test/**;**/generated/**gg</excludes>
                 <report>
                   <report>txt:target/detekt/detekt.txt</report>

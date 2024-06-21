@@ -209,7 +209,7 @@ empty-blocks:
   EmptyForBlock:
     active: true
   EmptyFunctionBlock:
-    active: false
+    active: true
     ignoreOverridden: false
   EmptyIfBlock:
     active: true
@@ -539,7 +539,7 @@ style:
     excludedFunctions: [ ]
   LoopWithTooManyJumpStatements:
     active: true
-    maxJumpCount: 3
+    maxJumpCount: 1
   MagicNumber:
     active: false
     ignoreNumbers:
