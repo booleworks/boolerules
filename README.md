@@ -35,11 +35,10 @@ In this repository you find
 
 ## Running BooleRules
 
-tbd.
+The easiest way to run BooleRules is using Docker Compose (which is part of every normal Docker Desktop installation). Just open a terminal in this folder, run `docker compose up` and then open `localhost:3000` from your browser.
 
 ## Funding
 
 BooleRules development is funded by the [SofDCar project](https://sofdcar.de/):
 
 <img src="https://github.com/booleworks/boolerules/blob/main/assets/bmwk.png?raw=true" alt="logo" width="200">
-

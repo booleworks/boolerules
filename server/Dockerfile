@@ -2,7 +2,8 @@
 # Copyright 2023 BooleWorks GmbH
 
 FROM eclipse-temurin:17-jre
-LABEL org.opencontainers.image.source=https://github.com/booleworks/boolerules
+LABEL org.opencontainers.image.source=https://github.com/booleworks/boolerules/server
+LABEL org.opencontainers.image.licenses=MIT
 RUN mkdir /opt/boolerules
 COPY target/boolerules-jar-with-dependencies.jar /opt/boolerules
 CMD java -jar /opt/boolerules/boolerules-jar-with-dependencies.jar
