@@ -3,7 +3,7 @@
 A little web application to showcase some functionality of the [BooleRules](https://github.com/booleworks/boolerules)
 rule engine.
 
-<img src="https://github.com/booleworks/boolerules/blob/main/assets/screenshot.jpeg?raw=true" alt="logo" width="600">
+<img src="https://github.com/booleworks/boolerules/blob/main/assets/screenshot.png?raw=true" alt="logo" width="600">
 
 ⚠ This is a developer preview, pre-alpha, and not ready for production use ⚠
 
