@@ -1,0 +1,5 @@
+POS;PV ID;DESCRIPTION;CONSTRAINT
+P1;;Position 1;;
+P1;PV1;Position Variant 1;zzt
+P1;PV2;Position Variant 2;dbj
+P1;PV3;Position Variant 3;dbj/xca
