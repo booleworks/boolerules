@@ -3,7 +3,7 @@
 A little web application to showcase some functionality of the [BooleRules](https://github.com/booleworks/boolerules)
 rule engine.
 
-<a href="https://www.logicng.org"><img src="https://github.com/booleworks/boolerules-showcase/blob/main/assets/screenshot.png?raw=true" alt="logo" width="800"></a>
+<img src="https://github.com/booleworks/boolerules/blob/main/assets/screenshot.jpeg?raw=true" alt="logo" width="600">
 
 ⚠ This is a developer preview, pre-alpha, and not ready for production use ⚠
 
@@ -58,5 +58,5 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 
 BooleRules development is funded by the [SofDCar project](https://sofdcar.de/):
 
-<a href="https://www.logicng.org"><img src="https://github.com/booleworks/logicng-rs/blob/main/doc/logos/bmwk.png?raw=true" alt="logo" width="200"></a>
+<img src="https://github.com/booleworks/boolerules/blob/main/assets/bmwk.png?raw=true" alt="logo" width="200">
 
