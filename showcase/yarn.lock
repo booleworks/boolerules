@@ -849,7 +849,7 @@
     vite-plugin-inspect "^0.8.4"
     vite-plugin-vue-inspector "^5.1.0"
     which "^3.0.1"
-    ws "^8.17.0"
+    ws "8.17.1"
 
 "@nuxt/kit@3.11.2", "@nuxt/kit@^3.10.3", "@nuxt/kit@^3.11.2", "@nuxt/kit@^3.2.0", "@nuxt/kit@^3.5.0", "@nuxt/kit@^3.7.3":
   version "3.11.2"
