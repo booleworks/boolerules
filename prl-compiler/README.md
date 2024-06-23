@@ -148,5 +148,5 @@ An IntelliJ Plugin for some syntax highlighting and refactoring functionality ca
 
 PRL and BooleRules development is funded by the [SofDCar project](https://sofdcar.de/):
 
-<a href="https://www.logicng.org"><img src="https://github.com/booleworks/logicng-rs/blob/main/doc/logos/bmwk.png?raw=true" alt="logo" width="200"></a>
+<img src="https://github.com/booleworks/boolerules/blob/main/assets/bmwk.png?raw=true" alt="logo" width="200">
 
