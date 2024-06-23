@@ -1,6 +1,6 @@
 # BooleRules Rule Engine
 
-<img src="https://github.com/booleworks/boolerules/blob/main/docs/boolerules-logo.png?raw=true" alt="logo" width="400"></a>
+<img src="https://github.com/booleworks/boolerules/blob/main/assets/boolerules-logo.png?raw=true" alt="logo" width="400"></a>
 
 ⚠ This is a developer preview, pre-alpha, and not ready for production use ⚠
 
@@ -14,12 +14,12 @@ application of logic for product configuration and variant management.
 
 ## Description
 
-<img src="https://github.com/booleworks/boolerules/blob/main/docs/boolerules-architecture.png?raw=true" alt="logo" width="600"></a>
+<img src="https://github.com/booleworks/boolerules/blob/main/assets/boolerules-architecture.png?raw=true" alt="logo" width="600"></a>
 
 The two central compontents of BooleRules are the PRL compiler and the server component.  Redis is used as a fast
 persistence layer.
 
-<img src="https://github.com/booleworks/boolerules/blob/main/docs/boolerules-compiler.png?raw=true" alt="logo" width="500"></a>
+<img src="https://github.com/booleworks/boolerules/blob/main/assets/boolerules-compiler.png?raw=true" alt="logo" width="500"></a>
 
 The compiler parses a rule file in PRL and compiles it into an internal format. During this process, a variety of checks
 are carried out to ensure that the rule file is consistent. In addition to standard checks for correct syntax (which are
@@ -46,5 +46,5 @@ computed with a single optimization to determine the appropriate configuration.
 
 BooleRules development is funded by the [SofDCar project](https://sofdcar.de/):
 
-<a href="https://sofdcar.de"><img src="https://github.com/booleworks/logicng-rs/blob/main/doc/logos/bmwk.png?raw=true" alt="logo" width="200"></a>
+<img src="https://github.com/booleworks/boolerules/blob/main/assets/bmwk.png?raw=true" alt="logo" width="200">
 
