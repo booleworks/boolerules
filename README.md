@@ -33,9 +33,26 @@ In this repository you find
 - [tree-sitter-grammar](https://github.com/booleworks/boolerules/tree/main/tree-sitter-grammar): A treesitter grammar
   for the PRL
 
-## Running BooleRules
+## Quick Start Guide
 
-The easiest way to run BooleRules is using Docker Compose (which is part of every normal Docker Desktop installation). Just open a terminal in this folder, run `docker compose up` and then open `localhost:3000` from your browser.
+### Running BooleRules
+
+The easiest way to run BooleRules is using Docker Compose (which is part of every normal Docker Desktop installation). 
+Just open a terminal in this folder, run `docker compose up` and then open `localhost:3000` from your browser.
+
+### Playing Around
+
+If you just want to play around a little bit, then open one of the provided rule files e.g. 
+[automotive.prl](https://raw.githubusercontent.com/booleworks/boolerules/main/test-files/prl/real/automotive/automotive_simple_1.prl).
+Once loaded, you can try the different algorithms on the left hand side.  For some algorithms you need to provide
+additional data.  We have some small example requests for the automotive example in the folder 
+[requests](https://github.com/booleworks/boolerules/tree/main/test-files/requests):
+
+- `bom_req.csv`: an example BOM (bill of materials) position for the "Position Validity" algorithm
+- `coverage_req.csv`: an example coverage request for the "Maximum Testcoverage" algorithm
+- `optimization_req.csv`: an example optimization request for the "Configuration Optimization" algorithm
+- `reconfiguration_req.csv`: an example reconfiguration request for the "Re-Configuration" algorithm
+
 
 ## Funding
 
