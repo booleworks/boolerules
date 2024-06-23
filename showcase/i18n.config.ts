@@ -1,7 +1,7 @@
 export default defineI18nConfig(() => ({
     warnHtmlMessage: false,
     legacy: false,
-    locale: 'de',
+    locale: 'en',
     messages: {
         en: {
             start: {
@@ -234,7 +234,7 @@ export default defineI18nConfig(() => ({
                     new: 'New',
                 },
                 bom: {
-                    desc: 'You can provide a bill of material (BOM) an compute three types of anomalies: \
+                    desc: 'You can provide a bill of material (BOM) and compute three types of anomalies: \
                     dead position variants, non-unique position variants and positions that are not complete.',
                     bom_position: 'BOM Position',
                     no_position: 'No loaded position',
