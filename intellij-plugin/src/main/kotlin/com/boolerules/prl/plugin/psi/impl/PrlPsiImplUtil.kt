@@ -32,10 +32,10 @@ object PrlPsiImplUtil {
             ?: element.boolFeatureRange?.featureDef
             ?: element.enumFeatureRange?.featureDef
             ?: element.intFeatureRange?.featureDef
-            ?: error("Unexpected feature type")
+            ?: error("Unexpected feature type: $element")
 
     @JvmStatic
-    fun getName(element: FeatureDef): String = element.text
+    fun getName(element: FeatureDef): String = element.text.removeSurrounding("`")
 
     @JvmStatic
     fun setName(element: FeatureDef, newName: String): PsiElement = renameIdentifier(element, newName)
@@ -46,13 +46,19 @@ object PrlPsiImplUtil {
 
     //<editor-fold desc="FeatureRef">
     @JvmStatic
-    fun getReferencedName(element: FeatureRef): List<String> = element.text.split(".")
-
-    @JvmStatic
     fun getReference(element: FeatureRef): PsiReference = element
 
     @JvmStatic
     fun getVariants(element: FeatureRef): Array<Any> = element.findParentOfType<RuleFile>()?.featureDefinitionList?.map { it.getFeatureDef() }?.toTypedArray() ?: emptyArray()
+
+    @JvmStatic
+    fun getName(element: FeatureRef): String = element.text.removeSurrounding("`")
+
+    @JvmStatic
+    fun setName(element: FeatureRef, newName: String): PsiElement = renameIdentifier(element, newName)
+
+    @JvmStatic
+    fun getNameIdentifier(element: FeatureRef): PsiElement = element
     //</editor-fold>
 
     //<editor-fold desc="PropertyRef">
@@ -65,13 +71,10 @@ object PrlPsiImplUtil {
 }
 
 fun renameIdentifier(element: PsiElement, newName: String): PsiElement {
-    val idNode = element.node.findChildByType(PrlTypes.IDENT)
-    if (idNode != null) {
-        val newElem = createPrlElement(element.project, newName)
-        element.node.replaceChild(idNode, newElem.firstChild.node)
-    } else {
-//        val btckNode = element.node.findChildByType(PrlTypes.BTCK_IDENTIFIER)
-        TODO("Rename refactoring for backtick identifiers not yet implemented")
-    }
+    val idNode = element.node.findChildByType(PrlTypes.IDENT) ?: element.node.findChildByType(PrlTypes.BTCK_IDENTIFIER) ?: return element
+    val newElem = createPrlElement(element.project, newName.addBackTicksIfNecessary())
+    element.node.replaceChild(idNode, newElem.firstChild.node)
     return element
 }
+
+private fun String.addBackTicksIfNecessary() = if (matches("[A-Za-z_][A-Za-z0-9_\\-.]*".toRegex())) this else "`$this`"

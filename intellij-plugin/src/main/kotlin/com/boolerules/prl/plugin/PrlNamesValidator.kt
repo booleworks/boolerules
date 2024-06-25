@@ -32,4 +32,4 @@ class PrlRenameInputValidator : RenameInputValidator {
 
 private val prlKeywordSet = PrlTokenSets.KEYWORDS.types.map { it.debugName }.toString()
 
-class PrlElementPattern : PsiElementPattern<PsiElement, PrlElementPattern>(PsiElement::class.java) {}
+class PrlElementPattern : PsiElementPattern<PsiElement, PrlElementPattern>(PsiElement::class.java)

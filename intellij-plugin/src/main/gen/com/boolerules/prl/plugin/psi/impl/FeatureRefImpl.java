@@ -30,12 +30,6 @@ public class FeatureRefImpl extends FeatureRefMixin implements FeatureRef {
 
   @Override
   @NotNull
-  public List<String> getReferencedName() {
-    return PrlPsiImplUtil.getReferencedName(this);
-  }
-
-  @Override
-  @NotNull
   public PsiReference getReference() {
     return PrlPsiImplUtil.getReference(this);
   }
@@ -44,6 +38,24 @@ public class FeatureRefImpl extends FeatureRefMixin implements FeatureRef {
   @NotNull
   public Object[] getVariants() {
     return PrlPsiImplUtil.getVariants(this);
+  }
+
+  @Override
+  @NotNull
+  public String getName() {
+    return PrlPsiImplUtil.getName(this);
+  }
+
+  @Override
+  @NotNull
+  public PsiElement setName(@NotNull String newName) {
+    return PrlPsiImplUtil.setName(this, newName);
+  }
+
+  @Override
+  @NotNull
+  public PsiElement getNameIdentifier() {
+    return PrlPsiImplUtil.getNameIdentifier(this);
   }
 
 }
