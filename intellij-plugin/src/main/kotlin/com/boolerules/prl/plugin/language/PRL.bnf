@@ -228,8 +228,8 @@ atomicConstraint ::= versionPredicate | featureRef | comparisonPredicate | inEnu
 
 featureRef ::= identifier {
   mixin = "com.boolerules.prl.plugin.psi.impl.FeatureRefMixin"
-  implements = [ "com.boolerules.prl.plugin.language.PrlReference" ]
-  methods = [ getReferencedName getReference getVariants ]
+  implements = [ "com.boolerules.prl.plugin.language.PrlReference" "com.boolerules.prl.plugin.language.PrlNamedElement" ]
+  methods = [ getReference getVariants getName setName getNameIdentifier ]
 }
 
 versionPredicate ::= featureRef LSQB comparator num RSQB

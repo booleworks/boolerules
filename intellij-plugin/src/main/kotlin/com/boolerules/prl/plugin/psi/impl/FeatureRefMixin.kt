@@ -11,8 +11,6 @@ import com.intellij.psi.util.findParentOfType
 
 abstract class FeatureRefMixin(node: ASTNode) : PrlASTWrapperPsiElement(node), PsiReference, PsiElement {
 
-    private fun myName(): String = text.substringAfterLast(".")
-
     override fun getElement(): PsiElement = node.psi
 
     override fun getRangeInElement(): TextRange {
@@ -21,14 +19,12 @@ abstract class FeatureRefMixin(node: ASTNode) : PrlASTWrapperPsiElement(node), P
 
     override fun resolve(): FeatureOrGroupDefinition? {
         val root = element.findParentOfType<RuleFile>() ?: return null
-        val name = myName()
-        val declarations = (root.featureDefinitionList + root.groupDefinitionList).filter { it.getFeatureDef().text == name }
+        val declarations = (root.featureDefinitionList + root.groupDefinitionList).filter { it.getFeatureDef().name == name }
         return declarations.firstOrNull()
     }
 
     override fun getCanonicalText(): String {
-        // TODO
-        return text
+        return name ?: ""
     }
 
     override fun handleElementRename(newElementName: String): PsiElement = renameIdentifier(this, newElementName)

@@ -92,6 +92,7 @@ public class Visitor extends PsiElementVisitor {
 
   public void visitFeatureRef(@NotNull FeatureRef o) {
     visitPrlReference(o);
+    // visitPrlNamedElement(o);
   }
 
   public void visitFeatureRestriction(@NotNull FeatureRestriction o) {
