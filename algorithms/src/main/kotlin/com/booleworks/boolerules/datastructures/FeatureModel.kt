@@ -5,7 +5,15 @@ package com.booleworks.boolerules.datastructures
 
 import com.booleworks.logicng.csp.CspAssignment
 import com.booleworks.logicng.formulas.Variable
-import com.booleworks.prl.model.constraints.*
+import com.booleworks.prl.model.constraints.BooleanFeature
+import com.booleworks.prl.model.constraints.EnumFeature
+import com.booleworks.prl.model.constraints.Feature
+import com.booleworks.prl.model.constraints.IntFeature
+import com.booleworks.prl.model.constraints.VersionedBooleanFeature
+import com.booleworks.prl.model.constraints.boolFt
+import com.booleworks.prl.model.constraints.enumFt
+import com.booleworks.prl.model.constraints.intFt
+import com.booleworks.prl.model.constraints.versionFt
 import com.booleworks.prl.transpiler.TranspilationInfo
 
 data class FeatureInstance(
@@ -20,6 +28,12 @@ data class FeatureInstance(
         is BooleanFeature -> feature.featureCode
         is EnumFeature -> "${feature.featureCode}=${enumValue}"
         is IntFeature -> "${feature.featureCode}=${intValue}"
+    }
+
+    companion object {
+        fun boolean(feature: String) = FeatureInstance(boolFt(feature))
+        fun enum(feature: String, value: String) = FeatureInstance(enumFt(feature), enumValue = value)
+        fun int(feature: String, value: Int) = FeatureInstance(intFt(feature), value)
     }
 }
 

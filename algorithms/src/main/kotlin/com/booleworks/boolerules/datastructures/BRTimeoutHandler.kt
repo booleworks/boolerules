@@ -17,8 +17,7 @@ data class BRTimeoutHandler(
     }
 
     companion object {
-        fun fromDuration(durationInSeconds: Int): BRTimeoutHandler {
-            return BRTimeoutHandler(System.currentTimeMillis() + durationInSeconds * 1000)
-        }
+        fun fromDuration(durationInSeconds: Int) =
+            BRTimeoutHandler(System.currentTimeMillis() + durationInSeconds * 1000)
     }
 }

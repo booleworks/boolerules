@@ -7,7 +7,11 @@ import com.booleworks.boolerules.algorithms.Algorithm
 import com.booleworks.boolerules.algorithms.ComputationState
 import com.booleworks.boolerules.algorithms.NON_CACHING_USE_FF
 import com.booleworks.boolerules.algorithms.SliceResult
-import com.booleworks.boolerules.datastructures.*
+import com.booleworks.boolerules.datastructures.BRTimeoutHandler
+import com.booleworks.boolerules.datastructures.Explanation
+import com.booleworks.boolerules.datastructures.FeatureModel
+import com.booleworks.boolerules.datastructures.computeExplanation
+import com.booleworks.boolerules.datastructures.extractModel
 import com.booleworks.boolerules.helpers.satSolver
 import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.datastructures.Tristate
@@ -19,17 +23,16 @@ import com.booleworks.prl.model.slices.SliceType
 import com.booleworks.prl.transpiler.LngIntVariable
 import com.booleworks.prl.transpiler.TranspilationInfo
 
+
 data class ConsistencyResult(
     override val slice: Slice,
     override val state: ComputationState,
     val consistent: Boolean,
-    val featureModel: FeatureModel?,
+    val exampleConfiguration: FeatureModel?,
     val explanation: Explanation?
 ) : SliceResult
 
-class ConsistencyComputation(
-    private val withDetails: Boolean,
-) : Algorithm<ConsistencyResult> {
+class Consistency(private val withDetails: Boolean) : Algorithm<ConsistencyResult> {
     override fun ffProvider() = NON_CACHING_USE_FF
 
     override fun allowedSliceTypes() = setOf(SliceType.SPLIT, SliceType.ANY, SliceType.ALL)

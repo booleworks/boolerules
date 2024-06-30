@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright 2023 BooleWorks GmbH
+
 package com.booleworks.boolerules.algorithms.optimization
 
 import com.booleworks.boolerules.algorithms.Algorithm

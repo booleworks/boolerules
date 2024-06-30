@@ -172,7 +172,7 @@ private fun computeConstraintsToCover(
     // k nicht baubare Constraints = (n-1)+(n-2)+...+(n-k) nicht baubare Kombinationen = k*n-(k*(k+1)/2)
     var numInvalidCombinations: Int
     if (pairwise) {
-        numInvalidCombinations = invalidConstraints.size * constraintsToCover.size -
+        numInvalidCombinations = invalidConstraints.size * cover.size -
                 invalidConstraints.size * (invalidConstraints.size + 1) / 2
         var index = 0
         val invalidCombinations = mutableListOf<String>()

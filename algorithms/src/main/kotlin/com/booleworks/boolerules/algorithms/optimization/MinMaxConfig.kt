@@ -3,8 +3,12 @@
 
 package com.booleworks.boolerules.algorithms.optimization
 
-import com.booleworks.boolerules.algorithms.*
+import com.booleworks.boolerules.algorithms.Algorithm
+import com.booleworks.boolerules.algorithms.ComputationState
+import com.booleworks.boolerules.algorithms.NON_CACHING_USE_FF
+import com.booleworks.boolerules.algorithms.OptimizationType
 import com.booleworks.boolerules.algorithms.OptimizationType.MAX
+import com.booleworks.boolerules.algorithms.SliceResult
 import com.booleworks.boolerules.datastructures.BRTimeoutHandler
 import com.booleworks.boolerules.datastructures.FeatureModel
 import com.booleworks.boolerules.datastructures.extractModel

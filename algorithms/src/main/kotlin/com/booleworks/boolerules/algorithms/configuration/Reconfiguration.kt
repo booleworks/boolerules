@@ -17,8 +17,6 @@ import com.booleworks.logicng.solvers.MaxSATSolver
 import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSAT
 import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSATConfig
 import com.booleworks.prl.model.PrlModel
-import com.booleworks.prl.model.constraints.Feature
-import com.booleworks.prl.model.constraints.boolFt
 import com.booleworks.prl.model.slices.Slice
 import com.booleworks.prl.model.slices.SliceType
 import com.booleworks.prl.transpiler.TranspilationInfo
@@ -28,8 +26,8 @@ enum class ReconfigurationAlgorithm { MAX_COV, MIN_DIFF, }
 data class ReconfigurationResult(
     override val slice: Slice,
     override val state: ComputationState,
-    val featuresToRemove: List<Feature>,
-    val featuresToAdd: List<Feature>
+    val featuresToRemove: List<FeatureInstance>,
+    val featuresToAdd: List<FeatureInstance>
 ) : SliceResult
 
 class Reconfiguration(
@@ -79,8 +77,8 @@ class Reconfiguration(
                 val reconfiguration = solver.model().positiveVariables()
                 val removed = configuration - reconfiguration
                 val added = notInConfiguration.intersect(reconfiguration)
-                val featuresToRemove = (invalidFeatures + removed).map { boolFt(it.name()) }.toList()
-                val featuresToAdd = added.map { boolFt(it.name()) }.toList()
+                val featuresToRemove = (invalidFeatures + removed).map { FeatureInstance.boolean(it.name()) }.toList()
+                val featuresToAdd = added.map { FeatureInstance.boolean(it.name()) }.toList()
                 ReconfigurationResult(slice, ComputationState.success(), featuresToRemove, featuresToAdd)
             }
 
