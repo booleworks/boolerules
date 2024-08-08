@@ -32,6 +32,7 @@ import com.booleworks.prl.parser.PrlForbiddenFeatureRule
 import com.booleworks.prl.parser.PrlGroupRule
 import com.booleworks.prl.parser.PrlIfThenElseRule
 import com.booleworks.prl.parser.PrlInclusionRule
+import com.booleworks.prl.parser.PrlIntFeatureDefinition
 import com.booleworks.prl.parser.PrlMandatoryFeatureRule
 import com.booleworks.prl.parser.PrlRule
 import com.booleworks.prl.parser.PrlRuleFile
@@ -103,6 +104,9 @@ class PrlCompiler {
                 state.addError("Feature name invalid: ${it.code}")
                 return@forEach
             }
+            if (hasEmptyDomain(it, state)) {
+                return@forEach
+            }
             propertyStore.addProperties(it, state)
             if (!state.hasErrors()) {
                 featureStore.addDefinition(it, state, propertyStore.slicingPropertyDefinitions, false)
@@ -128,6 +132,12 @@ class PrlCompiler {
     }
 
     private fun hasInvalidFeatureName(featureName: String) = featureName.contains(".")
+
+    private fun hasEmptyDomain(def: PrlFeatureDefinition, state: CompilerState) =
+        if (def is PrlIntFeatureDefinition && def.domain.isEmpty()) {
+            state.addError("Empty domain")
+            true
+        } else false
 
 
     private fun createFeatureDefinitionForGroup(rule: PrlGroupRule) =

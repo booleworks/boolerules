@@ -29,7 +29,7 @@ fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTran
     val encodingContext = CspEncodingContext(slices[0].info.encodingContext)
     val integerEncodings = slices[0].info.integerStore.clone()
 
-    val instantiation = mergeFeatureInstantiations(slices)
+    val (instantiation, invalidFeatures) = mergeFeatureInstantiations(slices)
     instantiation.integerFeatures.values.forEach {
         integerEncodings.getInfo(it.code)!!.addDefinition(it, encodingContext, cf)
     }
@@ -37,6 +37,9 @@ fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTran
     val integerVariables = mergedVarMap.values.toMutableSet()
     integerVariables.forEach {
         propositions.add(PrlProposition(RuleInformation(INTEGER_VARIABLE), integerEncodings.getEncoding(it)!!))
+    }
+    invalidFeatures.forEach { _ ->
+        propositions.add(PrlProposition(RuleInformation(INTEGER_VARIABLE), f.falsum()))
     }
 
     var count = 0
@@ -63,13 +66,15 @@ fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTran
                 )
             }
         }
-        propositions += slice.info.integerVariables.map {
-            createIntVariableEquivalence(
-                it.variable,
-                mergedVarMap[it.feature]!!.variable,
-                encodingContext,
-                f
-            )
+        propositions += slice.info.integerVariables.mapNotNull {
+            if (mergedVarMap.containsKey(it.feature)) {
+                createIntVariableEquivalence(
+                    it.variable,
+                    mergedVarMap[it.feature]!!.variable,
+                    encodingContext,
+                    f
+                )
+            } else null
         }
         slice.info.intPredicateMapping.forEach { (predicate, variable) ->
             val newVar = intPredicateMapping.computeIfAbsent(predicate) {
@@ -103,7 +108,8 @@ fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTran
     return MergedSliceTranslation(sliceSelectors, info)
 }
 
-fun mergeFeatureInstantiations(slices: List<SliceTranslation>): FeatureInstantiation {
+fun mergeFeatureInstantiations(slices: List<SliceTranslation>): Pair<FeatureInstantiation, List<String>> {
+    val invalidFeatures = mutableListOf<String>();
     val booleanFeatureDefs = mutableMapOf<String, MutableList<BooleanFeatureDefinition>>()
     slices.flatMap { it.info.featureInstantiations.booleanFeatures.entries }
         .groupByTo(booleanFeatureDefs, { it.key }, { it.value })
@@ -119,8 +125,16 @@ fun mergeFeatureInstantiations(slices: List<SliceTranslation>): FeatureInstantia
     val intFeatureDefs = mutableMapOf<String, MutableList<IntFeatureDefinition>>()
     slices.flatMap { it.info.featureInstantiations.integerFeatures.entries }
         .groupByTo(intFeatureDefs, { it.key }, { it.value })
-    val intFeatureInstantiations = intFeatureDefs.mapValues { (_, v) -> IntFeatureDefinition.merge(v.toSet()) }.toMutableMap()
+    val intFeatureInstantiations = mutableMapOf<String, IntFeatureDefinition>();
+    for ((k, v) in intFeatureDefs) {
+        val feature = IntFeatureDefinition.merge(v.toSet())
+        if (feature.domain.isEmpty()) {
+            invalidFeatures.add(k);
+        } else {
+            intFeatureInstantiations[k] = feature;
+        }
+    }
 
-    return FeatureInstantiation(booleanFeatureInstantiations, enumFeatureInstantiations, intFeatureInstantiations)
+    return Pair(FeatureInstantiation(booleanFeatureInstantiations, enumFeatureInstantiations, intFeatureInstantiations), invalidFeatures)
 }
 

@@ -96,6 +96,14 @@ class PrlCompilerTest {
     }
 
     @Test
+    fun testEmptyFeatureDomain() {
+        val parsed = parseRuleFile("../test-files/prl/compiler/empty_feature_domain.prl")
+        val compiler = PrlCompiler();
+        val model = compiler.compile(parsed)
+        assertThat(compiler.errors()).containsExactly("[feature=b, lineNumber=23] Empty domain")
+    }
+
+    @Test
     fun testReal() {
         val parsed = parseRuleFile("../test-files/prl/real/automotive/automotive_simple_1.prl")
         val compiler = PrlCompiler()
