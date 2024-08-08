@@ -123,14 +123,14 @@ internal object BackboneComputation : ListComputation<
         val clauses = mutableListOf<Formula>()
         val map = mutableMapOf<Variable, Pair<LngIntVariable, Int>>()
         variables.forEach { intVar ->
-            val satVars = info.encodingContext.variableMap[intVar.variable]!!
+            val satVars = info.encodingContext.variableMap[intVar.variable]
             val domain = intVar.variable.domain
             var previousVar: Variable? = null
             var index = 0
             var c = domain.lb()
             while (c < domain.ub()) {
                 if (domain.contains(c)) {
-                    val originalVar = satVars[index]!!
+                    val originalVar = satVars!![index]!!
                     val translatedVar = f.newAuxVariable(CspEncodingContext.CSP_AUX_LNG_VARIABLE)
                     if (previousVar == null) {
                         clauses.add(f.equivalence(originalVar, translatedVar))
@@ -143,11 +143,11 @@ internal object BackboneComputation : ListComputation<
                 }
                 ++c
             }
-            if (previousVar != null) {
-                val translatedVar = f.newAuxVariable(CspEncodingContext.CSP_AUX_LNG_VARIABLE)
-                clauses.add(f.equivalence(previousVar.negate(f), translatedVar))
-                map[translatedVar] = Pair(intVar, domain.ub())
-            }
+            val previousFormula = if (previousVar == null) f.verum() else previousVar.negate(f);
+            val translatedVar = f.newAuxVariable(CspEncodingContext.CSP_AUX_LNG_VARIABLE)
+            clauses.add(f.equivalence(previousFormula, translatedVar))
+            map[translatedVar] = Pair(intVar, domain.ub())
+
         }
         return Pair(f.and(clauses), map)
     }
