@@ -1,0 +1,29 @@
+header {
+  prl_version 1.0
+  creator "booleworks"
+  creation_date 2024-08-07
+}
+
+slicing properties {
+  int version
+}
+
+int feature a [1 - 4] {
+  version 1
+}
+int feature a [2 - 5] {
+  version 2
+}
+int feature a [10 - 20] {
+  version 3
+}
+int feature b [1, 2] {
+  version 1
+}
+int feature b [0 - -1] {
+  version 2
+}
+
+rule [2*b = a] / [b = a]
+rule [b < 5]
+rule [a > 2]
