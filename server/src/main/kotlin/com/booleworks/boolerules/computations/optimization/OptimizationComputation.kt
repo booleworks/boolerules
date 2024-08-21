@@ -107,8 +107,8 @@ internal object OptimizationComputation :
             val solverModel = solver.model()
             val evaluatedWeights = mapping.filter { (k, _) -> k.evaluate(solverModel) }
             val weight = evaluatedWeights.map { it.value }.sum()
-            val integerAssignment = cf.decode(solverModel, info.integerVariables.map(LngIntVariable::variable), info.encodingContext)
-            val example = extractModel(solverModel.positiveVariables(), integerAssignment, info)
+            val integerAssignment = cf.decode(solverModel, info.integerVariables.map(LngIntVariable::variable), info.knownVariables, info.encodingContext)
+            val example = extractModel(integerAssignment, info)
             val usedWeights = evaluatedWeights.map { WeightPair(constraintMap[it.key]!!, it.value) }
             OptimizationInternalResult(slice, request.computationType, weight, example, usedWeights)
         } else {

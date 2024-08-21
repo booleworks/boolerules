@@ -50,13 +50,13 @@ internal fun extractModel(
     )
 
 internal fun extractModel(
-    variables: Collection<Variable>,
     integerAssignment: CspAssignment,
     info: TranspilationInfo
 ): FeatureModelDO =
-    FeatureModelDO(variables.filter { it in info.knownVariables }
-        .map { variable -> extractFeature(variable, info) }.sorted() + extractIntFeatures(integerAssignment, info))
-
+    FeatureModelDO(
+        integerAssignment.positiveBooleans().map { v -> extractFeature(v, info) }
+                + extractIntFeatures(integerAssignment, info)
+    )
 
 internal fun extractIntFeatures(integerAssignment: CspAssignment, info: TranspilationInfo): Collection<FeatureDO> =
     integerAssignment.integerAssignments.map { (variable, value) ->

@@ -21,13 +21,14 @@ import com.booleworks.boolerules.computations.generic.extractModel
 import com.booleworks.boolerules.computations.modelenumeration.ModelEnumerationComputation.ModelEnumerationElementResult
 import com.booleworks.boolerules.computations.modelenumeration.ModelEnumerationComputation.ModelEnumerationInternalResult
 import com.booleworks.logicng.csp.CspFactory
+import com.booleworks.logicng.csp.functions.CspModelEnumeration
 import com.booleworks.logicng.formulas.Variable
 import com.booleworks.logicng.solvers.SATSolver
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
 import com.booleworks.prl.transpiler.LngIntVariable
 import com.booleworks.prl.transpiler.TranspilationInfo
-import java.util.SortedSet
+import java.util.*
 
 val MODELENUMERATION = object : ComputationType<
         ModelEnumerationRequest,
@@ -85,7 +86,7 @@ internal object ModelEnumerationComputation : ListComputation<
         status: ComputationStatusBuilder,
     ): ModelEnumerationInternalResult {
         val f = cf.formulaFactory()
-        val relevantVars = computeRelevantVars(f, info, request.features)
+        val relevantVars = computeRelevantVars(f, info, request.features).filter(info.knownVariables::contains).toSortedSet()
         val relevantIntVars = computeRelevantIntVars(info, request.features).map(LngIntVariable::variable)
 
         val solver = satSolver(NON_PT_CONFIG, f, info, slice, status).also {
@@ -93,10 +94,11 @@ internal object ModelEnumerationComputation : ListComputation<
         }
         addTautologyClauses(solver, relevantVars)
 
-        val models = solver.enumerateAllModels(relevantVars).map {
-            val integerAssignment = cf.decode(it.assignment(), relevantIntVars, info.encodingContext)
-            extractModel(it.positiveVariables(), integerAssignment, info)
-        }.toSet()
+        val models = CspModelEnumeration
+            .enumerate(solver, relevantIntVars, relevantVars, info.encodingContext, cf)
+            .map { model -> extractModel(model, info) }
+            .toSet()
+
         return ModelEnumerationInternalResult(slice, models.associateWith { slice }.toMutableMap())
     }
 

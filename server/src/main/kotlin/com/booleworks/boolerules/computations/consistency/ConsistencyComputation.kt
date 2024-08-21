@@ -76,12 +76,10 @@ internal object ConsistencyComputation :
         if (!status.successful()) return ConsistencyInternalResult(slice, false, null, null)
         return solver.satCall().solve().use { satCall ->
             if (satCall.satResult == Tristate.TRUE) {
-                val integerAssignment = cf.decode(
-                    satCall.model(info.encodingContext.relevantSatVariables),
-                    info.integerVariables.map(LngIntVariable::variable),
-                    info.encodingContext
-                )
-                val example = extractModel(satCall.model(info.knownVariables).positiveVariables(), integerAssignment, info)
+                val intVars = info.integerVariables.map(LngIntVariable::variable)
+                val model = satCall.model(info.encodingContext.getSatVariables(intVars) + info.knownVariables)
+                val integerAssignment = cf.decode(model, intVars, info.knownVariables, info.encodingContext)
+                val example = extractModel(integerAssignment, info)
                 ConsistencyInternalResult(slice, true, example, null)
             } else {
                 //TODO beautify explanation

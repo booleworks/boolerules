@@ -76,13 +76,13 @@ internal object MinMaxConfigComputation :
         status: ComputationStatusBuilder,
     ): MinMaxInternalResult {
         val f = cf.formulaFactory()
-        val relevantVars = computeRelevantVars(f, info, request.features)
+        val relevantVars = computeRelevantVars(f, info, request.features).filter(info.knownVariables::contains)
         val relevantIntVars = computeRelevantIntVars(info, request.features).map(LngIntVariable::variable)
         val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, cf.formulaFactory(), info)
         relevantVars.forEach { solver.addSoftFormula(f.literal(it.name(), request.computationType == MAX), 1) }
         return if (solver.solve() == OPTIMUM) {
-            val integerAssignment = cf.decode(solver.model(), relevantIntVars, info.encodingContext)
-            val example = extractModel(solver.model().positiveVariables(), integerAssignment, info)
+            val integerAssignment = cf.decode(solver.model(), relevantIntVars, relevantVars, info.encodingContext)
+            val example = extractModel(integerAssignment, info)
             val numberOfFeatures = example.size
             MinMaxInternalResult(slice, request.computationType, numberOfFeatures, example)
         } else {
