@@ -21,9 +21,8 @@ import com.booleworks.logicng.datastructures.Assignment
 import com.booleworks.logicng.formulas.Formula
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.formulas.Variable
-import com.booleworks.logicng.solvers.MaxSATSolver
-import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSAT
-import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSATConfig
+import com.booleworks.logicng.solvers.MaxSatSolver
+import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSatConfig
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.constraints.ComparisonOperator
 import com.booleworks.prl.model.constraints.VersionPredicate
@@ -85,11 +84,11 @@ object PackageSolvingComputation :
         cf: CspFactory,
         status: ComputationStatusBuilder
     ): PackageSolvingInternalResult {
-        val f = cf.formulaFactory()
+        val f = cf.formulaFactory
         val req = initialize(request, info, cf, status)
             ?: return PackageSolvingInternalResult(slice, emptyList(), emptyList(), emptyList())
 
-        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, f, info)
+        val solver = maxSat(MaxSatConfig.CONFIG_OLL, f, info)
         return if (!request.update) {
             handleAddRemove(f, req, solver, info, slice, status)
         } else {
@@ -101,7 +100,7 @@ object PackageSolvingComputation :
 private fun handleAddRemove(
     f: FormulaFactory,
     req: InternalRequest,
-    solver: MaxSATSolver,
+    solver: MaxSatSolver,
     info: TranspilationInfo,
     slice: Slice,
     status: ComputationStatusBuilder
@@ -127,20 +126,19 @@ private fun handleAddRemove(
         }
         solver.addSoftFormula(aux, 1)
     }
-    when (solver.solve()) {
-        MaxSAT.MaxSATResult.OPTIMUM -> return extractResult(f, slice, req, info, solver.model())
-        MaxSAT.MaxSATResult.UNDEF -> error("cannot happen, not called with handler")
-        MaxSAT.MaxSATResult.UNSATISFIABLE -> {
-            status.addWarning("installation request for slice $slice is not satisfiable -> skipping")
-            return PackageSolvingInternalResult(slice, listOf(), listOf(), listOf())
-        }
+    val solverResult = solver.solve()
+    if (solverResult.isSatisfiable) {
+        return extractResult(f, slice, req, info, solverResult.model.toAssignment())
+    } else {
+        status.addWarning("installation request for slice $slice is not satisfiable -> skipping")
+        return PackageSolvingInternalResult(slice, listOf(), listOf(), listOf())
     }
 }
 
 private fun handleUpgrade(
     f: FormulaFactory,
     req: InternalRequest,
-    solver: MaxSATSolver,
+    solver: MaxSatSolver,
     info: TranspilationInfo,
     slice: Slice,
     status: ComputationStatusBuilder
@@ -156,13 +154,12 @@ private fun handleUpgrade(
         val maxVer = info.versionMapping[fea]!!.lastKey()
         solver.addSoftFormula(vv(info, fea, maxVer), 1) // AUX => x in max version
     }
-    when (solver.solve()) {
-        MaxSAT.MaxSATResult.OPTIMUM -> return extractResult(f, slice, req, info, solver.model())
-        MaxSAT.MaxSATResult.UNDEF -> error("cannot happen, not called with handler")
-        MaxSAT.MaxSATResult.UNSATISFIABLE -> {
-            status.addWarning("installation request for slice $slice is not satisfiable -> skipping")
-            return PackageSolvingInternalResult(slice, listOf(), listOf(), listOf())
-        }
+    val solverResult = solver.solve()
+    if (solverResult.isSatisfiable) {
+        return extractResult(f, slice, req, info, solverResult.model.toAssignment())
+    } else {
+        status.addWarning("installation request for slice $slice is not satisfiable -> skipping")
+        return PackageSolvingInternalResult(slice, listOf(), listOf(), listOf())
     }
 }
 
@@ -183,17 +180,17 @@ private fun extractResult(
         val version = feaVer.second
         val found = req.softInstallation[feature]
         if (found == null) {
-            new.add(VersionedFeature(feature.name(), 0, version))
+            new.add(VersionedFeature(feature.name, 0, version))
         } else {
             if (found != version) {
-                changed.add(VersionedFeature(feature.name(), found, version))
+                changed.add(VersionedFeature(feature.name, found, version))
             }
         }
         allInstalled.add(feature)
     }
     req.softInstallation.keys
         .filter { it !in allInstalled }
-        .forEach { removed.add(VersionedFeature(it.name(), req.softInstallation[it]!!, 0)) }
+        .forEach { removed.add(VersionedFeature(it.name, req.softInstallation[it]!!, 0)) }
     return PackageSolvingInternalResult(slice, removed, new, changed)
 }
 
@@ -205,11 +202,11 @@ private fun initialize(
 ): InternalRequest? {
     val res = InternalRequest()
     for (installed in request.currentInstallation) {
-        val c = info.translateConstraint(cf.formulaFactory(), installed)
+        val c = info.translateConstraint(cf.formulaFactory, installed)
         if (c != null) {
             if (c.first is VersionPredicate && (c.first as VersionPredicate).comparison == ComparisonOperator.EQ) {
                 val p = c.first as VersionPredicate
-                res.softInstallation[cf.formulaFactory().variable(p.feature.featureCode)] = p.version
+                res.softInstallation[cf.formulaFactory.variable(p.feature.featureCode)] = p.version
             } else {
                 res.hardInstallation.add(c.second)
             }
@@ -235,7 +232,7 @@ private fun parseVersionPredicates(
     status: ComputationStatusBuilder
 ): Boolean {
     for (i in input) {
-        val vf = info.translateConstraint(cf.formulaFactory(), i)
+        val vf = info.translateConstraint(cf.formulaFactory, i)
         if (vf == null) {
             status.addError("Could not parse the constraint $i")
             return false
@@ -244,7 +241,7 @@ private fun parseVersionPredicates(
             return false
         } else {
             val p = vf.first as VersionPredicate
-            result[cf.formulaFactory().variable(p.feature.featureCode)] = p.version
+            result[cf.formulaFactory.variable(p.feature.featureCode)] = p.version
         }
     }
     return true

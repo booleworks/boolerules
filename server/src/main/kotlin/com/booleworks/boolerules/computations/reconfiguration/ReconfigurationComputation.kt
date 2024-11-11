@@ -15,9 +15,7 @@ import com.booleworks.boolerules.computations.generic.SingleComputationRunner
 import com.booleworks.boolerules.computations.generic.SliceTypeDO
 import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.logicng.csp.CspFactory
-import com.booleworks.logicng.solvers.MaxSATSolver
-import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSAT.MaxSATResult.OPTIMUM
-import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSATConfig
+import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSatConfig
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
 import com.booleworks.prl.transpiler.TranspilationInfo
@@ -78,7 +76,7 @@ object ReconfigurationComputation :
         cf: CspFactory,
         status: ComputationStatusBuilder
     ): ReconfigurationInternalResult {
-        val f = cf.formulaFactory()
+        val f = cf.formulaFactory
         val (validFeatures, invalidFeatures) = request.configuration.map { f.variable(it) }
             .partition { it in info.knownVariables }
         if (invalidFeatures.isNotEmpty()) {
@@ -93,7 +91,7 @@ object ReconfigurationComputation :
         val configuration = validFeatures.toSet()
         val notInConfiguration = info.knownVariables - configuration
 
-        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, f, info).also {
+        val solver = maxSat(MaxSatConfig.CONFIG_OLL, f, info).also {
             if (!status.successful()) return ReconfigurationInternalResult(slice, emptyList(), emptyList())
         }
         val weightForRemoval = when (request.algorithm) {
@@ -102,14 +100,15 @@ object ReconfigurationComputation :
         }
         configuration.forEach { solver.addSoftFormula(it, weightForRemoval) }
         notInConfiguration.forEach { solver.addSoftFormula(it.negate(f), 1) }
-        return if (solver.solve() == OPTIMUM) {
-            val reconfiguration = solver.model().positiveVariables()
+        val solverResult = solver.solve();
+        return if (solverResult.isSatisfiable) {
+            val reconfiguration = solverResult.model.positiveVariables()
             val removed = configuration - reconfiguration
             val added = notInConfiguration.intersect(reconfiguration)
             ReconfigurationInternalResult(
                 slice,
-                (invalidFeatures + removed).map { it.name() }.toList(),
-                added.map { it.name() }.toList()
+                (invalidFeatures + removed).map { it.name }.toList(),
+                added.map { it.name }.toList()
             )
         } else {
             status.addWarning(

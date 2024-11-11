@@ -4,8 +4,9 @@
 package com.booleworks.prl.transpiler
 
 import com.booleworks.logicng.csp.CspFactory
-import com.booleworks.logicng.csp.IntegerDomain
+import com.booleworks.logicng.csp.datastructures.domains.IntegerDomain
 import com.booleworks.logicng.csp.encodings.CspEncodingContext
+import com.booleworks.logicng.csp.encodings.OrderEncodingContext
 import com.booleworks.logicng.csp.predicates.ComparisonPredicate
 import com.booleworks.logicng.csp.terms.IntegerVariable
 import com.booleworks.logicng.csp.terms.Term
@@ -57,7 +58,7 @@ const val FEATURE_DEF_PREFIX = "DEF"
 const val INT_IN_PREDICATE_PREFIX = "IIP"
 
 fun initIntegerStore(
-    context: CspEncodingContext,
+    context: OrderEncodingContext,
     cf: CspFactory,
     store: FeatureStore
 ): IntegerStore = IntegerStore(store.intFeatures.values.associate { defs ->
@@ -78,7 +79,7 @@ fun initIntegerStore(
     }.toMap().toMutableMap()
     val map2 = map1.values.associateBy(LngIntVariable::variable) { v ->
         val clauses = cf.encodeVariable(v.variable, context)
-        cf.formulaFactory().and(clauses)
+        cf.formulaFactory.and(clauses)
     }.toMutableMap()
     Pair(feature, IntFeatureEncodingInfo(map1, map2))
 })
@@ -86,7 +87,7 @@ fun initIntegerStore(
 fun createIntVariableEquivalence(
     sliceVariable: IntegerVariable,
     mergedVar: IntegerVariable,
-    encodingContext: CspEncodingContext,
+    encodingContext: OrderEncodingContext,
     f: FormulaFactory
 ): PrlProposition {
     val constraints = mutableListOf<Formula>()
@@ -222,7 +223,13 @@ fun transpileIntTerm(
 ): Term? = when (term) {
     is IntValue -> cf.constant(term.value)
     is IntFeature -> transpileIntFeature(integerEncodings, instantiation, term)
-    is IntMul -> transpileIntFeature(integerEncodings, instantiation, term.feature)?.let { cf.mul(term.coefficient, it) }
+    is IntMul -> transpileIntFeature(integerEncodings, instantiation, term.feature)?.let {
+        cf.mul(
+            term.coefficient,
+            it
+        )
+    }
+
     is IntSum -> {
         val ops = term.operands.mapNotNull { transpileIntMul(cf, integerEncodings, instantiation, it) }
         if (ops.size == term.operands.size) {
@@ -238,7 +245,8 @@ fun transpileIntMul(
     integerEncodings: IntegerStore,
     instantiation: FeatureInstantiation,
     feature: IntMul
-): Term? = transpileIntFeature(integerEncodings, instantiation, feature.feature)?.let { cf.mul(feature.coefficient, it) }
+): Term? =
+    transpileIntFeature(integerEncodings, instantiation, feature.feature)?.let { cf.mul(feature.coefficient, it) }
 
 fun transpileIntFeature(
     integerEncodings: IntegerStore,
@@ -284,7 +292,7 @@ data class IntFeatureEncodingInfo(
             val domain = transpileIntDomain(definition.domain)
             val variable = LngIntVariable(definition.code, cf.auxVariable(FEATURE_DEF_PREFIX, definition.code, domain))
             val clauses = cf.encodeVariable(variable.variable, encodingContext)
-            val encoded = cf.formulaFactory().and(clauses)
+            val encoded = cf.formulaFactory.and(clauses)
             featureToVar[definition] = variable
             encodedVars[variable.variable] = encoded
         }

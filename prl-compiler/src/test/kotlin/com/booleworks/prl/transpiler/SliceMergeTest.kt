@@ -2,8 +2,8 @@ package com.booleworks.prl.transpiler
 
 import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.FormulaFactory
-import com.booleworks.logicng.solvers.SATSolver
-import com.booleworks.logicng.solvers.sat.SATSolverConfig
+import com.booleworks.logicng.solvers.SatSolver
+import com.booleworks.logicng.solvers.sat.SatSolverConfig
 import com.booleworks.prl.compiler.PrlCompiler
 import com.booleworks.prl.parser.parseRuleFile
 import org.assertj.core.api.Assertions.assertThat
@@ -60,7 +60,7 @@ class SliceMergeTest {
         assertThat(merged.info.booleanVariables).containsExactly(a, b, c, x)
         assertThat(merged.info.enumVariables).isEmpty()
         assertThat(merged.info.enumMapping).isEmpty()
-        val solver = SATSolver.newSolver(f)
+        val solver = SatSolver.newSolver(f)
         solver.addPropositions(merged.info.propositions)
         val models = solver.enumerateAllModels(listOf(a, b, c))
         assertThat(models).hasSize(2)
@@ -87,7 +87,7 @@ class SliceMergeTest {
         assertThat(filter(merged.info.propositions, "@SL7")).hasSize(9 + 4 + 4)
         assertThat(filter(merged.info.propositions, "@SL8")).hasSize(9 + 4 + 3)
         assertThat(merged.info.propositions).hasSize(166)
-        val solver = SATSolver.newSolver(f, SATSolverConfig.builder().proofGeneration(true).build())
+        val solver = SatSolver.newSolver(f, SatSolverConfig.builder().proofGeneration(true).build())
         solver.addPropositions(merged.info.propositions)
         assertThat(solver.sat()).isEqualTo(true)
         val models = solver.enumerateAllModels(listOf(a, b, c, p, q, r, x, y, z))
@@ -130,11 +130,11 @@ class SliceMergeTest {
         assertThat(filter(merged.info.propositions, "@SL2")).hasSize(13 + 3 + 7)
         assertThat(filter(merged.info.propositions, "@SL3")).hasSize(13 + 1 + 9)
         assertThat(merged.info.propositions).hasSize(94)
-        val solver = SATSolver.newSolver(f, SATSolverConfig.builder().proofGeneration(true).build())
+        val solver = SatSolver.newSolver(f, SatSolverConfig.builder().proofGeneration(true).build())
         solver.addPropositions(merged.info.propositions)
         assertThat(solver.sat()).isEqualTo(false)
     }
 
     private fun filter(props: List<PrlProposition>, sel: String) =
-        props.filter { it.formula().variables(f).any { v -> v.name().contains(sel) } }
+        props.filter { it.formula.variables(f).any { v -> v.name.contains(sel) } }
 }

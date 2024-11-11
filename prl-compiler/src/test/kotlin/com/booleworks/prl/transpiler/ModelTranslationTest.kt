@@ -63,19 +63,19 @@ class ModelTranslationTest {
     private val cf = CspFactory(FormulaFactory.caching())
     private val st1 = SliceTranslation(
         SliceSet(mutableListOf(s1), listOf(), mutableListOf(), listOf(), listOf()), TranspilationInfo(
-            mapOf(), FeatureInstantiation.empty(), CspEncodingContext(), IntegerStore.empty(),
+            mapOf(), FeatureInstantiation.empty(), CspEncodingContext.order(), IntegerStore.empty(),
             mapOf(), mapOf(), sortedSetOf(), mapOf(), setOf(), setOf()
         )
     )
     private val st2 = SliceTranslation(
         SliceSet(mutableListOf(s2, s3), listOf(), mutableListOf(), listOf(), listOf()), TranspilationInfo(
-            mapOf(), FeatureInstantiation.empty(), CspEncodingContext(), IntegerStore.empty(),
+            mapOf(), FeatureInstantiation.empty(), CspEncodingContext.order(), IntegerStore.empty(),
             mapOf(), mapOf(), sortedSetOf(), mapOf(), setOf(), setOf()
         )
     )
     private val st3 = SliceTranslation(
         SliceSet(mutableListOf(s4), listOf(), mutableListOf(), listOf(), listOf()), TranspilationInfo(
-            mapOf(), FeatureInstantiation.empty(), CspEncodingContext(), IntegerStore.empty(),
+            mapOf(), FeatureInstantiation.empty(), CspEncodingContext.order(), IntegerStore.empty(),
             mapOf(), mapOf(), sortedSetOf(), mapOf(), setOf(), setOf()
         )
     )

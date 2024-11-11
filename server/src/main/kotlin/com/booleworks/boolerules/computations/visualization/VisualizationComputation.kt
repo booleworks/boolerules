@@ -78,11 +78,11 @@ object VisualizationComputation :
         cf: CspFactory,
         status: ComputationStatusBuilder
     ): VisualizationInternalResult {
-        val f = cf.formulaFactory()
-        return ConstraintGraphGenerator.generateFromFormulas(f, info.propositions.map { it.formula() }).let { graph ->
+        val f = cf.formulaFactory
+        return ConstraintGraphGenerator.generateFromFormulas(f, info.propositions.map { it.formula }).let { graph ->
             VisualizationInternalResult(
                 slice,
-                graph.nodes().map { Node(it.content().variable().name(), it.content().variable().name()) },
+                graph.nodes().map { Node(it.content.variable().name, it.content.variable().name) },
                 graph.edges()
             )
         }
@@ -102,8 +102,8 @@ data class VisualizationInternalResult(
 fun Graph<Variable>.edges(): List<Edge> {
     val edges = mutableSetOf<Set<String>>()
     nodes().forEach { node ->
-        val nodeName = node.content().name()
-        node.neighbours().asSequence().map { it.content().name() }.filterNot { it == nodeName }
+        val nodeName = node.content.name
+        node.neighbours.asSequence().map { it.content.name }.filterNot { it == nodeName }
             .forEach { edges.add(setOf(nodeName, it)) }
     }
     return edges.map {

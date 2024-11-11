@@ -2,8 +2,8 @@ package com.booleworks.prl.transpiler;
 
 import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.FormulaFactory
-import com.booleworks.logicng.solvers.SATSolver
-import com.booleworks.logicng.solvers.sat.SATSolverConfig
+import com.booleworks.logicng.solvers.SatSolver
+import com.booleworks.logicng.solvers.sat.SatSolverConfig
 import com.booleworks.prl.compiler.PrlCompiler
 import com.booleworks.prl.parser.parseRuleFile
 import org.assertj.core.api.Assertions.assertThat
@@ -24,9 +24,9 @@ class LogicNGTranspilerVersionTest {
         assertThat(modelTranslation[0].info.versionVariables).hasSize(19595)
 
         val trans = modelTranslation[0]
-        val solver = SATSolver.newSolver(cf.formulaFactory())
+        val solver = SatSolver.newSolver(cf.formulaFactory)
         trans.info.propositions.forEach {
-            solver.add(it.formula().cnf(cf.formulaFactory()))
+            solver.add(it.formula.cnf(cf.formulaFactory))
         }
         assertThat(solver.sat()).isTrue()
     }
@@ -44,9 +44,9 @@ class LogicNGTranspilerVersionTest {
         assertThat(modelTranslation[0].info.versionVariables).hasSize(101)
 
         val trans = modelTranslation[0]
-        val solver = SATSolver.newSolver(cf.formulaFactory())
+        val solver = SatSolver.newSolver(cf.formulaFactory)
         trans.info.propositions.forEach {
-            solver.add(it.formula().cnf(cf.formulaFactory()))
+            solver.add(it.formula.cnf(cf.formulaFactory))
         }
         assertThat(solver.sat()).isTrue()
     }
@@ -64,11 +64,11 @@ class LogicNGTranspilerVersionTest {
         assertThat(modelTranslation[0].info.versionVariables).hasSize(10)
 
         val trans = modelTranslation[0]
-        val solver = SATSolver.newSolver(cf.formulaFactory(), SATSolverConfig.builder().proofGeneration(true).build())
+        val solver = SatSolver.newSolver(cf.formulaFactory, SatSolverConfig.builder().proofGeneration(true).build())
         trans.info.propositions.forEach {
-            solver.add(it.formula().cnf(cf.formulaFactory()))
+            solver.add(it.formula.cnf(cf.formulaFactory))
         }
-        val musicPlus = cf.formulaFactory().variable("@VER_MusicPlus_2")
+        val musicPlus = cf.formulaFactory.variable("@VER_MusicPlus_2")
         solver.add(musicPlus)
         val models = solver.enumerateAllModels(trans.info.versionVariables)
         models.forEach { assertThat(it.positiveVariables().contains(musicPlus)).isTrue() }

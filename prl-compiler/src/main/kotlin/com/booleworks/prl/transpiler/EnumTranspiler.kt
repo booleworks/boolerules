@@ -28,7 +28,7 @@ fun translateEnumComparison(
     enumMapping[constraint.feature.featureCode].let { enumMap ->
         if (enumMap == null) f.falsum() else enumMap[constraint.value.value].let { v ->
             if (v == null) f.constant(constraint.comparison != ComparisonOperator.EQ) else f.literal(
-                v.name(),
+                v.name,
                 constraint.comparison == ComparisonOperator.EQ
             )
         }

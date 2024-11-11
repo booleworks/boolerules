@@ -19,9 +19,8 @@ import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.boolerules.computations.generic.computeExplanation
 import com.booleworks.boolerules.computations.generic.extractModel
 import com.booleworks.logicng.csp.CspFactory
-import com.booleworks.logicng.datastructures.Tristate
-import com.booleworks.logicng.solvers.SATSolver
-import com.booleworks.logicng.solvers.sat.SATSolverConfig
+import com.booleworks.logicng.solvers.SatSolver
+import com.booleworks.logicng.solvers.sat.SatSolverConfig
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
 import com.booleworks.prl.transpiler.LngIntVariable
@@ -75,10 +74,11 @@ internal object ConsistencyComputation :
         val solver = prepareSolver(cf, request.computeAllDetails, info)
         if (!status.successful()) return ConsistencyInternalResult(slice, false, null, null)
         return solver.satCall().solve().use { satCall ->
-            if (satCall.satResult == Tristate.TRUE) {
+            if (satCall.satResult.result == true) {
                 val intVars = info.integerVariables.map(LngIntVariable::variable)
                 val model = satCall.model(info.encodingContext.getSatVariables(intVars) + info.knownVariables)
-                val integerAssignment = cf.decode(model, intVars, info.knownVariables, info.encodingContext)
+                val integerAssignment =
+                    cf.decode(model.toAssignment(), intVars, info.knownVariables, info.encodingContext)
                 val example = extractModel(integerAssignment, info)
                 ConsistencyInternalResult(slice, true, example, null)
             } else {
@@ -107,7 +107,7 @@ internal object ConsistencyComputation :
     ): SplitComputationDetail<ConsistencyDetail> {
         val solver = prepareSolver(cf, true, info)
         return solver.satCall().solve().use { satCall ->
-            assert(satCall.satResult == Tristate.FALSE) { "Detail computation should only be called for inconsistent slices" }
+            assert(satCall.satResult.result == false) { "Detail computation should only be called for inconsistent slices" }
             val explanation = computeExplanation(satCall, model.propertyStore.allDefinitions(), cf)
             val result = ConsistencyInternalResult(slice, false, null, explanation)
             SplitComputationDetail(result, splitProperties)
@@ -118,9 +118,9 @@ internal object ConsistencyComputation :
         cf: CspFactory,
         proofTracing: Boolean,
         info: TranspilationInfo,
-    ): SATSolver {
-        val f = cf.formulaFactory()
-        val solver = SATSolver.newSolver(f, SATSolverConfig.builder().proofGeneration(proofTracing).build()).apply {
+    ): SatSolver {
+        val f = cf.formulaFactory
+        val solver = SatSolver.newSolver(f, SatSolverConfig.builder().proofGeneration(proofTracing).build()).apply {
             addPropositions(info.propositions)
         }
         return solver

@@ -9,10 +9,10 @@ import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.formulas.FormulaFactoryConfig
 import com.booleworks.logicng.formulas.FormulaFactoryConfig.FormulaMergeStrategy.IMPORT
 import com.booleworks.logicng.formulas.FormulaFactoryConfig.FormulaMergeStrategy.USE_BUT_NO_IMPORT
-import com.booleworks.logicng.solvers.MaxSATSolver
-import com.booleworks.logicng.solvers.SATSolver
-import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSATConfig
-import com.booleworks.logicng.solvers.sat.SATSolverConfig
+import com.booleworks.logicng.solvers.MaxSatSolver
+import com.booleworks.logicng.solvers.SatSolver
+import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSatConfig
+import com.booleworks.logicng.solvers.sat.SatSolverConfig
 import com.booleworks.prl.model.FeatureDefinition
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.AnySliceSelection
@@ -23,23 +23,23 @@ import com.booleworks.prl.transpiler.SliceTranslation
 import com.booleworks.prl.transpiler.TranspilationInfo
 import com.booleworks.prl.transpiler.mergeSlices
 import com.booleworks.prl.transpiler.transpileModel
+import java.util.Collections
+import java.util.TreeMap
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.Collections
-import java.util.TreeMap
-import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicInteger
 
 val NON_CACHING_USE_FF: () -> FormulaFactory =
     { FormulaFactory.nonCaching(FormulaFactoryConfig.builder().formulaMergeStrategy(USE_BUT_NO_IMPORT).build()) }
 val CACHING_IMPORT_FF: () -> FormulaFactory =
     { FormulaFactory.caching(FormulaFactoryConfig.builder().formulaMergeStrategy(IMPORT).build()) }
 
-val PT_CONFIG: SATSolverConfig = SATSolverConfig.builder().proofGeneration(true).build()
-val NON_PT_CONFIG: SATSolverConfig = SATSolverConfig.builder().proofGeneration(false).build()
+val PT_CONFIG: SatSolverConfig = SatSolverConfig.builder().proofGeneration(true).build()
+val NON_PT_CONFIG: SatSolverConfig = SatSolverConfig.builder().proofGeneration(false).build()
 
 /**
  * Super class for all internal computations.
@@ -216,13 +216,13 @@ sealed class Computation<
     }
 
     internal fun satSolver(
-        config: SATSolverConfig,
+        config: SatSolverConfig,
         f: FormulaFactory,
         info: TranspilationInfo,
         slice: Slice,
         status: ComputationStatusBuilder
-    ): SATSolver {
-        val solver = SATSolver.newSolver(f, config)
+    ): SatSolver {
+        val solver = SatSolver.newSolver(f, config)
         solver.addPropositions(info.propositions)
         if (!solver.sat()) {
             status.addWarning(
@@ -234,13 +234,12 @@ sealed class Computation<
     }
 
     internal fun maxSat(
-        config: MaxSATConfig,
-        algo: (FormulaFactory, MaxSATConfig) -> MaxSATSolver,
+        config: MaxSatConfig,
         f: FormulaFactory,
         info: TranspilationInfo,
-    ): MaxSATSolver {
-        val solver = algo(f, config)
-        info.propositions.forEach { solver.addHardFormula(it.formula()) }
+    ): MaxSatSolver {
+        val solver = MaxSatSolver.newSolver(f, config)
+        info.propositions.forEach { solver.addHardFormula(it.formula) }
         return solver
     }
 

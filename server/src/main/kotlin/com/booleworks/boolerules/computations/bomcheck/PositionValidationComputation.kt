@@ -18,10 +18,9 @@ import com.booleworks.boolerules.computations.generic.SliceTypeDO
 import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.boolerules.computations.generic.extractModel
 import com.booleworks.logicng.csp.CspFactory
-import com.booleworks.logicng.datastructures.Tristate
 import com.booleworks.logicng.formulas.Formula
 import com.booleworks.logicng.formulas.FormulaFactory
-import com.booleworks.logicng.solvers.SATSolver
+import com.booleworks.logicng.solvers.SatSolver
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
 import com.booleworks.prl.transpiler.TranspilationInfo
@@ -76,7 +75,7 @@ internal object PositionValidationComputation : SingleComputation<
         cf: CspFactory,
         status: ComputationStatusBuilder,
     ): PositionInternalResult {
-        val f = cf.formulaFactory()
+        val f = cf.formulaFactory
         val solver = satSolver(NON_PT_CONFIG, f, info, slice, status).also {
             if (!it.sat()) return PositionInternalResult(slice, request.position, listOf(), listOf(), null)
         }
@@ -107,13 +106,14 @@ internal object PositionValidationComputation : SingleComputation<
     private fun checkDeadPVs(
         request: PositionValidationRequest,
         pvConstraintMap: MutableMap<PositionVariant, Formula>,
-        solver: SATSolver,
+        solver: SatSolver,
     ): List<PositionVariant> {
         val deadPVs = mutableListOf<PositionVariant>()
         if (BomCheckType.DEAD_PV in request.computationTypes) {
             pvConstraintMap.forEach { (pv, formula) ->
                 solver.satCall().addFormulas(formula).solve().use { satCall ->
-                    if (satCall.satResult != Tristate.TRUE) {
+                    val res = satCall.satResult;
+                    if (!res.isSuccess || res.result == false) {
                         deadPVs.add(pv)
                     }
                 }
@@ -125,7 +125,7 @@ internal object PositionValidationComputation : SingleComputation<
     private fun checkCompleteness(
         request: PositionValidationRequest,
         pvConstraintMap: MutableMap<PositionVariant, Formula>,
-        solver: SATSolver,
+        solver: SatSolver,
         info: TranspilationInfo,
         f: FormulaFactory,
         pConstraint: Formula,
@@ -134,7 +134,7 @@ internal object PositionValidationComputation : SingleComputation<
             val allPvConstraintsNegatedConjunction = f.and(pvConstraintMap.values.map { it.negate(f) })
             solver.satCall().addFormulas(pConstraint, allPvConstraintsNegatedConjunction).solve()
                 .use { satCall ->
-                    if (satCall.satResult == Tristate.TRUE) {
+                    if (satCall.satResult.result == true) {
                         val relevantVars = allPvConstraintsNegatedConjunction.variables(f)
                         return extractModel(satCall.model(info.knownVariables).positiveVariables(), info) //TODO
                     }
@@ -146,10 +146,10 @@ internal object PositionValidationComputation : SingleComputation<
     private fun checkUniqueness(
         request: PositionValidationRequest,
         pvConstraintMap: MutableMap<PositionVariant, Formula>,
-        solver: SATSolver,
+        solver: SatSolver,
         info: TranspilationInfo,
     ): List<NonUniquePvsDetail> {
-        val f = solver.factory()
+        val f = solver.factory
         val nonUniquePVs = mutableListOf<NonUniquePvsDetail>()
         if (BomCheckType.UNIQUENESS in request.computationTypes) {
             val constraints = pvConstraintMap.keys.toTypedArray()
@@ -159,7 +159,7 @@ internal object PositionValidationComputation : SingleComputation<
                     val secondPv = pvConstraintMap[constraints[j]]
                     val formula = f.and(firstPv, secondPv)
                     solver.satCall().addFormulas(formula).solve().use { satCall ->
-                        if (satCall.satResult == Tristate.TRUE) {
+                        if (satCall.satResult.result == true) {
                             val example = extractModel(
                                 satCall.model(info.knownVariables).positiveVariables(), info, formula.variables(f)
                             )

@@ -21,9 +21,7 @@ import com.booleworks.boolerules.computations.generic.computeRelevantVars
 import com.booleworks.boolerules.computations.generic.extractModel
 import com.booleworks.boolerules.computations.minmaxconfig.MinMaxConfigComputation.MinMaxInternalResult
 import com.booleworks.logicng.csp.CspFactory
-import com.booleworks.logicng.solvers.MaxSATSolver
-import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSAT.MaxSATResult.OPTIMUM
-import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSATConfig
+import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSatConfig
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
 import com.booleworks.prl.transpiler.LngIntVariable
@@ -75,13 +73,15 @@ internal object MinMaxConfigComputation :
         cf: CspFactory,
         status: ComputationStatusBuilder,
     ): MinMaxInternalResult {
-        val f = cf.formulaFactory()
+        val f = cf.formulaFactory
         val relevantVars = computeRelevantVars(f, info, request.features).filter(info.knownVariables::contains)
         val relevantIntVars = computeRelevantIntVars(info, request.features).map(LngIntVariable::variable)
-        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, cf.formulaFactory(), info)
-        relevantVars.forEach { solver.addSoftFormula(f.literal(it.name(), request.computationType == MAX), 1) }
-        return if (solver.solve() == OPTIMUM) {
-            val integerAssignment = cf.decode(solver.model(), relevantIntVars, relevantVars, info.encodingContext)
+        val solver = maxSat(MaxSatConfig.CONFIG_OLL, cf.formulaFactory, info)
+        relevantVars.forEach { solver.addSoftFormula(f.literal(it.name, request.computationType == MAX), 1) }
+        val solverResult = solver.solve()
+        return if (solverResult.isSatisfiable) {
+            val integerAssignment =
+                cf.decode(solverResult.model.toAssignment(), relevantIntVars, relevantVars, info.encodingContext)
             val example = extractModel(integerAssignment, info)
             val numberOfFeatures = example.size
             MinMaxInternalResult(slice, request.computationType, numberOfFeatures, example)

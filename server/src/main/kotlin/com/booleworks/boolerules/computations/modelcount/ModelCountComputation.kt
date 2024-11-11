@@ -66,17 +66,17 @@ internal object ModelCountComputation :
     ): ModelCountInternalResult {
         // currently no projected model counting is supported
         // val variables = computeRelevantVars(f, info, listOf())
-        val f = cf.formulaFactory()
+        val f = cf.formulaFactory
         val allVariables = sortedSetOf<Variable>()
         val formulas = info.propositions.map {
-            allVariables.addAll(it.formula().variables(f))
-            it.formula()
+            allVariables.addAll(it.formula.variables(f))
+            it.formula
         }
         allVariables.addAll(info.knownVariables)
         if (!status.successful()) {
             return ModelCountInternalResult(slice, BigInteger.ZERO)
         }
-        return ModelCountInternalResult(slice, ModelCounter.count(cf.formulaFactory(), formulas, allVariables))
+        return ModelCountInternalResult(slice, ModelCounter.count(cf.formulaFactory, formulas, allVariables))
     }
 
     override fun computeDetailForSlice(

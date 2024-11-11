@@ -2,18 +2,18 @@ package com.booleworks.prl.transpiler;
 
 import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.FormulaFactory
-import com.booleworks.logicng.solvers.SATSolver
+import com.booleworks.logicng.solvers.SatSolver
 import com.booleworks.prl.compiler.PrlCompiler
 import com.booleworks.prl.parser.parseRuleFile
+import java.util.TreeSet
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.entry
 import org.junit.jupiter.api.Test
-import java.util.TreeSet
 
 class LogicNGTranspilerVersionNoSlicesTest {
     private val model = PrlCompiler().compile(parseRuleFile("../test-files/prl/compiler/simple_version.prl"))
     private val cf = CspFactory(FormulaFactory.caching())
-    private val f = cf.formulaFactory()
+    private val f = cf.formulaFactory
     private val modelTranslation = transpileModel(cf, model, listOf())
 
     @Test
@@ -68,7 +68,7 @@ class LogicNGTranspilerVersionNoSlicesTest {
         val sliceSet = trans.sliceSet
         val props = trans.info.propositions
 
-        val original = props.filter { it.backpack().ruleType == RuleType.ORIGINAL_RULE }
+        val original = props.filter { it.backpack.ruleType == RuleType.ORIGINAL_RULE }
         assertThat(original).hasSize(7)
 
         // rule i1[ < 5]
@@ -128,7 +128,7 @@ class LogicNGTranspilerVersionNoSlicesTest {
         val sliceSet = trans.sliceSet
         val props = trans.info.propositions
 
-        val amo = props.filter { it.backpack().ruleType == RuleType.VERSION_AMO_CONSTRAINT }
+        val amo = props.filter { it.backpack.ruleType == RuleType.VERSION_AMO_CONSTRAINT }
         assertThat(amo).hasSize(3)
 
         assertThat(amo).contains(
@@ -157,7 +157,7 @@ class LogicNGTranspilerVersionNoSlicesTest {
         val sliceSet = trans.sliceSet
         val props = trans.info.propositions
 
-        val equiv = props.filter { it.backpack().ruleType == RuleType.VERSION_EQUIVALENCE }
+        val equiv = props.filter { it.backpack.ruleType == RuleType.VERSION_EQUIVALENCE }
         assertThat(equiv).hasSize(3)
 
         assertThat(equiv).contains(
@@ -183,7 +183,7 @@ class LogicNGTranspilerVersionNoSlicesTest {
     @Test
     fun testVersionSolvingUnversionedVars() {
         val trans = modelTranslation[0]
-        val solver = SATSolver.newSolver(f)
+        val solver = SatSolver.newSolver(f)
         solver.addPropositions(trans.info.propositions)
         assertThat(solver.sat()).isTrue()
         var models = solver.enumerateAllModels(f.variables("i1", "i2", "i3"))
@@ -198,7 +198,7 @@ class LogicNGTranspilerVersionNoSlicesTest {
     @Test
     fun testVersionSolvingVersionedVars() {
         val trans = modelTranslation[0]
-        val solver = SATSolver.newSolver(f)
+        val solver = SatSolver.newSolver(f)
         solver.addPropositions(trans.info.propositions)
         assertThat(solver.sat()).isTrue()
         val models = solver.enumerateAllModels(trans.info.versionVariables)
@@ -221,7 +221,7 @@ class LogicNGTranspilerVersionNoSlicesTest {
     @Test
     fun testVersionSolvingVersionedVarsWithBoolen() {
         val trans = modelTranslation[0]
-        val solver = SATSolver.newSolver(f)
+        val solver = SatSolver.newSolver(f)
         solver.addPropositions(trans.info.propositions)
         assertThat(solver.sat()).isTrue()
         val models = solver.enumerateAllModels(trans.info.versionVariables + f.variables("b1"))

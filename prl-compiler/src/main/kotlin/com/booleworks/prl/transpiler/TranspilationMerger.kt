@@ -4,7 +4,7 @@
 package com.booleworks.prl.transpiler
 
 import com.booleworks.logicng.csp.CspFactory
-import com.booleworks.logicng.csp.encodings.CspEncodingContext
+import com.booleworks.logicng.csp.encodings.OrderEncodingContext
 import com.booleworks.logicng.datastructures.Substitution
 import com.booleworks.logicng.formulas.Variable
 import com.booleworks.prl.model.BooleanFeatureDefinition
@@ -17,7 +17,7 @@ import com.booleworks.prl.transpiler.RuleType.UNKNOWN_FEATURE_IN_SLICE
 
 fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTranslation {
     //TODO version/int merging
-    val f = cf.formulaFactory()
+    val f = cf.formulaFactory
     val theoryMap = slices[0].info.theoryMap
     val knownVariables = slices.flatMap { it.info.knownVariables }.toSortedSet()
     val sliceSelectors = mutableMapOf<String, SliceTranslation>()
@@ -26,7 +26,7 @@ fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTran
     val unknownFeatures = slices[0].info.unknownFeatures.toMutableSet()
     val booleanVariables = mutableSetOf<Variable>()
     val intPredicateMapping = mutableMapOf<IntPredicate, Variable>()
-    val encodingContext = CspEncodingContext(slices[0].info.encodingContext)
+    val encodingContext = OrderEncodingContext(slices[0].info.encodingContext)
     val integerEncodings = slices[0].info.integerStore.clone()
 
     val (instantiation, invalidFeatures) = mergeFeatureInstantiations(slices)
@@ -48,7 +48,7 @@ fun mergeSlices(cf: CspFactory, slices: List<SliceTranslation>): MergedSliceTran
         sliceSelectors[selector] = slice
         val substitution = Substitution()
         knownVariables.forEach { kVar ->
-            val sVar = f.variable("${selector}_${kVar.name()}")
+            val sVar = f.variable("${selector}_${kVar.name}")
             propositions.add(
                 PrlProposition(
                     RuleInformation(FEATURE_EQUIVALENCE_OVER_SLICES, slice.sliceSet),
@@ -135,6 +135,9 @@ fun mergeFeatureInstantiations(slices: List<SliceTranslation>): Pair<FeatureInst
         }
     }
 
-    return Pair(FeatureInstantiation(booleanFeatureInstantiations, enumFeatureInstantiations, intFeatureInstantiations), invalidFeatures)
+    return Pair(
+        FeatureInstantiation(booleanFeatureInstantiations, enumFeatureInstantiations, intFeatureInstantiations),
+        invalidFeatures
+    )
 }
 

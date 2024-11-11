@@ -23,12 +23,12 @@ import com.booleworks.boolerules.computations.modelenumeration.ModelEnumerationC
 import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.csp.functions.CspModelEnumeration
 import com.booleworks.logicng.formulas.Variable
-import com.booleworks.logicng.solvers.SATSolver
+import com.booleworks.logicng.solvers.SatSolver
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
 import com.booleworks.prl.transpiler.LngIntVariable
 import com.booleworks.prl.transpiler.TranspilationInfo
-import java.util.*
+import java.util.SortedSet
 
 val MODELENUMERATION = object : ComputationType<
         ModelEnumerationRequest,
@@ -85,8 +85,9 @@ internal object ModelEnumerationComputation : ListComputation<
         cf: CspFactory,
         status: ComputationStatusBuilder,
     ): ModelEnumerationInternalResult {
-        val f = cf.formulaFactory()
-        val relevantVars = computeRelevantVars(f, info, request.features).filter(info.knownVariables::contains).toSortedSet()
+        val f = cf.formulaFactory
+        val relevantVars =
+            computeRelevantVars(f, info, request.features).filter(info.knownVariables::contains).toSortedSet()
         val relevantIntVars = computeRelevantIntVars(info, request.features).map(LngIntVariable::variable)
 
         val solver = satSolver(NON_PT_CONFIG, f, info, slice, status).also {
@@ -102,8 +103,8 @@ internal object ModelEnumerationComputation : ListComputation<
         return ModelEnumerationInternalResult(slice, models.associateWith { slice }.toMutableMap())
     }
 
-    private fun addTautologyClauses(solver: SATSolver, variables: SortedSet<Variable>) {
-        val f = solver.factory()
+    private fun addTautologyClauses(solver: SatSolver, variables: SortedSet<Variable>) {
+        val f = solver.factory
         val selTautology = f.variable(SEL_TAUTOLOGY)
         variables.forEach { solver.add(f.or(selTautology, it)) }
         solver.add(selTautology)

@@ -3,7 +3,7 @@
 
 package com.booleworks.prl.transpiler
 
-import com.booleworks.logicng.csp.encodings.CspEncodingContext
+import com.booleworks.logicng.csp.encodings.OrderEncodingContext
 import com.booleworks.logicng.datastructures.Substitution
 import com.booleworks.logicng.formulas.Formula
 import com.booleworks.logicng.formulas.FormulaFactory
@@ -55,7 +55,7 @@ data class RuleInformation(val ruleType: RuleType, val rule: AnyRule?, val slice
 }
 
 fun PrlProposition.substitute(f: FormulaFactory, substitution: Substitution) =
-    PrlProposition(backpack(), formula().substitute(f, substitution))
+    PrlProposition(backpack, formula.substitute(f, substitution))
 
 data class SliceTranslation(val sliceSet: SliceSet, val info: TranspilationInfo)
 
@@ -107,7 +107,7 @@ data class FeatureInstantiation(
 data class TranspilationInfo(
     val theoryMap: Map<String, Theory>, // A mapping from each feature to its theory (model)
     val featureInstantiations: FeatureInstantiation, // A mapping from each feature to its definition (slice)
-    val encodingContext: CspEncodingContext, // The context for CSP encodings (model)
+    val encodingContext: OrderEncodingContext,
     val integerStore: IntegerStore, // The store for integer variables (model)
     val intPredicateMapping: Map<IntPredicate, Variable>, // A mapping for all integer predicates (slice)
     val versionMapping: Map<Variable, SortedMap<Int, Variable>>, // All known enum variables and their values (slice)
@@ -139,7 +139,7 @@ data class TranspilationInfo(
         versionMapping.forEach { (feature, vs) ->
             vs.forEach { (ver, variable) ->
                 versionVariables.add(variable)
-                var2version[variable] = Pair(feature.name(), ver)
+                var2version[variable] = Pair(feature.name, ver)
             }
         }
         integerVariables = featureInstantiations.integerFeatures.values

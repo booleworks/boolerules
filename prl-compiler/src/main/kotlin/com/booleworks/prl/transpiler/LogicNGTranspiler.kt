@@ -5,6 +5,7 @@ package com.booleworks.prl.transpiler
 
 import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.csp.encodings.CspEncodingContext
+import com.booleworks.logicng.csp.encodings.OrderEncodingContext
 import com.booleworks.logicng.formulas.Formula
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.formulas.Variable
@@ -66,7 +67,7 @@ fun transpileModel(
     additionalConstraints: List<String> = emptyList(),
     considerConstraints: List<String> = emptyList(),
 ): ModelTranslation {
-    val context = CspEncodingContext()
+    val context = CspEncodingContext.order()
     val intStore = initIntegerStore(context, cf, model.featureStore)
     val skippedConstraints = mutableListOf<String>()
     val theoryMap = model.featureStore.theoryMap
@@ -83,12 +84,12 @@ fun transpileModel(
 
 fun transpileSliceSet(
     theoryMap: Map<String, Theory>,
-    context: CspEncodingContext,
+    context: OrderEncodingContext,
     cf: CspFactory,
     integerStore: IntegerStore,
     sliceSet: SliceSet
 ): SliceTranslation {
-    val f = cf.formulaFactory()
+    val f = cf.formulaFactory
     val state = initState(theoryMap, context, cf, sliceSet, integerStore)
     val propositions = sliceSet.rules.map { transpileRule(f, it, sliceSet, state) }.toMutableList()
     propositions += state.enumMapping.values.map {
@@ -169,12 +170,12 @@ fun transpileConstraint(
 
 private fun initState(
     theoryMap: Map<String, Theory>,
-    context: CspEncodingContext,
+    context: OrderEncodingContext,
     cf: CspFactory,
     sliceSet: SliceSet,
     integerStore: IntegerStore,
 ): TranspilationInfo {
-    val f = cf.formulaFactory()
+    val f = cf.formulaFactory
     val insts = getFeatureInstantiations(sliceSet)
     val versionMapping = if (sliceSet.hasVersionFeatures()) initVersionMapping(f, sliceSet.allRules) else mapOf()
     val intPredicateMapping = getAllIntPredicates(f, sliceSet)

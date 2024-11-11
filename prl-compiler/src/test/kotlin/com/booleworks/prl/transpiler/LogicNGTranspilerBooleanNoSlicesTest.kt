@@ -29,7 +29,7 @@ class LogicNGTranspilerBooleanNoSlicesTest {
         assertThat(modelTranslation.numberOfComputations).isEqualTo(1)
         assertThat(modelTranslation[0].info.propositions).hasSize(model.rules.size + 2)
         assertThat(modelTranslation[0].info.propositions.filter {
-            it.backpack().ruleType == RuleType.ADDITIONAL_RESTRICTION
+            it.backpack.ruleType == RuleType.ADDITIONAL_RESTRICTION
         }).hasSize(2)
     }
 }

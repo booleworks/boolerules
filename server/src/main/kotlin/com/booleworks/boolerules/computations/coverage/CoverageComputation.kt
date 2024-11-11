@@ -17,13 +17,12 @@ import com.booleworks.boolerules.computations.generic.computationDoc
 import com.booleworks.boolerules.computations.generic.extractModel
 import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.datastructures.Substitution
-import com.booleworks.logicng.datastructures.Tristate
 import com.booleworks.logicng.formulas.Formula
 import com.booleworks.logicng.formulas.FormulaFactory
 import com.booleworks.logicng.formulas.Variable
-import com.booleworks.logicng.solvers.MaxSATSolver
-import com.booleworks.logicng.solvers.SATSolver
-import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSAT
+import com.booleworks.logicng.solvers.MaxSatSolver
+import com.booleworks.logicng.solvers.SatSolver
+import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSatConfig
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
 import com.booleworks.prl.model.slices.SliceSelection
@@ -78,16 +77,16 @@ internal object CoverageComputation :
         val (baseFormula, constraintsToCover, invalidConstraints) = initialize(request, slice, info, cf, status)
             ?: return CoverageInternalResult(slice, emptyList(), 0)
 
-        val f = cf.formulaFactory()
+        val f = cf.formulaFactory
         val selectors = constraintsToCover.keys
         val initialCover = computeInitialCover(baseFormula, selectors, f)
         val fullModel = minimizeInitialCover(initialCover, baseFormula, selectors, f)
         val modelByIndex: Map<Int, List<Variable>> = fullModel.asSequence()
-            .filter { "_copy_" in it.name() }
-            .groupBy { it.name().substringAfterLast("_").toInt() - 1 }
+            .filter { "_copy_" in it.name }
+            .groupBy { it.name.substringAfterLast("_").toInt() - 1 }
         val selectedCopies = (0 until initialCover).filter { baseFormulaSelector(it, f) in fullModel }
         val covers = selectedCopies.map { copyIndex ->
-            val matchingModel = modelByIndex[copyIndex]!!.map { f.variable(it.name().substringBefore("_copy_")) }
+            val matchingModel = modelByIndex[copyIndex]!!.map { f.variable(it.name.substringBefore("_copy_")) }
             val configuration = extractModel(matchingModel, info)
             val coveredConstraints = matchingModel.mapNotNull { constraintsToCover[it]?.second }
             CoveringConfiguration(configuration, coveredConstraints)
@@ -111,7 +110,7 @@ internal object CoverageComputation :
         cf: CspFactory,
         status: ComputationStatusBuilder
     ): CoverageInitialization? {
-        val baseConstraints = info.propositions.map { it.formula() }.toMutableList()
+        val baseConstraints = info.propositions.map { it.formula }.toMutableList()
         val (invalidConstraints, constraintsToCover) = computeConstraintsToCover(
             cf,
             baseConstraints,
@@ -121,7 +120,7 @@ internal object CoverageComputation :
             status
         ) ?: return null
         baseConstraints += constraintsToCover.values.map { it.first }
-        val baseFormula = cf.formulaFactory().and(baseConstraints)
+        val baseFormula = cf.formulaFactory.and(baseConstraints)
         return CoverageInitialization(baseFormula, constraintsToCover, invalidConstraints)
     }
 
@@ -133,15 +132,15 @@ internal object CoverageComputation :
         slice: Slice,
         status: ComputationStatusBuilder,
     ): Pair<Int, Map<Variable, Pair<Formula, String>>>? {
-        val f = cf.formulaFactory()
-        val baseSolver = SATSolver.newSolver(f)
+        val f = cf.formulaFactory
+        val baseSolver = SatSolver.newSolver(f)
         baseConstraints.forEach { baseSolver.add(it) }
         val validConstraints = mutableListOf<Pair<Formula, String>>()
         val invalidConstraints = mutableListOf<String>()
         for (constraint in request.constraintsToCover) {
             val cPair = info.translateConstraint(f, constraint) ?: return null
             val formula = cPair.second
-            if (baseSolver.satCall().addFormulas(formula).sat() == Tristate.FALSE) {
+            if (baseSolver.satCall().addFormulas(formula).sat().result == false) {
                 invalidConstraints.add(constraint)
             } else {
                 validConstraints += formula to constraint
@@ -168,7 +167,7 @@ internal object CoverageComputation :
                 for (j in i + 1 until validConstraints.size) {
                     val (formulaJ, constraintJ) = validConstraints[j]
                     val combination = f.and(formulaI, formulaJ)
-                    if (baseSolver.satCall().addFormulas(combination).sat() == Tristate.FALSE) {
+                    if (baseSolver.satCall().addFormulas(combination).sat().result == false) {
                         invalidCombinations += "[$constraintI, $constraintJ]"
                         numInvalidCombinations++
                     } else {
@@ -197,7 +196,7 @@ internal object CoverageComputation :
     }
 
     private fun computeInitialCover(baseFormula: Formula, variablesToCover: Set<Variable>, f: FormulaFactory): Int {
-        val solver = SATSolver.newSolver(f)
+        val solver = SatSolver.newSolver(f)
         solver.add(baseFormula)
         val remainingSelectors = variablesToCover.toMutableSet()
         var initialCoverSize = 0
@@ -239,14 +238,14 @@ internal object CoverageComputation :
             f.or((0 until initialCover).map { f.and(variableCopy(variable, it, f), baseFormulaSelector(it, f)) })
         }
 
-        val oll = MaxSATSolver.oll(f)
+        val oll = MaxSatSolver.newSolver(f, MaxSatConfig.CONFIG_OLL)
         baseFormulaCopies.forEach(oll::addHardFormula)
         selectorConstraints.forEach(oll::addHardFormula)
         coverageConstraints.forEach(oll::addHardFormula)
         baseFormulaSelectors.forEach { oll.addSoftFormula(it.negate(f), 1) }
         val ollResult = oll.solve()
-        assert(ollResult == MaxSAT.MaxSATResult.OPTIMUM) { "OLL not optimal" }
-        val fullModel = oll.model().positiveVariables()
+        assert(ollResult.isSatisfiable) { "OLL not optimal" }
+        val fullModel = ollResult.model.positiveVariables()
         return fullModel
     }
 
@@ -276,7 +275,7 @@ internal object CoverageComputation :
                 ComputationStatusBuilder("", "", ComputationVariant.SINGLE)
             )!!
         return CoverageGraphResponse((1..maxConfigurations).map {
-            CoverableConstraints(it, computeMaxCover(baseFormula, it, constraintsToCover.keys, cf.formulaFactory()))
+            CoverableConstraints(it, computeMaxCover(baseFormula, it, constraintsToCover.keys, cf.formulaFactory))
         })
     }
 
@@ -299,13 +298,13 @@ internal object CoverageComputation :
             f.or((0 until numCopies).map { variableCopy(variable, it, f) })
         }
 
-        val oll = MaxSATSolver.oll(f)
+        val oll = MaxSatSolver.newSolver(f, MaxSatConfig.CONFIG_OLL)
         baseFormulaCopies.forEach(oll::addHardFormula)
         coverageConstraints.forEach { oll.addSoftFormula(it, 1) }
         val ollResult = oll.solve()
-        assert(ollResult == MaxSAT.MaxSATResult.OPTIMUM) { "OLL not optimal" }
-        val fullModel = oll.model()
-        return coverageConstraints.count { it.evaluate(fullModel) }
+        assert(ollResult.isSatisfiable) { "OLL not optimal" }
+        val fullModel = ollResult.model
+        return coverageConstraints.count { it.evaluate(fullModel.toAssignment()) }
     }
 }
 
@@ -327,4 +326,4 @@ data class CoverageInternalResult(
 
 private fun baseFormulaSelector(i: Int, f: FormulaFactory) = f.variable("BASE_COPY_USED_" + (i + 1))
 private fun variableCopy(variable: Variable, i: Int, f: FormulaFactory) =
-    f.variable(variable.name() + "_copy_" + (i + 1))
+    f.variable(variable.name + "_copy_" + (i + 1))

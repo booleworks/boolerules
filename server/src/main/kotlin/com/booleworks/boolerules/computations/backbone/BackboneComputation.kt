@@ -83,11 +83,11 @@ internal object BackboneComputation : ListComputation<
         cf: CspFactory,
         status: ComputationStatusBuilder,
     ): BackboneInternalResult {
-        val f = cf.formulaFactory()
+        val f = cf.formulaFactory
         val result = BackboneInternalResult(slice, LinkedHashMap())
         val relevantVars = computeRelevantVars(f, info, request.features).intersect(info.knownVariables)
         val relevantIntVars = computeRelevantIntVars(info, request.features)
-        val (translationFormula, translationMap) = computeTranslatedIntVars(relevantIntVars, cf.formulaFactory(), info)
+        val (translationFormula, translationMap) = computeTranslatedIntVars(relevantIntVars, cf.formulaFactory, info)
 
         val solver = satSolver(NON_PT_CONFIG, f, info, slice, status).also { if (!status.successful()) return result }
         solver.add(translationFormula)
@@ -123,7 +123,7 @@ internal object BackboneComputation : ListComputation<
         val clauses = mutableListOf<Formula>()
         val map = mutableMapOf<Variable, Pair<LngIntVariable, Int>>()
         variables.forEach { intVar ->
-            val satVars = info.encodingContext.variableMap[intVar.variable]
+            val satVars = info.encodingContext.getVariableMap()[intVar.variable]
             val domain = intVar.variable.domain
             var previousVar: Variable? = null
             var index = 0

@@ -20,9 +20,7 @@ import com.booleworks.boolerules.computations.generic.extractModel
 import com.booleworks.boolerules.computations.optimization.OptimizationComputation.OptimizationInternalResult
 import com.booleworks.logicng.csp.CspFactory
 import com.booleworks.logicng.formulas.Formula
-import com.booleworks.logicng.solvers.MaxSATSolver
-import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSAT.MaxSATResult.OPTIMUM
-import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSATConfig
+import com.booleworks.logicng.solvers.maxsat.algorithms.MaxSatConfig
 import com.booleworks.prl.model.PrlModel
 import com.booleworks.prl.model.slices.Slice
 import com.booleworks.prl.transpiler.LngIntVariable
@@ -77,8 +75,8 @@ internal object OptimizationComputation :
         cf: CspFactory,
         status: ComputationStatusBuilder,
     ): OptimizationInternalResult {
-        val f = cf.formulaFactory()
-        val solver = maxSat(MaxSATConfig.builder().build(), MaxSATSolver::oll, f, info)
+        val f = cf.formulaFactory
+        val solver = maxSat(MaxSatConfig.CONFIG_OLL, f, info)
         val mapping = mutableMapOf<Formula, Int>()
         val constraintMap = mutableMapOf<Formula, String>()
         request.weightings.forEach { wp ->
@@ -103,20 +101,28 @@ internal object OptimizationComputation :
         }
         return if (!status.successful()) {
             OptimizationInternalResult(slice, request.computationType, -1, null, listOf())
-        } else if (solver.solve() == OPTIMUM) {
-            val solverModel = solver.model()
-            val evaluatedWeights = mapping.filter { (k, _) -> k.evaluate(solverModel) }
-            val weight = evaluatedWeights.map { it.value }.sum()
-            val integerAssignment = cf.decode(solverModel, info.integerVariables.map(LngIntVariable::variable), info.knownVariables, info.encodingContext)
-            val example = extractModel(integerAssignment, info)
-            val usedWeights = evaluatedWeights.map { WeightPair(constraintMap[it.key]!!, it.value) }
-            OptimizationInternalResult(slice, request.computationType, weight, example, usedWeights)
         } else {
-            status.addWarning(
-                "Rule set for the slice $slice is inconsistent. Use the 'consistency' " +
-                        "check to get an explanation, why."
-            )
-            OptimizationInternalResult(slice, request.computationType, -1, null, listOf())
+            val solverResult = solver.solve();
+            if (solverResult.isSatisfiable) {
+                val solverModel = solverResult.model.toAssignment()
+                val evaluatedWeights = mapping.filter { (k, _) -> k.evaluate(solverModel) }
+                val weight = evaluatedWeights.map { it.value }.sum()
+                val integerAssignment = cf.decode(
+                    solverModel,
+                    info.integerVariables.map(LngIntVariable::variable),
+                    info.knownVariables,
+                    info.encodingContext
+                )
+                val example = extractModel(integerAssignment, info)
+                val usedWeights = evaluatedWeights.map { WeightPair(constraintMap[it.key]!!, it.value) }
+                OptimizationInternalResult(slice, request.computationType, weight, example, usedWeights)
+            } else {
+                status.addWarning(
+                    "Rule set for the slice $slice is inconsistent. Use the 'consistency' " +
+                            "check to get an explanation, why."
+                )
+                OptimizationInternalResult(slice, request.computationType, -1, null, listOf())
+            }
         }
     }
 

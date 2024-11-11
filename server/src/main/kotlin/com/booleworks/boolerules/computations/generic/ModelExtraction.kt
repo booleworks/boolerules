@@ -3,7 +3,7 @@
 
 package com.booleworks.boolerules.computations.generic
 
-import com.booleworks.logicng.csp.CspAssignment
+import com.booleworks.logicng.csp.datastructures.CspAssignment
 import com.booleworks.logicng.formulas.Variable
 import com.booleworks.prl.transpiler.TranspilationInfo
 import com.fasterxml.jackson.annotation.JsonIgnore
@@ -66,7 +66,7 @@ internal fun extractIntFeatures(integerAssignment: CspAssignment, info: Transpil
 
 internal fun extractFeature(variable: Variable, info: TranspilationInfo) =
     when (variable) {
-        in info.booleanVariables -> FeatureDO.boolean(variable.name(), true)
+        in info.booleanVariables -> FeatureDO.boolean(variable.name, true)
         in info.versionVariables -> {
             val (feature, version) = info.getFeatureAndVersion(variable)!!
             FeatureDO.boolean(feature, version)
