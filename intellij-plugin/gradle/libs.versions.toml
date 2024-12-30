@@ -3,10 +3,10 @@
 annotations = "24.0.1"
 
 # plugins
-kotlin = "2.0.10"
+kotlin = "2.1.0"
 prl-compiler = "0.0.2-SNAPSHOT"
 changelog = "2.1.2"
-gradleIntelliJPlugin = "1.17.3"
+gradleIntelliJPlugin = "2.2.1"
 qodana = "0.1.13"
 kover = "0.7.3"
 
@@ -16,7 +16,7 @@ prlCompiler = { group = "com.booleworks", name = "prl-compiler", version.ref = "
 
 [plugins]
 changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }
-gradleIntelliJPlugin = { id = "org.jetbrains.intellij", version.ref = "gradleIntelliJPlugin" }
+gradleIntelliJPlugin = { id = "org.jetbrains.intellij.platform", version.ref = "gradleIntelliJPlugin" }
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 qodana = { id = "org.jetbrains.qodana", version.ref = "qodana" }
