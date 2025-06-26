@@ -8,11 +8,11 @@
   <parent>
     <groupId>com.booleworks</groupId>
     <artifactId>boolerules-parent</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.1</version>
   </parent>
 
   <artifactId>prl-compiler</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.1</version>
   <packaging>jar</packaging>
 
   <name>PRL Compiler</name>
